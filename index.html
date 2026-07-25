@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rakhi Das | UI/UX Designer</title>
+<meta name="description" content="Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and intuitive product design.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header" id="siteHeader">
+  <nav class="navbar" aria-label="Primary navigation">
+    <a href="#home" class="logo" id="logo"></a>
+
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#experience" class="nav-link">Experience</a></li>
+      <li><a href="#achievements" class="nav-link">Achievements</a></li>
+      <li><a href="#case-studies" class="nav-link">Case Studies</a></li>
+      <li><a href="#testimonials" class="nav-link">Recommendations</a></li>
+      <li><a href="#skills" class="nav-link">Skills</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+        <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+        </svg>
+        <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navMenu">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ===================== HERO ===================== -->
+  <section id="home" class="hero">
+    <div class="hero-sky" aria-hidden="true">
+      <span class="hero-cloud hero-cloud-a"></span>
+      <span class="hero-cloud hero-cloud-b"></span>
+      <span class="hero-cloud hero-cloud-c"></span>
+    </div>
+
+    <div class="container hero-inner">
+      <p class="eyebrow" id="heroEyebrow"></p>
+
+      <h1 class="hero-display">
+        <span id="heroWordTop"></span>
+        <span id="heroWordBottom"></span>
+      </h1>
+
+      <div class="hero-footer-row">
+        <div class="hero-tagline">
+          <span id="heroTagline"></span>
+          <span class="company-chip" id="companyChip"></span>
+        </div>
+
+        <div class="hero-cta">
+          <a href="#case-studies" class="btn btn-primary">View Work</a>
+          <a href="#contact" class="btn btn-secondary">Contact Me</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-photo" role="img" aria-label="Photo placeholder">
+      <span id="heroInitials"></span>
+    </div>
+  </section>
+
+  <div class="based-in-bar">
+    <div class="container based-in-inner">
+      <span>Based in</span>
+      <span class="based-in-city" id="basedInCity"></span>
+    </div>
+  </div>
+
+  <!-- ===================== WHAT I DO ===================== -->
+  <section id="what-i-do" class="what-i-do">
+    <div class="container">
+      <p class="eyebrow eyebrow-dot" id="whatIDoEyebrow"></p>
+      <p class="statement" id="whatIDoStatement"></p>
+
+      <div class="what-i-do-stats" id="whatIDoStats"></div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2 class="section-title">About Me</h2>
+      <p class="section-subtitle">A little more about how I work and what I care about.</p>
+
+      <div class="about-grid">
+        <div class="about-photo-wrap">
+          <div class="polaroid">
+            <div class="polaroid-photo">
+              <span id="aboutInitials"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-text-wrap">
+          <div class="about-text" id="aboutText"></div>
+          <p class="signature" id="aboutSignature"></p>
+        </div>
+      </div>
+
+      <div class="about-stats" id="statsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===================== EXPERIENCE ===================== -->
+  <section id="experience" class="experience">
+    <div class="container container-wide">
+      <div class="section-head-row">
+        <div>
+          <h2 class="section-title section-title-left">Experience</h2>
+          <p class="section-subtitle section-subtitle-left">My professional journey so far. Scroll or drag sideways.</p>
+        </div>
+        <div class="scroll-nav-buttons">
+          <button type="button" class="scroll-nav-btn" id="experiencePrev" aria-label="Scroll to previous role">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+          </button>
+          <button type="button" class="scroll-nav-btn" id="experienceNext" aria-label="Scroll to next role">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="experience-track" id="experienceTrack"></div>
+    </div>
+  </section>
+
+  <!-- ===================== ACHIEVEMENTS ===================== -->
+  <section id="achievements" class="achievements">
+    <div class="container">
+      <h2 class="section-title">Achievements</h2>
+      <p class="section-subtitle">Certifications and milestones along the way.</p>
+
+      <div class="achievements-grid" id="achievementsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===================== CASE STUDIES ===================== -->
+  <section id="case-studies" class="case-studies">
+    <div class="container">
+      <h2 class="section-title">Case Studies</h2>
+      <p class="section-subtitle">
+        A closer look at a few projects. Edit data.js to add your own write-ups, images, and links to each tab.
+      </p>
+
+      <!-- Placeholder case studies: edit data.js to add real content for each tab. -->
+      <div class="case-study-tabs">
+        <div class="case-study-tablist" id="caseStudyTablist" role="tablist" aria-label="Case studies"></div>
+        <div class="case-study-panels" id="caseStudyPanels"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TESTIMONIALS ===================== -->
+  <section id="testimonials" class="testimonials">
+    <div class="container">
+      <h2 class="section-title">What People Say</h2>
+      <p class="section-subtitle">
+        A few words from people I've worked with. Replace these placeholders with real recommendations.
+      </p>
+
+      <div class="testimonials-track" id="testimonialsTrack"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SKILLS ===================== -->
+  <section id="skills" class="skills">
+    <div class="container">
+      <h2 class="section-title">Skills</h2>
+      <p class="section-subtitle">Tools and practices I use to design and validate great products.</p>
+
+      <div class="skills-grid">
+        <div class="skills-column">
+          <h3>Design &amp; Research</h3>
+          <div id="skillsDesign"></div>
+        </div>
+
+        <div class="skills-column">
+          <h3>Front-End Basics</h3>
+          <div id="skillsFrontend"></div>
+
+          <h3 class="skills-subhead">Also familiar with</h3>
+          <div class="tag-list" id="skillsTags"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section class="cta">
+    <div class="container cta-inner">
+      <h2 class="cta-heading" id="ctaHeading"></h2>
+      <p class="cta-body" id="ctaBody"></p>
+      <div class="cta-actions">
+        <a href="#contact" class="btn btn-primary">Say Hello</a>
+      </div>
+    </div>
+    <div class="cta-bg-word" id="ctaBgWord" aria-hidden="true"></div>
+  </section>
+
+  <!-- ===================== CONTACT ===================== -->
+  <section id="contact" class="contact">
+    <div class="container">
+      <h2 class="section-title">Contact</h2>
+      <p class="section-subtitle">Have a project in mind or just want to say hi? Send a message.</p>
+
+      <div class="contact-grid">
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" autocomplete="name" required aria-describedby="nameError">
+            <span class="form-error" id="nameError" aria-live="polite"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required aria-describedby="emailError">
+            <span class="form-error" id="emailError" aria-live="polite"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" required aria-describedby="messageError"></textarea>
+            <span class="form-error" id="messageError" aria-live="polite"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary form-submit">
+            <span class="btn-label">Send Message</span>
+          </button>
+
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="contact-info">
+          <p id="contactBlurb">Based in Kolkata, India. Open to freelance work and interesting collaborations.</p>
+          <ul class="social-list" id="socialList"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>&copy; <span id="year"></span> <span id="footerName"></span>. All rights reserved.</p>
+    <ul class="social-list footer-social" id="footerSocialList"></ul>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
