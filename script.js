@@ -159,17 +159,37 @@
       track.appendChild(card);
     });
 
-    var prevBtn = document.getElementById('experiencePrev');
-    var nextBtn = document.getElementById('experienceNext');
-    var scrollAmount = function () {
-      var card = track.querySelector('.experience-card');
-      return card ? card.getBoundingClientRect().width + 24 : 320;
-    };
-    prevBtn.addEventListener('click', function () {
-      track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+    /* No prev/next buttons — let vertical wheel scrolling pan the track horizontally,
+       and support click-and-drag for mouse users (touch/trackpad swipe works natively). */
+    track.addEventListener(
+      'wheel',
+      function (e) {
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        track.scrollLeft += e.deltaY;
+        e.preventDefault();
+      },
+      { passive: false }
+    );
+
+    var isDragging = false;
+    var dragStartX = 0;
+    var dragStartScroll = 0;
+
+    track.addEventListener('mousedown', function (e) {
+      isDragging = true;
+      track.classList.add('is-dragging');
+      dragStartX = e.pageX;
+      dragStartScroll = track.scrollLeft;
     });
-    nextBtn.addEventListener('click', function () {
-      track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+
+    window.addEventListener('mousemove', function (e) {
+      if (!isDragging) return;
+      track.scrollLeft = dragStartScroll - (e.pageX - dragStartX);
+    });
+
+    window.addEventListener('mouseup', function () {
+      isDragging = false;
+      track.classList.remove('is-dragging');
     });
   }
 
@@ -186,71 +206,25 @@
   }
 
   function renderCaseStudies() {
-    var tablist = document.getElementById('caseStudyTablist');
-    var panelsWrap = document.getElementById('caseStudyPanels');
-    var tabs = [];
-    var panels = [];
+    var list = document.getElementById('caseStudyList');
 
-    function activate(activeIndex) {
-      tabs.forEach(function (tab, i) {
-        var isActive = i === activeIndex;
-        tab.classList.toggle('is-active', isActive);
-        tab.setAttribute('aria-selected', String(isActive));
-        tab.tabIndex = isActive ? 0 : -1;
-        panels[i].hidden = !isActive;
-      });
-    }
-
-    data.projects.forEach(function (project, index) {
-      var tabId = 'cs-tab-' + index;
-      var panelId = 'cs-panel-' + index;
-
-      var tab = el('button', 'case-study-tab', project.tabLabel || project.number);
-      tab.type = 'button';
-      tab.id = tabId;
-      tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-controls', panelId);
-      tab.setAttribute('aria-selected', 'false');
-      tab.tabIndex = -1;
-      tab.addEventListener('click', function () {
-        activate(index);
-      });
-      tab.addEventListener('keydown', function (e) {
-        var lastIndex = tabs.length - 1;
-        var nextIndex = null;
-        if (e.key === 'ArrowRight') nextIndex = index === lastIndex ? 0 : index + 1;
-        if (e.key === 'ArrowLeft') nextIndex = index === 0 ? lastIndex : index - 1;
-        if (e.key === 'Home') nextIndex = 0;
-        if (e.key === 'End') nextIndex = lastIndex;
-        if (nextIndex !== null) {
-          e.preventDefault();
-          activate(nextIndex);
-          tabs[nextIndex].focus();
-        }
-      });
-      tablist.appendChild(tab);
-      tabs.push(tab);
-
-      var panel = el('div', 'case-study-panel');
-      panel.id = panelId;
-      panel.setAttribute('role', 'tabpanel');
-      panel.setAttribute('aria-labelledby', tabId);
-      panel.hidden = true;
+    data.projects.forEach(function (project) {
+      var card = el('article', 'case-study-card');
 
       var head = el('div', 'project-stack-head');
       head.appendChild(el('span', 'project-number', project.number));
       head.appendChild(el('span', 'project-year', project.year));
-      panel.appendChild(head);
+      card.appendChild(head);
 
-      panel.appendChild(el('h3', null, project.title));
+      card.appendChild(el('h3', null, project.title));
 
       var tagList = el('div', 'tag-list');
       project.tags.forEach(function (tag) {
         tagList.appendChild(el('span', 'tag', tag));
       });
-      panel.appendChild(tagList);
+      card.appendChild(tagList);
 
-      panel.appendChild(el('p', null, project.description));
+      card.appendChild(el('p', null, project.description));
 
       var links = el('div', 'project-links');
       if (project.status === 'soon') {
@@ -264,13 +238,10 @@
         links.appendChild(demo);
         links.appendChild(caseStudy);
       }
-      panel.appendChild(links);
+      card.appendChild(links);
 
-      panelsWrap.appendChild(panel);
-      panels.push(panel);
+      list.appendChild(card);
     });
-
-    activate(0);
   }
 
   function renderTestimonials() {
@@ -434,7 +405,7 @@
      Scroll reveal (runs after dynamic render so nodes exist)
   =========================================================== */
   var revealTargets = document.querySelectorAll(
-    '.stat-card, .experience-card, .achievement-card, .testimonial-card, .skill-bar'
+    '.stat-card, .experience-card, .achievement-card, .case-study-card, .testimonial-card, .skill-bar'
   );
 
   revealTargets.forEach(function (el) {

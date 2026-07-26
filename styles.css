@@ -820,63 +820,16 @@ section > .container > .section-title + .section-subtitle {
 }
 
 /* ==========================================================================
-   Experience — dark "scattered fan" card deck, horizontally scrollable.
-   This section keeps a fixed dark background regardless of light/dark mode,
-   the same way the hero does, so the glow + cards stay legible either way.
+   Experience — scattered fan card deck, horizontally scrollable.
+   Uses the site's normal theme tokens (adapts to light/dark mode) rather
+   than a fixed dark panel.
    ========================================================================== */
 .container-wide {
   max-width: 1320px;
 }
 
 .experience {
-  position: relative;
-  overflow: hidden;
-  background-color: #0b0b14;
-  isolation: isolate;
-}
-
-.experience-glow {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.glow-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.55;
-}
-
-.glow-blob-a {
-  width: 420px;
-  height: 420px;
-  top: -120px;
-  left: -60px;
-  background: radial-gradient(circle, var(--color-primary), transparent 70%);
-}
-
-.glow-blob-b {
-  width: 360px;
-  height: 360px;
-  bottom: -140px;
-  right: 5%;
-  background: radial-gradient(circle, var(--color-accent), transparent 70%);
-}
-
-.glow-blob-c {
-  width: 280px;
-  height: 280px;
-  top: 30%;
-  left: 45%;
-  background: radial-gradient(circle, #6c5ce7, transparent 70%);
-  opacity: 0.35;
-}
-
-.experience .container-wide {
-  position: relative;
-  z-index: 1;
+  background-color: var(--color-bg-alt);
 }
 
 .section-head-row {
@@ -891,42 +844,10 @@ section > .container > .section-title + .section-subtitle {
 .section-subtitle-left {
   text-align: left;
   margin-inline: 0;
-  color: #fff;
 }
 
 .section-subtitle-left {
   margin-bottom: 0;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.scroll-nav-buttons {
-  display: flex;
-  gap: var(--space-2);
-  flex-shrink: 0;
-}
-
-.scroll-nav-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background-color: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
-}
-
-.scroll-nav-btn:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  transform: translateY(-2px);
-}
-
-.scroll-nav-btn svg {
-  width: 18px;
-  height: 18px;
 }
 
 .experience-track {
@@ -935,18 +856,23 @@ section > .container > .section-title + .section-subtitle {
   scroll-behavior: smooth;
   padding: 70px var(--space-4) 60px;
   margin-inline: calc(-1 * var(--space-4));
+  cursor: grab;
+  user-select: none;
+}
+
+.experience-track.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
 }
 
 .experience-card {
   flex: 0 0 260px;
   margin-left: -8px;
-  background-color: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-  color: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-md);
   transform: rotate(var(--rot, 0deg)) translateY(var(--lift, 0px));
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
@@ -958,7 +884,7 @@ section > .container > .section-title + .section-subtitle {
 .experience-card:hover,
 .experience-card:focus-within {
   transform: rotate(0deg) translateY(-10px) scale(1.05);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   z-index: 50 !important;
 }
 
@@ -987,27 +913,26 @@ section > .container > .section-title + .section-subtitle {
 .experience-date {
   font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
 .experience-card h3 {
   margin-bottom: var(--space-1);
   font-size: 1.05rem;
-  color: #fff;
 }
 
 .timeline-company {
   font-size: 0.85rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-primary);
   margin-bottom: var(--space-3);
 }
 
 .experience-description {
   font-size: 0.85rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--color-text-secondary);
   margin-bottom: 0;
 }
 
@@ -1068,51 +993,28 @@ section > .container > .section-title + .section-subtitle {
 }
 
 /* ==========================================================================
-   Case Studies — tabbed content, 4-5 tabs by default (edit data.js to change)
+   Case Studies — vertical stack of cards (edit data.js to add/remove entries)
    ========================================================================== */
-.case-study-tabs {
+.case-study-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
   max-width: 820px;
   margin-inline: auto;
 }
 
-.case-study-tablist {
-  display: flex;
-  gap: var(--space-2);
-  overflow-x: auto;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: var(--space-6);
-}
-
-.case-study-tab {
-  flex-shrink: 0;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  padding: var(--space-3) var(--space-4);
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
-}
-
-.case-study-tab:hover {
-  color: var(--color-text);
-}
-
-.case-study-tab.is-active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-.case-study-panel {
+.case-study-card {
   background: linear-gradient(150deg, var(--color-primary), var(--color-accent));
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-lg);
   color: #fff;
-  min-height: 300px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.case-study-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 55px rgba(30, 30, 60, 0.25);
 }
 
 .project-stack-head {
@@ -1136,22 +1038,22 @@ section > .container > .section-title + .section-subtitle {
   opacity: 0.85;
 }
 
-.case-study-panel h3 {
+.case-study-card h3 {
   font-size: 1.4rem;
   margin-bottom: var(--space-3);
 }
 
-.case-study-panel .tag-list {
+.case-study-card .tag-list {
   margin-bottom: var(--space-3);
 }
 
-.case-study-panel .tag {
+.case-study-card .tag {
   background-color: rgba(255, 255, 255, 0.16);
   border-color: rgba(255, 255, 255, 0.3);
   color: #fff;
 }
 
-.case-study-panel p {
+.case-study-card p {
   color: rgba(255, 255, 255, 0.9);
   max-width: 60ch;
 }
