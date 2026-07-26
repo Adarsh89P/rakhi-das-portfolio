@@ -81,14 +81,22 @@ var PORTFOLIO_DATA = {
     ]
   },
 
+  /*
+    Experience cards for the pinned 3D deck. `summary` is the one-line pitch,
+    `achievements` the bullet highlights, `tech` the badge row. `logo` can be
+    an image URL; when it's absent `logoLetter` is used as a lettermark.
+  */
   experience: [
     {
       date: 'Dec 2024 – Present',
       role: 'Associate UI/UX Designer',
       company: 'Sundew',
+      logo: '',
       logoLetter: 'S',
       location: 'Greater Kolkata Area · On-site',
-      bullets: [
+      summary: 'Designing research-led product experiences for a fast-moving startup, from first interview to shipped interface.',
+      tech: ['Figma', 'User Research', 'Design Systems', 'Prototyping'],
+      achievements: [
         'Engaged with users to understand their goals, translating insights into effective design solutions.',
         'Worked closely with stakeholders to align design strategies with business commitments.',
         'Developed skills in user research, interface design, and collaboration within a startup environment.'
@@ -98,9 +106,12 @@ var PORTFOLIO_DATA = {
       date: 'Jun 2023 – Feb 2025',
       role: 'Associate UI/UX Designer',
       company: 'Fortmindz',
+      logo: '',
       logoLetter: 'F',
       location: 'Kolkata, West Bengal, India · On-site',
-      bullets: [
+      summary: 'Owned interface design for web and mobile products, backed by a reusable component library.',
+      tech: ['Figma', 'Adobe XD', 'Usability Testing', 'Component Library'],
+      achievements: [
         'Designed intuitive interfaces for web and mobile applications using research-driven design thinking.',
         'Built and maintained reusable components as part of a broader design system.',
         'Conducted usability testing and iterated on designs based on user feedback.'
@@ -110,9 +121,12 @@ var PORTFOLIO_DATA = {
       date: 'Nov 2022 – Jun 2023',
       role: 'User Experience Designer',
       company: 'Pixel Consultancy',
+      logo: '',
       logoLetter: 'P',
       location: 'Kolkata, India',
-      bullets: [
+      summary: 'Translated client briefs into interactive prototypes that made design decisions easy to review.',
+      tech: ['Adobe XD', 'Wireframing', 'Interaction Design'],
+      achievements: [
         'Created interactive prototypes to communicate design concepts to stakeholders.',
         'Applied user-centered design principles across client projects.'
       ]
@@ -121,9 +135,12 @@ var PORTFOLIO_DATA = {
       date: 'Oct 2020 – Feb 2023',
       role: 'Jr. Implementation Associate',
       company: 'Granicus',
+      logo: '',
       logoLetter: 'G',
       location: 'Bengaluru, Karnataka, India',
-      bullets: [
+      summary: 'Client-facing implementation work that became the foundation for a move into UX design.',
+      tech: ['Client Onboarding', 'Problem Solving', 'Communication'],
+      achievements: [
         'Supported client implementation and onboarding, building a foundation in communication and problem-solving before transitioning into UX design.'
       ]
     }
@@ -153,58 +170,79 @@ var PORTFOLIO_DATA = {
   ],
 
   /*
-    Placeholder case studies, shown as tabs in the Case Studies section.
-    Edit tabLabel/title/description/tags/status/links freely — add or remove
-    entries and the tab list + panels will follow automatically.
+    Case studies for the scroll-pinned deck. One card is on screen at a time.
+    `image` is optional — leave it empty and a generated gradient hero is used
+    instead. `metrics` is optional too; drop the key to hide the metrics row.
   */
   projects: [
     {
-      tabLabel: 'Case 01',
       number: '01',
       year: '2025',
+      category: 'Enterprise SaaS',
       title: 'SaaS Dashboard Redesign',
+      image: '',
       tags: ['Figma', 'User Research', 'Prototyping'],
       description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
+      metrics: [
+        { value: '+38%', label: 'Task completion' },
+        { value: '−2.4m', label: 'Time on task' },
+        { value: '12', label: 'Usability sessions' }
+      ],
       status: 'live',
       links: { demo: '#', case: '#' }
     },
     {
-      tabLabel: 'Case 02',
       number: '02',
       year: '2024',
+      category: 'Fintech Mobile',
       title: 'Mobile Banking App — Onboarding UX',
+      image: '',
       tags: ['Adobe XD', 'Usability Testing', 'Interaction Design'],
       description: 'Streamlined the onboarding journey for a fintech mobile app, reducing drop-off through iterative usability testing.',
+      metrics: [
+        { value: '−27%', label: 'Drop-off rate' },
+        { value: '4 → 2', label: 'Steps to activate' },
+        { value: '4.6★', label: 'Store rating' }
+      ],
       status: 'live',
       links: { demo: '#', case: '#' }
     },
     {
-      tabLabel: 'Case 03',
       number: '03',
       year: '2026',
+      category: 'E-Commerce',
       title: 'E-Commerce Usability Audit',
+      image: '',
       tags: ['Heuristic Evaluation', 'Wireframing', 'Design Systems'],
       description: 'Ran a heuristic evaluation and proposed a refreshed component library to improve consistency across the platform.',
+      metrics: [
+        { value: '46', label: 'Issues logged' },
+        { value: '10', label: 'Heuristics applied' }
+      ],
       status: 'soon',
       links: { demo: '#', case: '#' }
     },
     {
-      tabLabel: 'Case 04',
       number: '04',
       year: '—',
+      category: 'Add a category',
       title: 'Add your fourth case study title',
+      image: '',
       tags: ['Tag one', 'Tag two', 'Tag three'],
       description: 'Add a short summary of the problem, your approach, and the outcome for this project.',
+      metrics: [],
       status: 'soon',
       links: { demo: '#', case: '#' }
     },
     {
-      tabLabel: 'Case 05',
       number: '05',
       year: '—',
+      category: 'Add a category',
       title: 'Add your fifth case study title',
+      image: '',
       tags: ['Tag one', 'Tag two', 'Tag three'],
       description: 'Add a short summary of the problem, your approach, and the outcome for this project.',
+      metrics: [],
       status: 'soon',
       links: { demo: '#', case: '#' }
     }

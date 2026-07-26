@@ -13,7 +13,9 @@
     network: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>',
     lock: '<rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path>',
     quote: '<path d="M7 7h4v6a4 4 0 0 1-4 4H6v-2h1a2 2 0 0 0 2-2H7V7Zm9 0h4v6a4 4 0 0 1-4 4h-1v-2h1a2 2 0 0 0 2-2h-2V7Z"></path>',
-    paperclip: '<path d="M8 12.5V7a4 4 0 0 1 8 0v9a2.5 2.5 0 0 1-5 0V8"></path>'
+    paperclip: '<path d="M8 12.5V7a4 4 0 0 1 8 0v9a2.5 2.5 0 0 1-5 0V8"></path>',
+    pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"></path><circle cx="12" cy="10" r="2.5"></circle>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"></path>'
   };
 
   var SOCIAL_ICONS = {
@@ -134,62 +136,106 @@
     });
   }
 
+  /* -----------------------------------------------------------
+     Progress rail shared by both pinned decks: a counter plus one
+     dot per card. Dots are buttons that jump to that card's slice
+     of the pinned scroll range (wired up in initStacks).
+  ----------------------------------------------------------- */
+  function renderProgress(container, count, labelFor) {
+    var counter = el('span', 'stack-count');
+    counter.innerHTML = '<span class="stack-count-current">01</span><span class="stack-count-sep">/</span>' +
+      '<span class="stack-count-total">' + pad(count) + '</span>';
+    container.appendChild(counter);
+
+    var dots = el('div', 'stack-dots');
+    for (var i = 0; i < count; i++) {
+      var dot = el('button', 'stack-dot' + (i === 0 ? ' is-active' : ''));
+      dot.type = 'button';
+      dot.setAttribute('data-index', String(i));
+      dot.setAttribute('aria-label', labelFor(i));
+      dots.appendChild(dot);
+    }
+    container.appendChild(dots);
+  }
+
+  function pad(n) {
+    return n < 10 ? '0' + n : String(n);
+  }
+
+  /* -----------------------------------------------------------
+     Experience — layered 3D card deck (motion lives in initStacks)
+  ----------------------------------------------------------- */
   function renderExperience() {
-    var track = document.getElementById('experienceTrack');
-    /* Alternating rotation/lift per card gives the scattered "fan" look; cycles every 4 cards. */
-    var rotations = [-4, 3, -3, 4];
-    var lifts = [0, 16, 4, 20];
+    var stage = document.getElementById('experienceStage');
+    var logoPalette = [
+      ['#6c5ce7', '#5b8def'],
+      ['#00b8a9', '#5b8def'],
+      ['#f5a623', '#ef7b7b'],
+      ['#c65ce7', '#6c5ce7']
+    ];
 
     data.experience.forEach(function (job, index) {
-      var card = el('article', 'experience-card');
-      card.style.setProperty('--rot', rotations[index % rotations.length] + 'deg');
-      card.style.setProperty('--lift', lifts[index % lifts.length] + 'px');
-      card.style.zIndex = String(data.experience.length - index);
+      var pair = logoPalette[index % logoPalette.length];
+      var card = el('article', 'exp-card' + (index === 0 ? ' is-active' : ''));
+      card.setAttribute('data-index', String(index));
+      card.style.setProperty('--card-from', pair[0]);
+      card.style.setProperty('--card-to', pair[1]);
 
-      var head = el('div', 'experience-card-head');
-      head.appendChild(el('span', 'experience-logo-chip', job.logoLetter));
-      head.appendChild(el('span', 'experience-date', job.date));
-      card.appendChild(head);
+      var inner = el('div', 'exp-card-inner');
 
-      card.appendChild(el('h3', null, job.role));
-      card.appendChild(el('p', 'timeline-company', job.company));
+      var head = el('header', 'exp-card-head');
 
-      card.appendChild(el('p', 'experience-description', job.bullets.join(' ')));
+      var logo = el('span', 'exp-logo');
+      if (job.logo) {
+        var logoImg = el('img');
+        logoImg.src = job.logo;
+        logoImg.alt = job.company + ' logo';
+        logo.appendChild(logoImg);
+      } else {
+        logo.textContent = job.logoLetter;
+        logo.classList.add('exp-logo-letter');
+      }
+      head.appendChild(logo);
 
-      track.appendChild(card);
+      var titles = el('div', 'exp-card-titles');
+      titles.appendChild(el('h3', 'exp-company', job.company));
+      titles.appendChild(el('p', 'exp-role', job.role));
+      head.appendChild(titles);
+
+      head.appendChild(el('span', 'exp-duration', job.date));
+      inner.appendChild(head);
+
+      if (job.location) {
+        inner.appendChild(el('p', 'exp-location', svg(ICONS.pin) + '<span>' + job.location + '</span>'));
+      }
+
+      if (job.summary) {
+        inner.appendChild(el('p', 'exp-summary', job.summary));
+      }
+
+      if (job.achievements && job.achievements.length) {
+        inner.appendChild(el('p', 'exp-label', 'Key achievements'));
+        var list = el('ul', 'exp-achievements');
+        job.achievements.forEach(function (bullet) {
+          list.appendChild(el('li', null, bullet));
+        });
+        inner.appendChild(list);
+      }
+
+      if (job.tech && job.tech.length) {
+        var badges = el('div', 'tag-list exp-tech');
+        job.tech.forEach(function (item) {
+          badges.appendChild(el('span', 'tag tag-soft', item));
+        });
+        inner.appendChild(badges);
+      }
+
+      card.appendChild(inner);
+      stage.appendChild(card);
     });
 
-    /* No prev/next buttons — let vertical wheel scrolling pan the track horizontally,
-       and support click-and-drag for mouse users (touch/trackpad swipe works natively). */
-    track.addEventListener(
-      'wheel',
-      function (e) {
-        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-        track.scrollLeft += e.deltaY;
-        e.preventDefault();
-      },
-      { passive: false }
-    );
-
-    var isDragging = false;
-    var dragStartX = 0;
-    var dragStartScroll = 0;
-
-    track.addEventListener('mousedown', function (e) {
-      isDragging = true;
-      track.classList.add('is-dragging');
-      dragStartX = e.pageX;
-      dragStartScroll = track.scrollLeft;
-    });
-
-    window.addEventListener('mousemove', function (e) {
-      if (!isDragging) return;
-      track.scrollLeft = dragStartScroll - (e.pageX - dragStartX);
-    });
-
-    window.addEventListener('mouseup', function () {
-      isDragging = false;
-      track.classList.remove('is-dragging');
+    renderProgress(document.getElementById('expProgress'), data.experience.length, function (i) {
+      return 'Go to experience ' + (i + 1) + ': ' + data.experience[i].company;
     });
   }
 
@@ -205,42 +251,107 @@
     });
   }
 
+  /* -----------------------------------------------------------
+     Case studies — one full-height card at a time (motion lives
+     in initStacks). Supply project.image in data.js for a real
+     hero shot; otherwise a gradient cover stands in for it.
+  ----------------------------------------------------------- */
   function renderCaseStudies() {
-    var list = document.getElementById('caseStudyList');
+    var stage = document.getElementById('caseStudyStage');
+    /* Cycled gradient pairs so each card reads as its own "cover", like a slide deck. */
+    var gradients = [
+      ['#5b8def', '#6c5ce7'],
+      ['#6c5ce7', '#c65ce7'],
+      ['#00b8a9', '#5b8def'],
+      ['#f5a623', '#ef7b7b'],
+      ['#ef7b7b', '#6c5ce7']
+    ];
 
-    data.projects.forEach(function (project) {
-      var card = el('article', 'case-study-card');
+    data.projects.forEach(function (project, index) {
+      var pair = gradients[index % gradients.length];
+      var card = el('article', 'cs-card' + (index === 0 ? ' is-active' : ''));
+      card.setAttribute('data-index', String(index));
+      card.style.setProperty('--card-from', pair[0]);
+      card.style.setProperty('--card-to', pair[1]);
 
-      var head = el('div', 'project-stack-head');
-      head.appendChild(el('span', 'project-number', project.number));
-      head.appendChild(el('span', 'project-year', project.year));
-      card.appendChild(head);
+      var inner = el('div', 'cs-card-inner');
 
-      card.appendChild(el('h3', null, project.title));
+      /* --- hero media --- */
+      var media = el('div', 'cs-media');
+      var frame = el('div', 'cs-media-frame');
 
-      var tagList = el('div', 'tag-list');
-      project.tags.forEach(function (tag) {
-        tagList.appendChild(el('span', 'tag', tag));
-      });
-      card.appendChild(tagList);
-
-      card.appendChild(el('p', null, project.description));
-
-      var links = el('div', 'project-links');
-      if (project.status === 'soon') {
-        var lockPill = el('span', 'project-lock', svg(ICONS.lock) + '<span>Coming Soon</span>');
-        links.appendChild(lockPill);
+      if (project.image) {
+        var img = el('img', 'cs-media-img');
+        img.src = project.image;
+        img.alt = project.title;
+        img.loading = 'lazy';
+        frame.appendChild(img);
       } else {
-        var demo = el('a', 'project-link', 'Live Demo');
-        demo.href = project.links.demo;
-        var caseStudy = el('a', 'project-link', 'Case Study');
-        caseStudy.href = project.links.case;
-        links.appendChild(demo);
-        links.appendChild(caseStudy);
+        var cover = el('div', 'cs-media-img cs-cover');
+        cover.setAttribute('aria-hidden', 'true');
+        cover.appendChild(el('span', 'cs-cover-number', project.number));
+        var mock = el('div', 'cs-cover-mock');
+        mock.appendChild(el('span', 'cs-cover-dot'));
+        mock.appendChild(el('span', 'cs-cover-bar cs-cover-bar-lg'));
+        mock.appendChild(el('span', 'cs-cover-bar cs-cover-bar-md'));
+        mock.appendChild(el('span', 'cs-cover-bar cs-cover-bar-sm'));
+        cover.appendChild(mock);
+        frame.appendChild(cover);
       }
-      card.appendChild(links);
 
-      list.appendChild(card);
+      media.appendChild(frame);
+
+      var badges = el('div', 'cs-media-badges');
+      badges.appendChild(el('span', 'cs-category', project.category || 'Case Study'));
+      badges.appendChild(el('span', 'cs-year', project.year));
+      media.appendChild(badges);
+      inner.appendChild(media);
+
+      /* --- body --- */
+      var body = el('div', 'cs-body');
+      body.appendChild(el('h3', 'cs-title', project.title));
+      body.appendChild(el('p', 'cs-desc', project.description));
+
+      var chips = el('div', 'tag-list cs-chips');
+      project.tags.forEach(function (tag) {
+        chips.appendChild(el('span', 'tag tag-soft', tag));
+      });
+      body.appendChild(chips);
+
+      if (project.metrics && project.metrics.length) {
+        var metrics = el('div', 'cs-metrics');
+        project.metrics.forEach(function (metric) {
+          var item = el('div', 'cs-metric');
+          item.appendChild(el('span', 'cs-metric-value', metric.value));
+          item.appendChild(el('span', 'cs-metric-label', metric.label));
+          metrics.appendChild(item);
+        });
+        body.appendChild(metrics);
+      }
+
+      var actions = el('div', 'cs-actions');
+      if (project.status === 'soon') {
+        actions.appendChild(el('span', 'project-lock', svg(ICONS.lock) + '<span>Coming Soon</span>'));
+      } else {
+        var caseBtn = el('a', 'btn btn-primary cs-btn', '<span>View Case Study</span>' + svg(ICONS.arrow));
+        caseBtn.href = project.links.case;
+        actions.appendChild(caseBtn);
+
+        if (project.links.demo) {
+          var demo = el('a', 'cs-link', 'Live Demo');
+          demo.href = project.links.demo;
+          actions.appendChild(demo);
+        }
+      }
+      body.appendChild(actions);
+
+      inner.appendChild(body);
+      card.appendChild(inner);
+      stage.appendChild(card);
+    });
+
+    renderProgress(document.getElementById('csProgress'), data.projects.length, function (i) {
+      return 'Go to case study ' + (i + 1) + ': ' + data.projects[i].title;
     });
   }
 
@@ -317,6 +428,283 @@
   }
 
   renderAll();
+
+  /* ===========================================================
+     Pinned scroll decks — GSAP ScrollTrigger
+
+     Both the Case Studies and Experience sections pin themselves
+     to the viewport and hand their card transitions over to the
+     scroll position (scrubbed, never snapped). When GSAP is
+     unavailable or the visitor prefers reduced motion, the whole
+     thing degrades to a plain stacked list via .stacks-static.
+  =========================================================== */
+  var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* Shallow copy of `base` with `extra` layered on top — keeps the
+     shared card states below readable without mutating them. */
+  function merge(base, extra) {
+    var out = {};
+    var key;
+    for (key in base) {
+      if (Object.prototype.hasOwnProperty.call(base, key)) out[key] = base[key];
+    }
+    for (key in extra) {
+      if (Object.prototype.hasOwnProperty.call(extra, key)) out[key] = extra[key];
+    }
+    return out;
+  }
+
+  function cardsIn(stageId) {
+    var stage = document.getElementById(stageId);
+    if (!stage) return [];
+    return Array.prototype.slice.call(stage.children);
+  }
+
+  /* Which card owns the screen at timeline time `t`. */
+  function indexAt(switchTimes, t) {
+    var index = 0;
+    for (var i = 0; i < switchTimes.length; i++) {
+      if (t >= switchTimes[i]) index = i;
+    }
+    return index;
+  }
+
+  function setActiveIndex(cards, progressEl, index) {
+    if (progressEl.getAttribute('data-index') === String(index)) return;
+    progressEl.setAttribute('data-index', String(index));
+
+    cards.forEach(function (card, i) {
+      card.classList.toggle('is-active', i === index);
+    });
+
+    var dots = progressEl.querySelectorAll('.stack-dot');
+    Array.prototype.forEach.call(dots, function (dot, i) {
+      dot.classList.toggle('is-active', i === index);
+    });
+
+    var current = progressEl.querySelector('.stack-count-current');
+    if (current) current.textContent = pad(index + 1);
+  }
+
+  /* Clicking a progress dot scrolls to that card's slice of the pin range. */
+  function wireProgressJumps(progressEl, trigger, switchTimes, duration) {
+    progressEl.addEventListener('click', function (e) {
+      var dot = e.target.closest ? e.target.closest('.stack-dot') : null;
+      if (!dot) return;
+
+      var i = Number(dot.getAttribute('data-index')) || 0;
+      var ratio = duration ? switchTimes[i] / duration : 0;
+      /* Nudge just past the switch point so the target card is fully settled. */
+      var range = trigger.end - trigger.start;
+      var top = trigger.start + range * Math.min(ratio + 0.02, 1);
+      window.scrollTo({ top: top, behavior: motionQuery.matches ? 'auto' : 'smooth' });
+    });
+  }
+
+  /* -----------------------------------------------------------
+     Case studies: cards rise from below, the active one drifts
+     from 1.0 to 1.03, and the outgoing card lifts, blurs and fades.
+  ----------------------------------------------------------- */
+  function buildCaseStudyDeck() {
+    var pin = document.getElementById('csPin');
+    var progressEl = document.getElementById('csProgress');
+    var cards = cardsIn('caseStudyStage');
+    if (!pin || cards.length < 2) return;
+
+    /* autoAlpha rather than opacity: it flips visibility:hidden at 0, so the
+       four off-screen cards stop being painted and blurred every frame. */
+    var DWELL = 0.55;
+    var enter = { yPercent: 105, scale: 0.92, autoAlpha: 0, filter: 'blur(14px)' };
+    var active = { yPercent: 0, scale: 1, autoAlpha: 1, filter: 'blur(0px)' };
+    var settled = { yPercent: 0, scale: 1.03, autoAlpha: 1, filter: 'blur(0px)' };
+    var exit = { yPercent: -14, scale: 0.94, autoAlpha: 0, filter: 'blur(12px)' };
+
+    cards.forEach(function (card, i) {
+      gsap.set(card, merge(i === 0 ? active : enter, { zIndex: i + 1 }));
+    });
+
+    var tl = gsap.timeline({ defaults: { ease: 'none' } });
+    var switchTimes = [0];
+
+    tl.to(cards[0], merge(settled, { duration: DWELL }), 0);
+
+    for (var i = 1; i < cards.length; i++) {
+      var at = tl.duration();
+      tl.fromTo(cards[i - 1], settled, merge(exit, { duration: 1 }), at);
+      tl.fromTo(cards[i], enter, merge(active, { duration: 1 }), at);
+      tl.to(cards[i], merge(settled, { duration: DWELL }), at + 1);
+      switchTimes.push(at + 0.5);
+    }
+
+    /* Hold on the final card before the section releases the scroll. */
+    tl.to({}, { duration: 0.4 });
+
+    var duration = tl.duration();
+
+    var trigger = ScrollTrigger.create({
+      animation: tl,
+      trigger: pin,
+      start: 'top top',
+      end: function () {
+        return '+=' + Math.round(cards.length * window.innerHeight * 0.9);
+      },
+      pin: pin,
+      pinSpacing: true,
+      anticipatePin: 1,
+      scrub: 0.7,
+      invalidateOnRefresh: true,
+      onUpdate: function (self) {
+        setActiveIndex(cards, progressEl, indexAt(switchTimes, duration * self.progress));
+      }
+    });
+
+    wireProgressJumps(progressEl, trigger, switchTimes, duration);
+  }
+
+  /* -----------------------------------------------------------
+     Experience: a layered 3D deck. `depth` is a card's distance
+     from the active slot — 0 is centre stage, positive is waiting
+     behind, negative is already seen (rotated back and faded out).
+  ----------------------------------------------------------- */
+  function experienceState(depth) {
+    if (depth === 0) {
+      return { yPercent: 0, z: 0, scale: 1, rotateX: 0, autoAlpha: 1, filter: 'blur(0px)', zIndex: 60 };
+    }
+
+    if (depth < 0) {
+      return {
+        yPercent: -26,
+        z: -260,
+        scale: 0.88,
+        rotateX: -16,
+        autoAlpha: 0,
+        filter: 'blur(12px)',
+        zIndex: Math.max(1, 10 + depth)
+      };
+    }
+
+    /* Only three cards are ever visible behind the active one. Offsets are
+       generous on purpose — the cards are near-opaque, so a small peek
+       would read as a shadow rather than as a stack. */
+    var d = Math.min(depth, 3);
+    var offsets = [0, 17, 30, 40];
+    var opacities = [1, 0.78, 0.42, 0.18];
+    var blurs = [0, 1.5, 3.5, 5.5];
+    return {
+      yPercent: offsets[d],
+      z: -70 * d,
+      scale: 1 - 0.015 * d,
+      rotateX: 4 * d,
+      autoAlpha: depth > 3 ? 0 : opacities[d],
+      filter: 'blur(' + blurs[d] + 'px)',
+      zIndex: 60 - d
+    };
+  }
+
+  /* One scroll step: every card shifts one slot forward in the deck. */
+  function addExperienceStep(tl, cards, step, at, duration) {
+    cards.forEach(function (card, i) {
+      tl.fromTo(
+        card,
+        experienceState(i - step),
+        merge(experienceState(i - step - 1), { duration: duration }),
+        at
+      );
+    });
+  }
+
+  function buildExperienceDeck() {
+    var pin = document.getElementById('expPin');
+    var progressEl = document.getElementById('expProgress');
+    var cards = cardsIn('experienceStage');
+    if (!pin || cards.length < 2) return;
+
+    var STEP = 1;
+    var HOLD = 0.45;
+
+    cards.forEach(function (card, i) {
+      gsap.set(card, experienceState(i));
+    });
+
+    var tl = gsap.timeline({ defaults: { ease: 'none' } });
+    var switchTimes = [0];
+
+    for (var s = 0; s < cards.length - 1; s++) {
+      var at = HOLD + s * (STEP + HOLD);
+      addExperienceStep(tl, cards, s, at, STEP);
+      switchTimes.push(at + STEP * 0.5);
+    }
+
+    tl.to({}, { duration: HOLD });
+
+    var duration = tl.duration();
+
+    var trigger = ScrollTrigger.create({
+      animation: tl,
+      trigger: pin,
+      start: 'top top',
+      end: function () {
+        return '+=' + Math.round(cards.length * window.innerHeight * 0.85);
+      },
+      pin: pin,
+      pinSpacing: true,
+      anticipatePin: 1,
+      scrub: 0.7,
+      invalidateOnRefresh: true,
+      onUpdate: function (self) {
+        setActiveIndex(cards, progressEl, indexAt(switchTimes, duration * self.progress));
+      }
+    });
+
+    wireProgressJumps(progressEl, trigger, switchTimes, duration);
+  }
+
+  function initStacks() {
+    if (!window.gsap || !window.ScrollTrigger || motionQuery.matches) {
+      document.body.classList.add('stacks-static');
+      return;
+    }
+
+    window.gsap.registerPlugin(window.ScrollTrigger);
+    buildCaseStudyDeck();
+    buildExperienceDeck();
+
+    /* Late-loading webfonts change card heights, so re-measure once settled. */
+    window.addEventListener('load', function () {
+      window.ScrollTrigger.refresh();
+    });
+  }
+
+  initStacks();
+
+  /* ===========================================================
+     Smooth anchor scrolling
+
+     Done in JS rather than `html { scroll-behavior: smooth }`
+     because that CSS also applies to ScrollTrigger's own pin
+     corrections, which makes pinned sections judder.
+  =========================================================== */
+  document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var hash = link.getAttribute('href');
+      if (!hash || hash === '#') return;
+
+      var target = document.querySelector(hash);
+      if (!target) return;
+
+      e.preventDefault();
+
+      /* Pinned sections start flush with the viewport top (they carry
+         their own header padding); everything else clears the header. */
+      var offset = target.classList.contains('stack-section')
+        ? 0
+        : parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 76;
+
+      var top = window.pageYOffset + target.getBoundingClientRect().top - offset + 1;
+      window.scrollTo({ top: top, behavior: motionQuery.matches ? 'auto' : 'smooth' });
+      if (history.replaceState) history.replaceState(null, '', hash);
+    });
+  });
 
   /* ===========================================================
      Theme toggle (defaults to light; persists choice in localStorage)
@@ -404,8 +792,11 @@
   /* ===========================================================
      Scroll reveal (runs after dynamic render so nodes exist)
   =========================================================== */
+  /* .exp-card and .cs-card are driven by ScrollTrigger (see initStacks) so
+     they're excluded here — two transform-based animations fighting over the
+     same property would cancel each other out. */
   var revealTargets = document.querySelectorAll(
-    '.stat-card, .experience-card, .achievement-card, .case-study-card, .testimonial-card, .skill-bar'
+    '.stat-card, .achievement-card, .testimonial-card, .skill-bar'
   );
 
   revealTargets.forEach(function (el) {
@@ -413,7 +804,7 @@
   });
 
   var skillFills = document.querySelectorAll('.skill-fill');
-  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var prefersReducedMotion = motionQuery.matches;
 
   if ('IntersectionObserver' in window && !prefersReducedMotion) {
     var observer = new IntersectionObserver(
