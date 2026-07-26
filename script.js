@@ -136,24 +136,25 @@
 
   function renderExperience() {
     var track = document.getElementById('experienceTrack');
-    data.experience.forEach(function (job) {
+    /* Alternating rotation/lift per card gives the scattered "fan" look; cycles every 4 cards. */
+    var rotations = [-4, 3, -3, 4];
+    var lifts = [0, 16, 4, 20];
+
+    data.experience.forEach(function (job, index) {
       var card = el('article', 'experience-card');
+      card.style.setProperty('--rot', rotations[index % rotations.length] + 'deg');
+      card.style.setProperty('--lift', lifts[index % lifts.length] + 'px');
+      card.style.zIndex = String(data.experience.length - index);
 
-      card.appendChild(el('span', 'experience-date', job.date));
-
-      var head = el('div', 'timeline-card-head');
-      head.appendChild(el('span', 'timeline-logo', job.logoLetter));
-      var headText = el('div');
-      headText.appendChild(el('h3', null, job.role));
-      headText.appendChild(el('p', 'timeline-company', job.company + ' · ' + job.location));
-      head.appendChild(headText);
+      var head = el('div', 'experience-card-head');
+      head.appendChild(el('span', 'experience-logo-chip', job.logoLetter));
+      head.appendChild(el('span', 'experience-date', job.date));
       card.appendChild(head);
 
-      var ul = el('ul');
-      job.bullets.forEach(function (bullet) {
-        ul.appendChild(el('li', null, bullet));
-      });
-      card.appendChild(ul);
+      card.appendChild(el('h3', null, job.role));
+      card.appendChild(el('p', 'timeline-company', job.company));
+
+      card.appendChild(el('p', 'experience-description', job.bullets.join(' ')));
 
       track.appendChild(card);
     });

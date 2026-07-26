@@ -820,10 +820,63 @@ section > .container > .section-title + .section-subtitle {
 }
 
 /* ==========================================================================
-   Experience — horizontal scrolling track
+   Experience — dark "scattered fan" card deck, horizontally scrollable.
+   This section keeps a fixed dark background regardless of light/dark mode,
+   the same way the hero does, so the glow + cards stay legible either way.
    ========================================================================== */
 .container-wide {
   max-width: 1320px;
+}
+
+.experience {
+  position: relative;
+  overflow: hidden;
+  background-color: #0b0b14;
+  isolation: isolate;
+}
+
+.experience-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.glow-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+}
+
+.glow-blob-a {
+  width: 420px;
+  height: 420px;
+  top: -120px;
+  left: -60px;
+  background: radial-gradient(circle, var(--color-primary), transparent 70%);
+}
+
+.glow-blob-b {
+  width: 360px;
+  height: 360px;
+  bottom: -140px;
+  right: 5%;
+  background: radial-gradient(circle, var(--color-accent), transparent 70%);
+}
+
+.glow-blob-c {
+  width: 280px;
+  height: 280px;
+  top: 30%;
+  left: 45%;
+  background: radial-gradient(circle, #6c5ce7, transparent 70%);
+  opacity: 0.35;
+}
+
+.experience .container-wide {
+  position: relative;
+  z-index: 1;
 }
 
 .section-head-row {
@@ -838,10 +891,12 @@ section > .container > .section-title + .section-subtitle {
 .section-subtitle-left {
   text-align: left;
   margin-inline: 0;
+  color: #fff;
 }
 
 .section-subtitle-left {
   margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .scroll-nav-buttons {
@@ -854,9 +909,9 @@ section > .container > .section-title + .section-subtitle {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -864,8 +919,8 @@ section > .container > .section-title + .section-subtitle {
 }
 
 .scroll-nav-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
   transform: translateY(-2px);
 }
 
@@ -876,90 +931,84 @@ section > .container > .section-title + .section-subtitle {
 
 .experience-track {
   display: flex;
-  gap: var(--space-4);
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: var(--space-2) var(--space-2) var(--space-4);
-  margin: 0 calc(-1 * var(--space-4));
-  padding-inline: var(--space-4);
   scroll-behavior: smooth;
+  padding: 70px var(--space-4) 60px;
+  margin-inline: calc(-1 * var(--space-4));
 }
 
 .experience-card {
-  flex: 0 0 min(360px, 85vw);
-  scroll-snap-align: start;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  flex: 0 0 260px;
+  margin-left: -8px;
+  background-color: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-lg);
   padding: var(--space-4);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+  transform: rotate(var(--rot, 0deg)) translateY(var(--lift, 0px));
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-.experience-date {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  padding: 5px 14px;
-  border-radius: var(--radius-full);
-  margin-bottom: var(--space-3);
+.experience-card:first-child {
+  margin-left: 0;
 }
 
-.timeline-card-head {
+.experience-card:hover,
+.experience-card:focus-within {
+  transform: rotate(0deg) translateY(-10px) scale(1.05);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  z-index: 50 !important;
+}
+
+.experience-card-head {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
 
-.timeline-logo {
+.experience-logo-chip {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
   background: linear-gradient(145deg, var(--color-primary), var(--color-accent));
   color: #fff;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.experience-date {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
 .experience-card h3 {
   margin-bottom: var(--space-1);
   font-size: 1.05rem;
+  color: #fff;
 }
 
 .timeline-company {
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: var(--space-3);
 }
 
-.experience-card ul {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.experience-card li {
-  position: relative;
-  padding-left: var(--space-3);
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-}
-
-.experience-card li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.6em;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background-color: var(--color-accent);
+.experience-description {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 0;
 }
 
 /* ==========================================================================
@@ -1558,6 +1607,22 @@ section > .container > .section-title + .section-subtitle {
   .section-head-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* The scattered/rotated fan reads best with room to spread out; flatten it below desktop. */
+  .experience-track {
+    padding-top: var(--space-2);
+    gap: var(--space-4);
+  }
+
+  .experience-card {
+    transform: none;
+    margin-left: 0;
+  }
+
+  .experience-card:hover,
+  .experience-card:focus-within {
+    transform: translateY(-6px);
   }
 }
 
