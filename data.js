@@ -82,19 +82,32 @@ var PORTFOLIO_DATA = {
   },
 
   /*
-    Experience cards for the pinned 3D deck. `summary` is the one-line pitch,
-    `achievements` the bullet highlights, `tech` the badge row. `logo` can be
-    an image URL; when it's absent `logoLetter` is used as a lettermark.
+    Experience slides for the pinned horizontal story.
+
+      number       big editorial numeral shown in the left column ("01", "02"…)
+      years        short form of the duration, sits under the numeral
+      date         full duration, shown as a chip on the card
+      about        one-line company description — placeholder copy, swap in
+                   the company's own blurb when you have it
+      summary      what *you* did there, in one line
+      achievements 3–5 bullets for the right column
+      tech         badge row, animated in one at a time
+      pattern      background motif: grid | dots | diagonal | rings
+      logo         image URL; when empty, `logoLetter` renders as a lettermark
   */
   experience: [
     {
+      number: '01',
       date: 'Dec 2024 – Present',
+      years: '2024 — Now',
       role: 'Associate UI/UX Designer',
       company: 'Sundew',
       logo: '',
       logoLetter: 'S',
       location: 'Greater Kolkata Area · On-site',
+      about: 'A digital product studio where design, engineering and strategy sit in the same room, shipping web and mobile products for client teams.',
       summary: 'Designing research-led product experiences for a fast-moving startup, from first interview to shipped interface.',
+      pattern: 'grid',
       tech: ['Figma', 'User Research', 'Design Systems', 'Prototyping'],
       achievements: [
         'Engaged with users to understand their goals, translating insights into effective design solutions.',
@@ -103,13 +116,17 @@ var PORTFOLIO_DATA = {
       ]
     },
     {
+      number: '02',
       date: 'Jun 2023 – Feb 2025',
+      years: '2023 — 2025',
       role: 'Associate UI/UX Designer',
       company: 'Fortmindz',
       logo: '',
       logoLetter: 'F',
       location: 'Kolkata, West Bengal, India · On-site',
+      about: 'A software development company building web and mobile applications for startups and established product teams.',
       summary: 'Owned interface design for web and mobile products, backed by a reusable component library.',
+      pattern: 'dots',
       tech: ['Figma', 'Adobe XD', 'Usability Testing', 'Component Library'],
       achievements: [
         'Designed intuitive interfaces for web and mobile applications using research-driven design thinking.',
@@ -118,30 +135,41 @@ var PORTFOLIO_DATA = {
       ]
     },
     {
+      number: '03',
       date: 'Nov 2022 – Jun 2023',
+      years: '2022 — 2023',
       role: 'User Experience Designer',
       company: 'Pixel Consultancy',
       logo: '',
       logoLetter: 'P',
       location: 'Kolkata, India',
+      about: 'A design consultancy delivering interface and experience work across a rotating roster of client projects.',
       summary: 'Translated client briefs into interactive prototypes that made design decisions easy to review.',
+      pattern: 'diagonal',
       tech: ['Adobe XD', 'Wireframing', 'Interaction Design'],
       achievements: [
+        'Turned client briefs into wireframes and design directions the team could review early.',
         'Created interactive prototypes to communicate design concepts to stakeholders.',
         'Applied user-centered design principles across client projects.'
       ]
     },
     {
+      number: '04',
       date: 'Oct 2020 – Feb 2023',
+      years: '2020 — 2023',
       role: 'Jr. Implementation Associate',
       company: 'Granicus',
       logo: '',
       logoLetter: 'G',
       location: 'Bengaluru, Karnataka, India',
+      about: 'A technology company serving public-sector organisations, where implementation teams work directly alongside customers.',
       summary: 'Client-facing implementation work that became the foundation for a move into UX design.',
+      pattern: 'rings',
       tech: ['Client Onboarding', 'Problem Solving', 'Communication'],
       achievements: [
-        'Supported client implementation and onboarding, building a foundation in communication and problem-solving before transitioning into UX design.'
+        'Supported client implementation and onboarding from kickoff through go-live.',
+        'Built a foundation in communication and stakeholder problem-solving.',
+        'Used that day-to-day exposure to real users as the springboard into UX design.'
       ]
     }
   ],

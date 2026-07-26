@@ -147,21 +147,35 @@
   </section>
 
   <!-- ===================== EXPERIENCE =====================
-       Same pin mechanic, but the cards sit in a layered 3D deck. -->
-  <section id="experience" class="experience stack-section">
-    <div class="stack-pin" id="expPin">
-      <div class="container stack-inner">
-        <div class="stack-head">
-          <div class="stack-head-text">
-            <p class="eyebrow eyebrow-dot">Career</p>
-            <h2 class="section-title section-title-left">My Journey</h2>
-          </div>
-          <div class="stack-progress" id="expProgress"></div>
+       Pinned horizontal story. #expPin is pinned by GSAP ScrollTrigger and
+       vertical scroll scrubs one full-viewport slide across the stage at a
+       time. Slide markup is generated in script.js from
+       PORTFOLIO_DATA.experience; below 900px the whole thing collapses to a
+       stacked vertical list (see the media query in styles.css). -->
+  <section id="experience" class="experience exp-section stack-section"
+           aria-roledescription="carousel" aria-label="Career experience">
+    <div class="exp-pin" id="expPin">
+      <div class="exp-aura" aria-hidden="true">
+        <span class="exp-aura-a"></span>
+        <span class="exp-aura-b"></span>
+      </div>
+
+      <div class="exp-canvas" id="expCanvas">
+        <div class="exp-topbar exp-gutter">
+          <p class="eyebrow eyebrow-dot exp-eyebrow">Career</p>
+          <h2 class="section-title section-title-left exp-title">
+            <span class="exp-title-mask"><span class="exp-title-line">My Journey</span></span>
+          </h2>
         </div>
 
-        <div class="stack-stage exp-stage" id="experienceStage"></div>
+        <div class="exp-viewport">
+          <div class="exp-track" id="experienceTrack"></div>
+          <div class="exp-rail" id="expRail"></div>
+        </div>
       </div>
     </div>
+
+    <p class="exp-sr" id="expLive" aria-live="polite"></p>
   </section>
 
   <!-- ===================== ACHIEVEMENTS ===================== -->
@@ -271,10 +285,12 @@
   </div>
 </footer>
 
-<!-- GSAP + ScrollTrigger power the pinned case-study and experience decks.
-     If these fail to load, script.js falls back to a static stacked layout. -->
+<!-- GSAP + ScrollTrigger power the pinned case-study deck and the Experience
+     story; Lenis smooths the vertical scroll that drives them. If any of
+     these fail to load, script.js falls back to a static stacked layout. -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
 
 <script src="data.js"></script>
 <script src="script.js"></script>

@@ -163,80 +163,153 @@
   }
 
   /* -----------------------------------------------------------
-     Experience — layered 3D card deck (motion lives in initStacks)
+     Experience — full-viewport story slides
+
+     Each job becomes one slide: numeral + years on the left, a glass
+     card in the middle, achievements and tech badges on the right.
+     All the motion lives in buildExperienceStory() further down.
   ----------------------------------------------------------- */
+
+  /* Reuses the site's existing accent colours; each slide picks a pair for
+     its numeral, hairline, bullets and background motif. */
+  var EXP_PALETTE = [
+    ['#6c5ce7', '#5b8def'],
+    ['#00b8a9', '#5b8def'],
+    ['#f5a623', '#ef7b7b'],
+    ['#c65ce7', '#6c5ce7']
+  ];
+
+  var EXP_PATTERNS = { grid: 1, dots: 1, diagonal: 1, rings: 1 };
+
+  function buildExperienceSlide(job, index, total) {
+    var pair = EXP_PALETTE[index % EXP_PALETTE.length];
+    var number = job.number || pad(index + 1);
+
+    var slide = el('article', 'exp-slide' + (index === 0 ? ' is-active' : ''));
+    slide.setAttribute('data-index', String(index));
+    slide.setAttribute('role', 'group');
+    slide.setAttribute('aria-roledescription', 'slide');
+    slide.setAttribute('aria-label',
+      number + ' of ' + pad(total) + ': ' + job.company + ', ' + job.role);
+    slide.style.setProperty('--card-from', pair[0]);
+    slide.style.setProperty('--card-to', pair[1]);
+    slide.style.setProperty('--exp-pattern', 'color-mix(in srgb, ' + pair[0] + ' 20%, transparent)');
+
+    var pattern = EXP_PATTERNS[job.pattern] ? job.pattern : 'grid';
+    var bg = el('div', 'exp-slide-bg exp-pattern-' + pattern);
+    bg.setAttribute('aria-hidden', 'true');
+    slide.appendChild(bg);
+
+    var inner = el('div', 'exp-slide-inner exp-gutter');
+
+    /* --- left: the big number and the years --- */
+    var lead = el('div', 'exp-col exp-col-lead');
+    lead.appendChild(el('span', 'exp-number', number));
+    lead.appendChild(el('span', 'exp-years', job.years || job.date));
+    lead.appendChild(el('span', 'exp-lead-rule'));
+    if (job.location) {
+      lead.appendChild(el('span', 'exp-place', svg(ICONS.pin) + '<span>' + job.location + '</span>'));
+    }
+    inner.appendChild(lead);
+
+    /* --- centre: the company card --- */
+    var main = el('div', 'exp-col exp-col-main');
+    var card = el('div', 'exp-card');
+
+    var top = el('div', 'exp-card-top');
+    var logo = el('span', 'exp-logo');
+    if (job.logo) {
+      var logoImg = el('img');
+      logoImg.src = job.logo;
+      logoImg.alt = job.company + ' logo';
+      logo.appendChild(logoImg);
+    } else {
+      logo.textContent = job.logoLetter;
+      logo.classList.add('exp-logo-letter');
+      logo.setAttribute('aria-hidden', 'true');
+    }
+    top.appendChild(logo);
+    top.appendChild(el('span', 'exp-duration', job.date));
+    card.appendChild(top);
+
+    /* Masked wrapper so the name can slide up from below its own baseline. */
+    var mask = el('span', 'exp-company-mask');
+    mask.appendChild(el('h3', 'exp-company', job.company));
+    card.appendChild(mask);
+
+    card.appendChild(el('p', 'exp-role', job.role));
+    if (job.about) card.appendChild(el('p', 'exp-about', job.about));
+    if (job.summary) card.appendChild(el('p', 'exp-summary', job.summary));
+
+    main.appendChild(card);
+    inner.appendChild(main);
+
+    /* --- right: achievements and tech badges --- */
+    var side = el('div', 'exp-col exp-col-side');
+
+    if (job.achievements && job.achievements.length) {
+      side.appendChild(el('p', 'exp-label', 'Key achievements'));
+      var list = el('ul', 'exp-achievements');
+      job.achievements.forEach(function (bullet) {
+        list.appendChild(el('li', null, bullet));
+      });
+      side.appendChild(list);
+    }
+
+    if (job.tech && job.tech.length) {
+      side.appendChild(el('p', 'exp-label', 'Stack'));
+      var badges = el('div', 'exp-tech');
+      job.tech.forEach(function (item) {
+        badges.appendChild(el('span', 'exp-badge', item));
+      });
+      side.appendChild(badges);
+    }
+
+    inner.appendChild(side);
+    slide.appendChild(inner);
+    return slide;
+  }
+
+  /* Thin vertical rail: counter, scrubbed fill, one dot per slide and the
+     current company's name set vertically underneath. */
+  function renderExperienceRail(total) {
+    var rail = document.getElementById('expRail');
+    if (!rail) return;
+
+    var count = el('div', 'exp-rail-count');
+    count.innerHTML =
+      '<span class="exp-rail-current">01</span>' +
+      '<span class="exp-rail-sep">/</span>' +
+      '<span class="exp-rail-total">' + pad(total) + '</span>';
+    rail.appendChild(count);
+
+    var track = el('div', 'exp-rail-track');
+    track.appendChild(el('div', 'exp-rail-fill'));
+
+    for (var i = 0; i < total; i++) {
+      var dot = el('button', 'exp-rail-dot' + (i === 0 ? ' is-active' : ''));
+      dot.type = 'button';
+      dot.setAttribute('data-index', String(i));
+      dot.setAttribute('aria-label', 'Go to experience ' + (i + 1) + ': ' + data.experience[i].company);
+      if (i === 0) dot.setAttribute('aria-current', 'true');
+      dot.style.top = (total > 1 ? (i / (total - 1)) * 100 : 0) + '%';
+      track.appendChild(dot);
+    }
+    rail.appendChild(track);
+
+    rail.appendChild(el('span', 'exp-rail-label', data.experience[0].company));
+  }
+
   function renderExperience() {
-    var stage = document.getElementById('experienceStage');
-    var logoPalette = [
-      ['#6c5ce7', '#5b8def'],
-      ['#00b8a9', '#5b8def'],
-      ['#f5a623', '#ef7b7b'],
-      ['#c65ce7', '#6c5ce7']
-    ];
+    var track = document.getElementById('experienceTrack');
+    if (!track) return;
 
+    var total = data.experience.length;
     data.experience.forEach(function (job, index) {
-      var pair = logoPalette[index % logoPalette.length];
-      var card = el('article', 'exp-card' + (index === 0 ? ' is-active' : ''));
-      card.setAttribute('data-index', String(index));
-      card.style.setProperty('--card-from', pair[0]);
-      card.style.setProperty('--card-to', pair[1]);
-
-      var inner = el('div', 'exp-card-inner');
-
-      var head = el('header', 'exp-card-head');
-
-      var logo = el('span', 'exp-logo');
-      if (job.logo) {
-        var logoImg = el('img');
-        logoImg.src = job.logo;
-        logoImg.alt = job.company + ' logo';
-        logo.appendChild(logoImg);
-      } else {
-        logo.textContent = job.logoLetter;
-        logo.classList.add('exp-logo-letter');
-      }
-      head.appendChild(logo);
-
-      var titles = el('div', 'exp-card-titles');
-      titles.appendChild(el('h3', 'exp-company', job.company));
-      titles.appendChild(el('p', 'exp-role', job.role));
-      head.appendChild(titles);
-
-      head.appendChild(el('span', 'exp-duration', job.date));
-      inner.appendChild(head);
-
-      if (job.location) {
-        inner.appendChild(el('p', 'exp-location', svg(ICONS.pin) + '<span>' + job.location + '</span>'));
-      }
-
-      if (job.summary) {
-        inner.appendChild(el('p', 'exp-summary', job.summary));
-      }
-
-      if (job.achievements && job.achievements.length) {
-        inner.appendChild(el('p', 'exp-label', 'Key achievements'));
-        var list = el('ul', 'exp-achievements');
-        job.achievements.forEach(function (bullet) {
-          list.appendChild(el('li', null, bullet));
-        });
-        inner.appendChild(list);
-      }
-
-      if (job.tech && job.tech.length) {
-        var badges = el('div', 'tag-list exp-tech');
-        job.tech.forEach(function (item) {
-          badges.appendChild(el('span', 'tag tag-soft', item));
-        });
-        inner.appendChild(badges);
-      }
-
-      card.appendChild(inner);
-      stage.appendChild(card);
+      track.appendChild(buildExperienceSlide(job, index, total));
     });
 
-    renderProgress(document.getElementById('expProgress'), data.experience.length, function (i) {
-      return 'Go to experience ' + (i + 1) + ': ' + data.experience[i].company;
-    });
+    renderExperienceRail(total);
   }
 
   function renderAchievements() {
@@ -496,8 +569,7 @@
       var ratio = duration ? switchTimes[i] / duration : 0;
       /* Nudge just past the switch point so the target card is fully settled. */
       var range = trigger.end - trigger.start;
-      var top = trigger.start + range * Math.min(ratio + 0.02, 1);
-      window.scrollTo({ top: top, behavior: motionQuery.matches ? 'auto' : 'smooth' });
+      scrollToY(trigger.start + range * Math.min(ratio + 0.02, 1));
     });
   }
 
@@ -561,102 +633,295 @@
     wireProgressJumps(progressEl, trigger, switchTimes, duration);
   }
 
-  /* -----------------------------------------------------------
-     Experience: a layered 3D deck. `depth` is a card's distance
-     from the active slot — 0 is centre stage, positive is waiting
-     behind, negative is already seen (rotated back and faded out).
-  ----------------------------------------------------------- */
-  function experienceState(depth) {
-    if (depth === 0) {
-      return { yPercent: 0, z: 0, scale: 1, rotateX: 0, autoAlpha: 1, filter: 'blur(0px)', zIndex: 60 };
-    }
+  /* ===========================================================
+     Experience — pinned horizontal storytelling
 
-    if (depth < 0) {
-      return {
-        yPercent: -26,
-        z: -260,
-        scale: 0.88,
-        rotateX: -16,
-        autoAlpha: 0,
-        filter: 'blur(12px)',
-        zIndex: Math.max(1, 10 + depth)
-      };
-    }
+     Vertical scroll is the only input. It scrubs a timeline in which
+     the live slide drifts left (scaling down, blurring, fading) while
+     the next one arrives from the right, with the numeral running
+     slightly ahead of the card and the achievements column lagging
+     behind it for parallax depth.
 
-    /* Only three cards are ever visible behind the active one. Offsets are
-       generous on purpose — the cards are near-opaque, so a small peek
-       would read as a shadow rather than as a stack. */
-    var d = Math.min(depth, 3);
-    var offsets = [0, 17, 30, 40];
-    var opacities = [1, 0.78, 0.42, 0.18];
-    var blurs = [0, 1.5, 3.5, 5.5];
-    return {
-      yPercent: offsets[d],
-      z: -70 * d,
-      scale: 1 - 0.015 * d,
-      rotateX: 4 * d,
-      autoAlpha: depth > 3 ? 0 : opacities[d],
-      filter: 'blur(' + blurs[d] + 'px)',
-      zIndex: 60 - d
-    };
+     Below 900px the same slides render as a stacked vertical list and
+     each one reveals on scroll instead — same story, no pinning.
+  =========================================================== */
+
+  /* Per-slide reveal: heading, then logo, name, achievements, badges.
+     Only touches properties the scrub timeline never writes to (y/x on
+     children, opacity, scale) so the two never fight over a value. */
+  function buildExperienceIntro(slide) {
+    var q = gsap.utils.selector(slide);
+    var tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+
+    tl.fromTo(q('.exp-number'), { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.75 }, 0)
+      .fromTo(q('.exp-years, .exp-lead-rule, .exp-place'),
+        { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.07 }, 0.1)
+      .fromTo(q('.exp-logo'),
+        { scale: 0.55, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.65, ease: 'back.out(1.8)' }, 0.1)
+      .fromTo(q('.exp-duration'),
+        { y: -10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5 }, 0.2)
+      /* The name rides up from behind the clipped mask around it. */
+      .fromTo(q('.exp-company'),
+        { yPercent: 105, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.75, ease: 'power4.out' }, 0.18)
+      .fromTo(q('.exp-role'),
+        { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55 }, 0.3)
+      .fromTo(q('.exp-about, .exp-summary'),
+        { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.08 }, 0.36)
+      .fromTo(q('.exp-label'), { autoAlpha: 0 }, { autoAlpha: 0.7, duration: 0.4, stagger: 0.16 }, 0.4)
+      .fromTo(q('.exp-achievements li'),
+        { x: 26, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.55, stagger: 0.09 }, 0.44)
+      .fromTo(q('.exp-badge'),
+        { scale: 0.7, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.45, ease: 'back.out(2.2)', stagger: 0.07 }, 0.66);
+
+    return tl;
   }
 
-  /* One scroll step: every card shifts one slot forward in the deck. */
-  function addExperienceStep(tl, cards, step, at, duration) {
-    cards.forEach(function (card, i) {
-      tl.fromTo(
-        card,
-        experienceState(i - step),
-        merge(experienceState(i - step - 1), { duration: duration }),
-        at
-      );
-    });
-  }
-
-  function buildExperienceDeck() {
+  function buildExperienceStory() {
+    var section = document.getElementById('experience');
     var pin = document.getElementById('expPin');
-    var progressEl = document.getElementById('expProgress');
-    var cards = cardsIn('experienceStage');
-    if (!pin || cards.length < 2) return;
+    var canvas = document.getElementById('expCanvas');
+    var trackEl = document.getElementById('experienceTrack');
+    var rail = document.getElementById('expRail');
+    var liveRegion = document.getElementById('expLive');
+    if (!section || !pin || !trackEl) return;
 
-    var STEP = 1;
-    var HOLD = 0.45;
+    var slides = Array.prototype.slice.call(trackEl.children);
+    if (!slides.length) return;
 
-    cards.forEach(function (card, i) {
-      gsap.set(card, experienceState(i));
-    });
+    var railFill = rail && rail.querySelector('.exp-rail-fill');
+    var railCurrent = rail && rail.querySelector('.exp-rail-current');
+    var railLabel = rail && rail.querySelector('.exp-rail-label');
+    var railDots = rail ? Array.prototype.slice.call(rail.querySelectorAll('.exp-rail-dot')) : [];
 
-    var tl = gsap.timeline({ defaults: { ease: 'none' } });
-    var switchTimes = [0];
+    var intros = slides.map(buildExperienceIntro);
 
-    for (var s = 0; s < cards.length - 1; s++) {
-      var at = HOLD + s * (STEP + HOLD);
-      addExperienceStep(tl, cards, s, at, STEP);
-      switchTimes.push(at + STEP * 0.5);
+    /* --- heading reveals first, before the section ever pins --- */
+    var headPlayed = false;
+    var headTl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+    headTl
+      .fromTo('.exp-eyebrow', { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6 }, 0)
+      .fromTo('.exp-title-line', { yPercent: 110 }, { yPercent: 0, duration: 0.85, ease: 'power4.out' }, 0.06)
+      .add(function () {
+        intros[0].play(0);
+      }, 0.34);
+
+    if (rail) {
+      headTl.fromTo(rail, { x: 18, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.6 }, 0.3);
     }
 
-    tl.to({}, { duration: HOLD });
+    function playHeading() {
+      if (headPlayed) return;
+      headPlayed = true;
+      headTl.play(0);
+    }
 
-    var duration = tl.duration();
+    ScrollTrigger.create({ trigger: section, start: 'top 78%', once: true, onEnter: playHeading });
+    /* Covers a reload that lands mid-section, where the trigger never crosses. */
+    if (section.getBoundingClientRect().top < window.innerHeight * 0.78) playHeading();
 
-    var trigger = ScrollTrigger.create({
-      animation: tl,
-      trigger: pin,
-      start: 'top top',
-      end: function () {
-        return '+=' + Math.round(cards.length * window.innerHeight * 0.85);
-      },
-      pin: pin,
-      pinSpacing: true,
-      anticipatePin: 1,
-      scrub: 0.7,
-      invalidateOnRefresh: true,
-      onUpdate: function (self) {
-        setActiveIndex(cards, progressEl, indexAt(switchTimes, duration * self.progress));
+    /* --- shared active-slide bookkeeping --- */
+    var activeIndex = 0;
+
+    function setActiveSlide(index, replayIntros) {
+      if (index === activeIndex) return;
+      activeIndex = index;
+
+      slides.forEach(function (slide, i) {
+        slide.classList.toggle('is-active', i === index);
+      });
+
+      if (replayIntros) {
+        intros.forEach(function (tl, i) {
+          /* Reveal the slide as it starts arriving; rewind only the ones
+             far enough away that nobody can see them reset. */
+          if (i === index) tl.play(0);
+          else if (Math.abs(i - index) > 1) tl.pause(0);
+        });
       }
+
+      railDots.forEach(function (dot, i) {
+        dot.classList.toggle('is-active', i === index);
+        if (i === index) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+
+      var job = data.experience[index];
+      if (railCurrent) railCurrent.textContent = pad(index + 1);
+      if (railLabel) railLabel.textContent = job.company;
+      if (liveRegion) liveRegion.textContent = job.company + ' — ' + job.role + ', ' + job.date;
+    }
+
+    /* Rail dots jump to a slide's slice of the pinned scroll range. Wired
+       once here; the desktop branch below keeps `nav` current. */
+    var nav = null;
+    if (rail) {
+      rail.addEventListener('click', function (e) {
+        var dot = e.target.closest ? e.target.closest('.exp-rail-dot') : null;
+        if (!dot || !nav) return;
+
+        var i = Number(dot.getAttribute('data-index')) || 0;
+        var ratio = nav.duration ? nav.switchTimes[i] / nav.duration : 0;
+        var range = nav.trigger.end - nav.trigger.start;
+        /* Nudge past the switch point so the target slide is fully settled. */
+        scrollToY(nav.trigger.start + range * Math.min(ratio + 0.03, 1));
+      });
+    }
+
+    /* --- desktop: pinned horizontal scrub / mobile: stacked reveals --- */
+    gsap.matchMedia().add(
+      { isDesktop: '(min-width: 901px)', isMobile: '(max-width: 900px)' },
+      function (ctx) {
+        if (ctx.conditions.isMobile) {
+          nav = null;
+          slides.forEach(function (slide, i) {
+            gsap.fromTo(slide, { y: 44, autoAlpha: 0 }, {
+              y: 0,
+              autoAlpha: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: slide,
+                start: 'top 82%',
+                once: true,
+                onEnter: function () {
+                  intros[i].play(0);
+                }
+              }
+            });
+          });
+          return;
+        }
+
+        var HOLD = 0.5;
+        var STEP = 1;
+
+        /* Three slide states. autoAlpha rather than opacity so off-screen
+           slides flip to visibility:hidden and stop being painted. */
+        var ahead = { xPercent: 100, scale: 0.92, autoAlpha: 0, filter: 'blur(10px)' };
+        var onstage = { xPercent: 0, scale: 1, autoAlpha: 1, filter: 'blur(0px)' };
+        var behind = { xPercent: -38, scale: 0.9, autoAlpha: 0, filter: 'blur(12px)' };
+
+        var leads = slides.map(function (s) { return s.querySelector('.exp-col-lead'); });
+        var sides = slides.map(function (s) { return s.querySelector('.exp-col-side'); });
+
+        /* Re-measured on every ScrollTrigger refresh (invalidateOnRefresh),
+           so the parallax stays proportional after a resize. */
+        function vw(fraction) {
+          return function () {
+            return window.innerWidth * fraction;
+          };
+        }
+
+        slides.forEach(function (slide, i) {
+          gsap.set(slide, merge(i === 0 ? onstage : ahead, { zIndex: i + 1 }));
+        });
+
+        var switchTimes = [0];
+        var setFill = railFill ? gsap.quickSetter(railFill, 'scaleY') : null;
+
+        var tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          onUpdate: function () {
+            setActiveSlide(indexAt(switchTimes, tl.time()), true);
+            if (setFill) setFill(tl.progress());
+          }
+        });
+
+        var lastEnd = HOLD;
+        for (var s = 0; s < slides.length - 1; s++) {
+          var at = HOLD + s * (STEP + HOLD);
+
+          tl.fromTo(slides[s], onstage, merge(behind, { duration: STEP }), at);
+          tl.fromTo(slides[s + 1], ahead, merge(onstage, { duration: STEP }), at);
+
+          /* Parallax within the slide: the numeral outruns the card, the
+             achievements column trails it. Offsets are viewport-relative
+             pixels, not percentages of the column — the columns change
+             width between breakpoints, the illusion shouldn't. */
+          if (leads[s]) tl.fromTo(leads[s], { x: 0 }, { x: vw(-0.13), duration: STEP }, at);
+          if (leads[s + 1]) tl.fromTo(leads[s + 1], { x: vw(0.11) }, { x: 0, duration: STEP }, at);
+          if (sides[s]) tl.fromTo(sides[s], { x: 0 }, { x: vw(0.06), duration: STEP }, at);
+          if (sides[s + 1]) tl.fromTo(sides[s + 1], { x: vw(-0.07) }, { x: 0, duration: STEP }, at);
+
+          /* Hand over just before the midpoint, so the incoming slide is
+             already revealing its content while it slides into place. */
+          switchTimes.push(at + STEP * 0.45);
+          lastEnd = at + STEP;
+        }
+
+        /* A longer beat on the last slide: it has to read fully before the
+           outro starts dimming it. */
+        tl.to({}, { duration: HOLD * 1.9 }, lastEnd);
+        var duration = tl.duration();
+
+        /* Background washes drift across the whole pinned range. */
+        tl.fromTo('.exp-aura-a', { xPercent: -4, yPercent: -3 },
+          { xPercent: 9, yPercent: 5, duration: duration }, 0);
+        tl.fromTo('.exp-aura-b', { xPercent: 5, yPercent: 4 },
+          { xPercent: -8, yPercent: -5, duration: duration }, 0);
+
+        /* Outro: the stage lifts and dims as the pin releases, so the next
+           section arrives as a hand-off rather than a hard cut. */
+        var outro = HOLD * 0.9;
+        tl.fromTo(canvas,
+          { yPercent: 0, autoAlpha: 1 },
+          { yPercent: -4, autoAlpha: 0.2, duration: outro, ease: 'power2.in' },
+          duration - outro);
+
+        var trigger = ScrollTrigger.create({
+          animation: tl,
+          trigger: pin,
+          start: 'top top',
+          end: function () {
+            return '+=' + Math.round(slides.length * window.innerHeight * 0.95);
+          },
+          pin: pin,
+          pinSpacing: true,
+          anticipatePin: 1,
+          scrub: 0.8,
+          invalidateOnRefresh: true
+        });
+
+        nav = { trigger: trigger, switchTimes: switchTimes, duration: duration };
+      }
+    );
+  }
+
+  /* ===========================================================
+     Lenis smooth scrolling — drives the real window scroll, so
+     ScrollTrigger's pinning keeps working untouched. GSAP's ticker
+     runs the RAF loop so scroll and animation share one frame.
+  =========================================================== */
+  var lenis = null;
+
+  function initLenis() {
+    if (!window.Lenis || !window.gsap || motionQuery.matches) return;
+
+    lenis = new window.Lenis({
+      duration: 1.05,
+      easing: function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+      },
+      smoothWheel: true,
+      touchMultiplier: 1.6
     });
 
-    wireProgressJumps(progressEl, trigger, switchTimes, duration);
+    if (window.ScrollTrigger) lenis.on('scroll', window.ScrollTrigger.update);
+
+    window.gsap.ticker.add(function (time) {
+      lenis.raf(time * 1000);
+    });
+    window.gsap.ticker.lagSmoothing(0);
+  }
+
+  /* Single entry point for programmatic scrolling, so anchors and deck
+     jumps stay in sync with whichever scroller is in charge. */
+  function scrollToY(top) {
+    if (lenis) {
+      lenis.scrollTo(top, { duration: 1.1 });
+      return;
+    }
+    window.scrollTo({ top: top, behavior: motionQuery.matches ? 'auto' : 'smooth' });
   }
 
   function initStacks() {
@@ -666,8 +931,9 @@
     }
 
     window.gsap.registerPlugin(window.ScrollTrigger);
+    initLenis();
     buildCaseStudyDeck();
-    buildExperienceDeck();
+    buildExperienceStory();
 
     /* Late-loading webfonts change card heights, so re-measure once settled. */
     window.addEventListener('load', function () {
@@ -676,6 +942,8 @@
   }
 
   initStacks();
+  /* After initStacks so ScrollTrigger is registered by the time it runs. */
+  initNavGlass();
 
   /* ===========================================================
      Smooth anchor scrolling
@@ -701,10 +969,53 @@
         : parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 76;
 
       var top = window.pageYOffset + target.getBoundingClientRect().top - offset + 1;
-      window.scrollTo({ top: top, behavior: motionQuery.matches ? 'auto' : 'smooth' });
+      scrollToY(top);
       if (history.replaceState) history.replaceState(null, '', hash);
     });
   });
+
+  /* ===========================================================
+     Floating glass navbar
+
+     One tween on --nav-p (see the header block in styles.css) carries
+     the bar from transparent to frosted glass: 12px blur, hairline
+     border, soft shadow, a little shorter and lifted off the top edge.
+     Playing/reversing a paused tween — rather than scrubbing — keeps
+     the ease intact in both directions.
+  =========================================================== */
+  function initNavGlass() {
+    var header = document.getElementById('siteHeader');
+    var navbar = header && header.querySelector('.navbar');
+    if (!navbar) return;
+
+    /* No GSAP, or the visitor asked for less motion: snap between the two
+       states instead of animating. */
+    if (!window.gsap || !window.ScrollTrigger || motionQuery.matches) {
+      var apply = function () {
+        navbar.style.setProperty('--nav-p', window.pageYOffset > 12 ? '1' : '0');
+      };
+      window.addEventListener('scroll', apply, { passive: true });
+      apply();
+      return;
+    }
+
+    var tween = gsap.to(navbar, {
+      '--nav-p': 1,
+      duration: 0.55,
+      ease: 'power3.out',
+      paused: true
+    });
+
+    window.ScrollTrigger.create({
+      start: 'top -12',
+      end: 99999,
+      onToggle: function (self) {
+        header.classList.toggle('is-scrolled', self.isActive);
+        if (self.isActive) tween.play();
+        else tween.reverse();
+      }
+    });
+  }
 
   /* ===========================================================
      Theme toggle (defaults to light; persists choice in localStorage)
