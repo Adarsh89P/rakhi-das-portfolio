@@ -16,18 +16,25 @@
 
 <a class="skip-link" href="#main">Skip to main content</a>
 
+<!-- Intro splash: giant wordmark + portrait, covering the real header/hero
+     until the visitor moves the mouse (or taps), then flies both pieces
+     down into their real nav-logo / hero-photo positions. See the
+     "Intro splash build" block at the end of script.js. -->
+<div class="splash" id="splash" aria-hidden="true">
+  <span class="splash-logo" id="splashLogo"></span>
+  <div class="splash-photo">
+    <img src="public/rakhi-portrait-cutout.png" alt="" />
+  </div>
+</div>
+
 <header class="site-header" id="siteHeader">
   <nav class="navbar" aria-label="Primary navigation">
-    <a href="#home" class="logo" id="logo"></a>
-
     <ul class="nav-menu" id="navMenu">
       <li><a href="#about" class="nav-link">About</a></li>
       <li><a href="#case-studies" class="nav-link">Case Studies</a></li>
+      <li class="nav-logo"><a href="#home" class="logo" id="logo"></a></li>
       <li><a href="#experience" class="nav-link">Experience</a></li>
       <li><a href="#achievements" class="nav-link">Achievements</a></li>
-      <li><a href="#testimonials" class="nav-link">Recommendations</a></li>
-      <li><a href="#skills" class="nav-link">Skills</a></li>
-      <li><a href="#contact" class="nav-link">Contact</a></li>
     </ul>
 
     <div class="nav-actions">
@@ -52,35 +59,37 @@
 
   <!-- ===================== HERO ===================== -->
   <section id="home" class="hero">
-    <div class="hero-sky" aria-hidden="true">
-      <span class="hero-cloud hero-cloud-a"></span>
-      <span class="hero-cloud hero-cloud-b"></span>
-      <span class="hero-cloud hero-cloud-c"></span>
-    </div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow" id="heroEyebrow"></p>
 
-    <div class="container hero-inner">
-      <p class="eyebrow" id="heroEyebrow"></p>
+        <h1 class="hero-display">
+          <span class="hero-display-accent" id="heroWordTop"></span>
+          <span id="heroWordBottom"></span>
+        </h1>
 
-      <h1 class="hero-display">
-        <span id="heroWordTop"></span>
-        <span id="heroWordBottom"></span>
-      </h1>
-
-      <div class="hero-footer-row">
-        <div class="hero-tagline">
-          <span id="heroTagline"></span>
-          <span class="company-chip" id="companyChip"></span>
-        </div>
+        <p class="hero-bio" id="heroBio"></p>
 
         <div class="hero-cta">
-          <a href="#case-studies" class="btn btn-primary">View Work</a>
-          <a href="#contact" class="btn btn-secondary">Contact Me</a>
+          <a href="#case-studies" class="btn btn-primary">
+            View Work
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+          <a href="#contact" class="btn btn-text">
+            Contact Me
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+        </div>
+
+        <div class="hero-follow">
+          <p>Follow me on:</p>
+          <ul class="social-list footer-social" id="heroSocialList"></ul>
         </div>
       </div>
-    </div>
 
-    <div class="hero-photo" role="img" aria-label="Photo placeholder">
-      <span id="heroInitials"></span>
+      <div class="hero-photo">
+        <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" />
+      </div>
     </div>
   </section>
 
@@ -111,7 +120,7 @@
         <div class="about-photo-wrap">
           <div class="polaroid">
             <div class="polaroid-photo">
-              <span id="aboutInitials"></span>
+              <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" />
             </div>
           </div>
         </div>

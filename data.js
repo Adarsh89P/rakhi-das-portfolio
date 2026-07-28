@@ -12,8 +12,7 @@ var PORTFOLIO_DATA = {
 
   profile: {
     logoFirst: 'Rakhi',
-    logoLast: 'Das',
-    initials: 'RD',
+    logoLast: '.UX',
     name: 'Rakhi Das',
     eyebrow: "Hey, I'm Rakhi",
     /* Big two-line display headline in the hero, like a giant poster word. */
@@ -21,8 +20,6 @@ var PORTFOLIO_DATA = {
     heroWordBottom: 'designer',
     headline: 'UI/UX Designer — crafting intuitive apps & websites',
     bio: 'UI/UX Designer with 4+ years of experience creating intuitive mobile apps, SaaS platforms, and product interfaces. Skilled at turning complex problems into simple, user-friendly solutions through research-driven, user-centered design.',
-    tagline: 'Designing intuitive products for',
-    companyChip: { initial: 'S', name: 'Sundew' },
     availabilityBadge: 'Available for freelance & collab work',
     city: 'Kolkata, India',
     heroMeta: ['Kolkata, India', '4+ Years Experience', '1,000+ Connections'],

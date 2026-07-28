@@ -47,19 +47,15 @@
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', data.meta.description);
 
-    document.getElementById('logo').innerHTML =
-      data.profile.logoFirst + '<span>' + data.profile.logoLast + '</span>';
+    var logoMark = data.profile.logoFirst + data.profile.logoLast;
+    document.getElementById('logo').textContent = logoMark;
+    document.getElementById('splashLogo').textContent = logoMark;
 
     document.getElementById('heroEyebrow').textContent = data.profile.eyebrow;
     document.getElementById('heroWordTop').textContent = data.profile.heroWordTop;
     document.getElementById('heroWordBottom').textContent = data.profile.heroWordBottom;
-    document.getElementById('heroTagline').textContent = data.profile.tagline + ' ';
-    document.getElementById('heroInitials').textContent = data.profile.initials;
-
-    var chip = document.getElementById('companyChip');
-    var chipAvatar = el('span', 'company-chip-avatar', data.profile.companyChip.initial);
-    chip.appendChild(chipAvatar);
-    chip.appendChild(document.createTextNode(data.profile.companyChip.name));
+    document.getElementById('heroBio').textContent = data.profile.bio;
+    renderSocial('heroSocialList', true);
 
     document.getElementById('basedInCity').textContent = data.profile.city;
 
@@ -87,8 +83,6 @@
   }
 
   function renderAbout() {
-    document.getElementById('aboutInitials').textContent = data.profile.initials;
-
     var aboutText = document.getElementById('aboutText');
     data.about.paragraphs.forEach(function (p) {
       aboutText.appendChild(el('p', null, p));
@@ -1209,4 +1203,65 @@
     formStatus.className = 'form-status success';
     form.reset();
   });
+
+  /* ===========================================================
+     Intro splash build — see the .splash rules in styles.css.
+
+     The real header/hero render normally the whole time; the splash is
+     just an opaque curtain with two oversized "ghost" copies (wordmark,
+     portrait) on top. On the visitor's first mouse move/tap/click, each
+     ghost gets a computed translate()+scale() transform that flies it
+     from its own rect onto its real counterpart's rect (#logo,
+     .hero-photo) — classic FLIP, done by hand since there's no
+     framer-motion here. Because the ghost and the real element look
+     identical, hiding the curtain once they land is seamless.
+  =========================================================== */
+  (function initSplashBuild() {
+    var splash = document.getElementById('splash');
+    var splashLogo = document.getElementById('splashLogo');
+    var logoTarget = document.getElementById('logo');
+    var photoTarget = document.querySelector('.hero-photo');
+    if (!splash) return;
+
+    var splashPhoto = splash.querySelector('.splash-photo');
+
+    if (motionQuery.matches || !logoTarget || !photoTarget) {
+      splash.style.display = 'none';
+      return;
+    }
+
+    var built = false;
+
+    function flip(ghost, target) {
+      var first = ghost.getBoundingClientRect();
+      var last = target.getBoundingClientRect();
+      var scaleX = last.width / first.width;
+      var scaleY = last.height / first.height;
+      var dx = (last.left + last.width / 2) - (first.left + first.width / 2);
+      var dy = (last.top + last.height / 2) - (first.top + first.height / 2);
+      ghost.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scaleX + ', ' + scaleY + ')';
+    }
+
+    function build() {
+      if (built) return;
+      built = true;
+
+      flip(splashLogo, logoTarget);
+      flip(splashPhoto, photoTarget);
+      splash.classList.add('is-building');
+
+      splash.addEventListener('transitionend', function onCurtainGone(e) {
+        if (e.target !== splash) return;
+        splash.removeEventListener('transitionend', onCurtainGone);
+        splash.style.display = 'none';
+      });
+    }
+
+    document.addEventListener('mousemove', build, { once: true, passive: true });
+    document.addEventListener('touchstart', build, { once: true, passive: true });
+    document.addEventListener('click', build, { once: true });
+    /* Fallback for a visitor who never moves the mouse/taps — a keyboard
+       user tabbing through without activating anything, say. */
+    setTimeout(build, 4500);
+  })();
 })();
