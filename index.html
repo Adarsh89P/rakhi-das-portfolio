@@ -11,21 +11,37 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+
+<!-- Inline and before first paint on purpose: the intro classes have to be
+     on <html> when the page is first painted, otherwise the settled hero
+     flashes for a frame before script.js runs. -->
+<script>
+  (function () {
+    var root = document.documentElement;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    root.classList.add('hero-intro', 'hero-intro-start');
+
+    /* Bail-out: if script.js never gets far enough to claim the intro
+       (blocked, errored, offline CDN), don't strand the visitor behind an
+       opaque veil with the page scroll locked. */
+    setTimeout(function () {
+      if (!root.classList.contains('hero-live')) {
+        root.classList.remove('hero-intro', 'hero-intro-start');
+      }
+    }, 5000);
+  })();
+</script>
 </head>
 <body>
 
 <a class="skip-link" href="#main">Skip to main content</a>
 
-<!-- Intro splash: giant wordmark + portrait, covering the real header/hero
-     until the visitor moves the mouse (or taps), then flies both pieces
-     down into their real nav-logo / hero-photo positions. See the
-     "Intro splash build" block at the end of script.js. -->
-<div class="splash" id="splash" aria-hidden="true">
-  <span class="splash-logo" id="splashLogo"></span>
-  <div class="splash-photo">
-    <img src="public/rakhi-portrait-cutout.png" alt="" />
-  </div>
-</div>
+<!-- Cream curtain behind the poster during the intro. The poster itself is a
+     normal in-flow element scaled up over this veil, so settling it into the
+     page is a single transform transition. See "Hero poster" in script.js. -->
+<div class="hero-veil" id="heroVeil" aria-hidden="true"></div>
 
 <header class="site-header" id="siteHeader">
   <nav class="navbar" aria-label="Primary navigation">
@@ -57,17 +73,38 @@
 
 <main id="main">
 
-  <!-- ===================== HERO ===================== -->
+  <!-- ===================== HERO =====================
+       The poster (giant wordmark + duotone cutout) is a single in-flow
+       block. On load, script.js scales it up over .hero-veil to fill the
+       viewport; the first pointer move releases the transform so it settles
+       into the page while the copy below rises in. Pointer position keeps
+       driving a lerped parallax on the two layers afterwards. -->
   <section id="home" class="hero">
-    <div class="container hero-grid">
-      <div class="hero-copy">
+    <div class="hero-poster" id="heroPoster">
+      <h1 class="hero-word" id="heroWord">
+        <span class="hero-word-fit" id="heroWordFit"></span>
+      </h1>
+
+      <!-- Two nested elements on purpose: the outer one carries the pointer
+           parallax, the inner one carries the intro entrance, so neither
+           transform has to be composed by hand. -->
+      <div class="hero-portrait" id="heroPortrait">
+        <div class="hero-portrait-inner">
+          <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" />
+        </div>
+      </div>
+    </div>
+
+    <div class="container hero-copy" id="heroCopy">
+      <div class="hero-copy-lead">
         <p class="eyebrow" id="heroEyebrow"></p>
-
-        <h1 class="hero-display">
-          <span class="hero-display-accent" id="heroWordTop"></span>
+        <p class="hero-tagline">
+          <span class="hero-tagline-accent" id="heroWordTop"></span>
           <span id="heroWordBottom"></span>
-        </h1>
+        </p>
+      </div>
 
+      <div class="hero-copy-body">
         <p class="hero-bio" id="heroBio"></p>
 
         <div class="hero-cta">
@@ -85,10 +122,6 @@
           <p>Follow me on:</p>
           <ul class="social-list footer-social" id="heroSocialList"></ul>
         </div>
-      </div>
-
-      <div class="hero-photo">
-        <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" />
       </div>
     </div>
   </section>

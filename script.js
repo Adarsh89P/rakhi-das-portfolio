@@ -32,6 +32,17 @@
     return '<svg viewBox="' + (viewBox || '0 0 24 24') + '" ' + attrs + '>' + iconKey + '</svg>';
   }
 
+  /* Trailing-edge debounce — resize handlers only. */
+  function debounce(fn, wait) {
+    var timer = null;
+    return function () {
+      var args = arguments;
+      var self = this;
+      clearTimeout(timer);
+      timer = setTimeout(function () { fn.apply(self, args); }, wait);
+    };
+  }
+
   function el(tag, className, html) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -49,7 +60,11 @@
 
     var logoMark = data.profile.logoFirst + data.profile.logoLast;
     document.getElementById('logo').textContent = logoMark;
-    document.getElementById('splashLogo').textContent = logoMark;
+
+    /* The poster wordmark is the same mark, set at whatever size makes it
+       span the poster (see fitWord in the hero poster block below). */
+    document.getElementById('heroWordFit').textContent = logoMark;
+    document.getElementById('heroWord').setAttribute('aria-label', data.profile.name + ' — ' + data.profile.headline);
 
     document.getElementById('heroEyebrow').textContent = data.profile.eyebrow;
     document.getElementById('heroWordTop').textContent = data.profile.heroWordTop;
@@ -1205,63 +1220,186 @@
   });
 
   /* ===========================================================
-     Intro splash build — see the .splash rules in styles.css.
+     Hero poster — see the "Hero poster" block in styles.css.
 
-     The real header/hero render normally the whole time; the splash is
-     just an opaque curtain with two oversized "ghost" copies (wordmark,
-     portrait) on top. On the visitor's first mouse move/tap/click, each
-     ghost gets a computed translate()+scale() transform that flies it
-     from its own rect onto its real counterpart's rect (#logo,
-     .hero-photo) — classic FLIP, done by hand since there's no
-     framer-motion here. Because the ghost and the real element look
-     identical, hiding the curtain once they land is seamless.
+     Three things happen here, in order:
+
+     1. fitWord() sizes the wordmark so it spans a fixed fraction of the
+        poster's width. Measuring beats a vw formula: the same rule then
+        holds on a 360px phone and a 1440px desktop no matter how Poppins
+        actually measures once it has loaded.
+
+     2. The intro. The poster is a normal in-flow block; we scale it *up*
+        over the fixed cream veil so it reads as a full-screen splash, let
+        the wordmark and cutout fade in, then on the visitor's first move
+        release the transform. Because settling is a single transform
+        transition on one composited element, the flight is smooth in a
+        way an animated layout change never is.
+
+     3. Pointer parallax, permanently. Two lerped values feed CSS custom
+        properties on the poster; the wordmark drifts against the cursor
+        and the cutout with it, which is what reads as depth.
   =========================================================== */
-  (function initSplashBuild() {
-    var splash = document.getElementById('splash');
-    var splashLogo = document.getElementById('splashLogo');
-    var logoTarget = document.getElementById('logo');
-    var photoTarget = document.querySelector('.hero-photo');
-    if (!splash) return;
+  (function initHeroPoster() {
+    var docEl = document.documentElement;
+    var poster = document.getElementById('heroPoster');
+    var wordFit = document.getElementById('heroWordFit');
+    if (!poster || !wordFit) return;
 
-    var splashPhoto = splash.querySelector('.splash-photo');
+    /* Fraction of the poster's width the wordmark should span. */
+    var WORD_FILL = 0.94;
+    /* Measured at this size, then scaled — big enough that rounding in
+       offsetWidth doesn't matter. */
+    var PROBE_PX = 200;
 
-    if (motionQuery.matches || !logoTarget || !photoTarget) {
-      splash.style.display = 'none';
+    function fitWord() {
+      /* offsetWidth, not getBoundingClientRect: layout width is immune to
+         the scale transform the poster wears during the intro. */
+      var target = poster.offsetWidth * WORD_FILL;
+      if (!target) return;
+
+      wordFit.style.fontSize = PROBE_PX + 'px';
+      var natural = wordFit.offsetWidth;
+      if (!natural) return;
+
+      wordFit.style.fontSize = (PROBE_PX * target / natural).toFixed(2) + 'px';
+    }
+
+    fitWord();
+    /* Poppins almost certainly isn't ready on first measure. */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitWord);
+
+    /* ---------- reduced motion: the poster, no theatre ---------- */
+    if (motionQuery.matches) {
+      docEl.classList.add('hero-live');
+      docEl.classList.remove('hero-intro', 'hero-intro-start');
+      window.addEventListener('resize', debounce(fitWord, 150));
       return;
     }
 
-    var built = false;
+    /* ---------- 2. intro ---------- */
+    function introTransform() {
+      /* Only valid while the poster sits at identity. */
+      var r = poster.getBoundingClientRect();
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      if (!r.width || !r.height) return '';
 
-    function flip(ghost, target) {
-      var first = ghost.getBoundingClientRect();
-      var last = target.getBoundingClientRect();
-      var scaleX = last.width / first.width;
-      var scaleY = last.height / first.height;
-      var dx = (last.left + last.width / 2) - (first.left + first.width / 2);
-      var dy = (last.top + last.height / 2) - (first.top + first.height / 2);
-      ghost.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scaleX + ', ' + scaleY + ')';
+      var scale = Math.min((vw * 0.98) / r.width, (vh * 0.86) / r.height);
+      if (scale < 1) scale = 1;
+
+      var dx = vw / 2 - (r.left + r.width / 2);
+      var dy = vh / 2 - (r.top + r.height / 2);
+      return 'translate3d(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px,0) scale(' + scale.toFixed(4) + ')';
     }
 
-    function build() {
-      if (built) return;
-      built = true;
+    var settled = false;
+    var armed = false;
+    var pendingSettle = false;
 
-      flip(splashLogo, logoTarget);
-      flip(splashPhoto, photoTarget);
-      splash.classList.add('is-building');
+    /* Tells the inline <head> bail-out that this module is in charge now. */
+    docEl.classList.add('hero-live');
 
-      splash.addEventListener('transitionend', function onCurtainGone(e) {
-        if (e.target !== splash) return;
-        splash.removeEventListener('transitionend', onCurtainGone);
-        splash.style.display = 'none';
+    /* html/body overflow is locked in CSS for .hero-intro; Lenis drives the
+       scroll itself and has to be stopped separately. */
+    if (lenis) lenis.stop();
+
+    poster.style.transform = introTransform();
+
+    /* Two frames: one for the transform above to be committed, one for the
+       entrance transition to have a "from" value to animate out of. */
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        docEl.classList.remove('hero-intro-start');
       });
+    });
+
+    /* Don't let a mouse move at t=50ms cut the entrance off mid-fade. */
+    setTimeout(function () {
+      armed = true;
+      if (pendingSettle) settle();
+    }, 1100);
+
+    function settle() {
+      if (settled) return;
+      if (!armed) { pendingSettle = true; return; }
+      settled = true;
+
+      docEl.classList.add('hero-settling');
+      docEl.classList.remove('hero-intro');
+      poster.style.transform = '';
+      if (lenis) lenis.start();
+
+      window.setTimeout(function () {
+        docEl.classList.remove('hero-settling');
+        /* Parallax keeps running, so the poster keeps its own will-change;
+           the veil is inert from here on. */
+        var veil = document.getElementById('heroVeil');
+        if (veil) veil.style.display = 'none';
+        if (window.ScrollTrigger) window.ScrollTrigger.refresh();
+      }, 1250);
     }
 
-    document.addEventListener('mousemove', build, { once: true, passive: true });
-    document.addEventListener('touchstart', build, { once: true, passive: true });
-    document.addEventListener('click', build, { once: true });
-    /* Fallback for a visitor who never moves the mouse/taps — a keyboard
-       user tabbing through without activating anything, say. */
-    setTimeout(build, 4500);
+    document.addEventListener('mousemove', settle, { once: true, passive: true });
+    document.addEventListener('touchstart', settle, { once: true, passive: true });
+    document.addEventListener('wheel', settle, { once: true, passive: true });
+    document.addEventListener('click', settle, { once: true });
+    document.addEventListener('keydown', settle, { once: true });
+    /* A visitor who never moves the mouse or taps still gets the page. */
+    setTimeout(settle, 3600);
+
+    /* ---------- 3. pointer parallax ---------- */
+    /* Depth in px at full cursor deflection. The wordmark moves against the
+       cursor and the cutout with it — opposing directions are what sell the
+       separation between the two planes. */
+    var WORD_DEPTH = { x: -16, y: -9 };
+    var PORTRAIT_DEPTH = { x: 26, y: 14 };
+    var EASE = 0.075;
+
+    var targetX = 0, targetY = 0;
+    var currentX = 0, currentY = 0;
+    var frame = null;
+
+    function tick() {
+      currentX += (targetX - currentX) * EASE;
+      currentY += (targetY - currentY) * EASE;
+
+      poster.style.setProperty('--word-x', (currentX * WORD_DEPTH.x).toFixed(2) + 'px');
+      poster.style.setProperty('--word-y', (currentY * WORD_DEPTH.y).toFixed(2) + 'px');
+      poster.style.setProperty('--portrait-x', (currentX * PORTRAIT_DEPTH.x).toFixed(2) + 'px');
+      poster.style.setProperty('--portrait-y', (currentY * PORTRAIT_DEPTH.y).toFixed(2) + 'px');
+
+      /* Park the loop once it has visually arrived. */
+      if (Math.abs(targetX - currentX) > 0.0005 || Math.abs(targetY - currentY) > 0.0005) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        frame = null;
+      }
+    }
+
+    document.addEventListener('mousemove', function (e) {
+      /* -1..1 from the viewport centre. */
+      targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+      targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!frame) frame = requestAnimationFrame(tick);
+    }, { passive: true });
+
+    /* Pointer leaves the window: drift back to rest rather than freezing. */
+    document.addEventListener('mouseleave', function () {
+      targetX = 0;
+      targetY = 0;
+      if (!frame) frame = requestAnimationFrame(tick);
+    }, { passive: true });
+
+    /* ---------- resize ---------- */
+    window.addEventListener('resize', debounce(function () {
+      fitWord();
+      /* Mid-intro the poster still has to fill the new viewport, and
+         introTransform() can only measure it at identity. */
+      if (!settled) {
+        poster.style.transform = '';
+        poster.style.transform = introTransform();
+      }
+    }, 150));
   })();
 })();
