@@ -15,9 +15,10 @@ var PORTFOLIO_DATA = {
     logoLast: '.UX',
     name: 'Rakhi Das',
     eyebrow: "Hey, I'm Rakhi",
-    /* Big two-line display headline in the hero, like a giant poster word. */
-    heroWordTop: 'product',
-    heroWordBottom: 'designer',
+    /* Two-part hero headline: heroWordTop is the gradient-accented lead word/phrase,
+       heroWordBottom is the rest of the sentence in the normal text color. */
+    heroWordTop: 'Designing',
+    heroWordBottom: 'products people actually enjoy using.',
     headline: 'UI/UX Designer — crafting intuitive apps & websites',
     bio: 'UI/UX Designer with 4+ years of experience creating intuitive mobile apps, SaaS platforms, and product interfaces. Skilled at turning complex problems into simple, user-friendly solutions through research-driven, user-centered design.',
     availabilityBadge: 'Available for freelance & collab work',
@@ -38,6 +39,12 @@ var PORTFOLIO_DATA = {
   },
 
   about: {
+    heading: {
+      pre: 'Turning complex problems into',
+      highlight: 'simple',
+      post: 'experiences.'
+    },
+    ctaLabel: 'Know More',
     paragraphs: [
       "I'm a UI/UX Designer based in Kolkata, India, with over four years of experience designing mobile apps, SaaS platforms, and product interfaces for startups and enterprises alike. My work centers on turning complex, ambiguous problems into simple, user-friendly solutions.",
       "I collaborate closely with stakeholders to align design strategy with business goals — helping products drive growth while still delivering meaningful, usable experiences for real people. My process leans heavily on research: heuristic evaluation, usability testing, and iterative prototyping guide every decision I make.",
@@ -52,6 +59,12 @@ var PORTFOLIO_DATA = {
     { number: '2', label: 'Design Certifications' },
     { number: '1,034', label: 'Professional Connections' }
   ],
+
+  /* Gradient banner listing real past employers as plain text — edit freely. */
+  workedWith: {
+    heading: "Companies I've Worked With",
+    companies: ['Sundew', 'Fortmindz', 'Pixel Consultancy', 'Granicus']
+  },
 
   skills: {
     design: [

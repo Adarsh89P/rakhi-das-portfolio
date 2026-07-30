@@ -3,6 +3,7 @@
    ========================================================================== */
 :root {
   --font-base: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-display: 'Bricolage Grotesque', var(--font-base);
   --font-script: 'Caveat', cursive;
 
   /* Light theme (default) */
@@ -65,12 +66,6 @@
   --lh-snug: 1.35;
   --lh-body: 1.65;
 
-  /* Hero poster palette (the cream/black/acid-yellow poster). Deliberately
-     literal rather than themed — the poster is a fixed brand artefact. */
-  --poster-bg: #fbfbf0;
-  --poster-ink: #08080a;
-  --poster-accent: #e9e60a;
-
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
 }
@@ -90,10 +85,6 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.45);
-
-  --poster-bg: #0e0e0c;
-  --poster-ink: #fbfbf0;
-  --poster-accent: #e9e60a;
 }
 
 /* ==========================================================================
@@ -215,8 +206,6 @@ section {
   color: var(--color-primary-contrast);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  /* Above .hero-veil (850) and the intro poster (880) — a keyboard user
-     tabbing in mid-intro must see this land on top, not behind. */
   z-index: 1100;
 }
 
@@ -423,6 +412,7 @@ section > .container > .section-title + .section-subtitle {
 }
 
 .logo {
+  font-family: var(--font-display);
   font-weight: 800;
   /* px clamp, not rem: the bar also has to fit a hamburger and a theme
      toggle at 360px, so this one can't ride the fluid root. */
@@ -584,203 +574,21 @@ section > .container > .section-title + .section-subtitle {
 }
 
 /* ==========================================================================
-   Hero poster — cream field, full-bleed "Rakhi.UX" wordmark, duotone cutout
-   standing in front of it.
-
-   Layout: the poster is an ordinary in-flow block sized to the page. The
-   intro doesn't move it into place — it starts scaled *up* over a fixed
-   cream veil so it reads as a full-screen splash, and settling it is one
-   transform transition back to identity. Transform-only means the whole
-   flight is composited, which is where the smoothness comes from.
-
-   The two layers (word, portrait) then track the pointer independently at
-   different depths via --word-x/--portrait-x, lerped in script.js.
+   Hero — static split layout: copy left, portrait photo right.
    ========================================================================== */
-.hero-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 850;
-  background-color: var(--poster-bg);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.7s ease 0.25s;
-}
-
-/* Only live between "JS took over" and "poster has settled". */
-html.hero-intro .hero-veil {
-  opacity: 1;
-  transition: none;
-}
-
-/* The header would otherwise sit on top of the full-screen poster. */
-html.hero-intro .site-header {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.site-header {
-  transition: opacity 0.6s ease 0.35s;
-}
-
 .hero {
   position: relative;
-  padding-top: calc(var(--header-height) + var(--space-4));
+  padding-top: calc(var(--header-height) + var(--space-6));
   padding-bottom: var(--section-pad);
-  background-color: var(--poster-bg);
-  color: var(--poster-ink);
-  /* No overflow clipping here on purpose — during the intro the poster is
-     scaled well beyond the section's own box, and fitWord() already keeps
-     the wordmark inside it once settled. */
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-/* The page mustn't scroll out from under the full-screen poster. */
-html.hero-intro,
-html.hero-intro body {
-  overflow: hidden;
-}
-
-.hero-poster {
-  position: relative;
-  /* Only the intro needs the poster above the veil (850) and the header
-     (500); once settled it must sit under the nav and the mobile drawer. */
-  z-index: 1;
-  width: 100%;
-  /* Tall enough for the portrait to read at full length, capped so the
-     poster never pushes the copy entirely below the fold on desktop. */
-  height: clamp(320px, 62vh, 620px);
-  transform-origin: 50% 50%;
-  will-change: transform;
-}
-
-html.hero-intro .hero-poster,
-html.hero-settling .hero-poster {
-  z-index: 880;
-}
-
-html.hero-settling .hero-poster {
-  transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ---- the wordmark ---- */
-.hero-word {
-  position: absolute;
-  inset-inline: 0;
-  /* Optical centre: the portrait's head crosses the word slightly above
-     the middle, exactly as in the reference. */
-  top: 34%;
-  margin: 0;
-  text-align: center;
-  line-height: 0.82;
-  z-index: 1;
-  transform: translate3d(var(--word-x, 0px), var(--word-y, 0px), 0);
-  will-change: transform;
-}
-
-/* Sized by script.js (fitHeroWord) rather than a vw formula, so the
-   wordmark spans the same fraction of the poster on every screen width
-   regardless of how the font actually measures. */
-.hero-word-fit {
-  display: inline-block;
-  font-size: 12vw;
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  color: var(--poster-ink);
-  white-space: nowrap;
-}
-
-/* ---- the portrait ---- */
-/* Outer element: pointer parallax only. Deliberately untransitioned — the
-   easing comes from the lerp in script.js, and a CSS transition on top of
-   it would smear the motion a second time and feel laggy. */
-.hero-portrait {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  height: 100%;
-  /* The cutout's own 533x740 ratio, so object-fit: contain never letterboxes
-     it — the box the duotone mask paints into is exactly the subject's box. */
-  aspect-ratio: 533 / 740;
-  z-index: 2;
-  transform: translate3d(calc(-50% + var(--portrait-x, 0px)), var(--portrait-y, 0px), 0);
-  will-change: transform;
-}
-
-/* Inner element: the intro entrance. */
-.hero-portrait-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.hero-portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  filter: grayscale(1) contrast(1.06);
-}
-
-/* Duotone wash: the same cutout used as a mask so the yellow only lands on
-   the subject, multiplied so highlights go acid-yellow and shadows stay ink.
-   The mask uses the identical sizing/position as the <img> underneath, so
-   the two stay registered at any poster size. */
-.hero-portrait-inner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(180deg, transparent 44%, var(--poster-accent) 94%);
-  -webkit-mask-image: url('public/rakhi-portrait-cutout.png');
-  mask-image: url('public/rakhi-portrait-cutout.png');
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-position: bottom center;
-  mask-position: bottom center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
-
-:root[data-theme='dark'] .hero-portrait-inner::after {
-  mix-blend-mode: screen;
-}
-
-/* ---- intro entrance (plays once, before the pointer arrives) ---- */
-.hero-word-fit,
-.hero-portrait-inner {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hero-portrait-inner {
-  transition-delay: 0.12s;
-}
-
-html.hero-intro-start .hero-word-fit {
-  opacity: 0;
-  transform: translateY(0.14em);
-}
-
-html.hero-intro-start .hero-portrait-inner {
-  opacity: 0;
-  transform: translateY(7%);
-}
-
-/* ---- copy below the poster ---- */
-.hero-copy {
+.hero-inner {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  align-items: start;
-  gap: var(--space-5) var(--space-6);
-  padding-top: var(--space-6);
-  transition: opacity 0.7s ease 0.25s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
-}
-
-html.hero-intro .hero-copy {
-  opacity: 0;
-  transform: translateY(22px);
-  transition: none;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: var(--space-6) var(--space-7);
 }
 
 .eyebrow {
@@ -793,18 +601,25 @@ html.hero-intro .hero-copy {
 }
 
 .hero-tagline {
+  font-family: var(--font-display);
   font-size: var(--fs-2xl);
   font-weight: 800;
   line-height: var(--lh-tight);
-  letter-spacing: -0.035em;
-  color: var(--poster-ink);
-  margin-bottom: 0;
-  text-transform: lowercase;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.hero-tagline-accent,
+.gradient-text {
+  background: linear-gradient(100deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .hero-tagline-accent {
   display: block;
-  color: color-mix(in srgb, var(--poster-ink) 42%, var(--poster-bg));
 }
 
 .hero-bio {
@@ -846,8 +661,35 @@ html.hero-intro .hero-copy {
 .hero-follow p {
   font-size: var(--fs-sm);
   font-weight: 500;
-  color: var(--poster-ink);
+  color: var(--color-text);
   margin-bottom: var(--space-2);
+}
+
+.hero-photo-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-photo {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--color-bg-alt), var(--color-surface));
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  /* Soft fade at the bottom edge so the portrait blends into the page
+     instead of ending on a hard rectangle. */
+  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
 }
 
 .hero-follow .social-list {
@@ -954,6 +796,20 @@ html.hero-intro .hero-copy {
 /* ==========================================================================
    About
    ========================================================================== */
+.about-heading {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  max-width: 46rem;
+  margin-bottom: var(--space-6);
+}
+
+.about-cta {
+  align-self: flex-start;
+  margin-top: var(--space-4);
+}
+
 .about-grid {
   display: grid;
   grid-template-columns: 0.7fr 1.3fr;
@@ -1035,6 +891,42 @@ html.hero-intro .hero-copy {
 .stat-label {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   Worked With — gradient banner listing real past employers as plain text.
+   ========================================================================== */
+.worked-with {
+  background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
+  padding-block: var(--space-7);
+}
+
+.worked-with-inner {
+  text-align: center;
+}
+
+.worked-with-heading {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: var(--space-6);
+}
+
+.worked-with-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3) var(--space-6);
+}
+
+.worked-with-item {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 0.9rem + 1vw, 1.6rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -2548,10 +2440,18 @@ html.hero-intro .hero-copy {
     background-color: var(--color-primary);
   }
 
-  .hero-copy {
+  .hero-inner {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
-    padding-top: var(--space-5);
+    gap: var(--space-5);
+  }
+
+  .hero-photo-wrap {
+    order: -1;
+  }
+
+  .hero-photo {
+    max-width: 340px;
+    margin-inline: auto;
   }
 
   .about-grid {
@@ -2763,21 +2663,16 @@ html.hero-intro .hero-copy {
     align-items: stretch;
   }
 
-  /* The cutout is bottom-anchored at the poster's full height, so the
-     poster's height is the only thing controlling how wide it lands. At
-     390px a taller poster would put the portrait across most of the
-     wordmark; this keeps both readable — and because the portrait still
-     fills the box, shortening it leaves no dead cream above the head. */
   .hero {
-    padding-top: calc(var(--header-height) + var(--space-2));
+    padding-top: calc(var(--header-height) + var(--space-3));
   }
 
-  .hero-poster {
-    height: clamp(260px, 44vh, 380px);
+  .hero-photo {
+    max-width: 260px;
   }
 
-  .hero-word {
-    top: 32%;
+  .worked-with-list {
+    gap: var(--space-3) var(--space-4);
   }
 
   .testimonial-card {
