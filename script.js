@@ -20,9 +20,9 @@
 
   var SOCIAL_ICONS = {
     linkedin: '<path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.02-3.06-1.87-3.06-1.87 0-2.16 1.46-2.16 2.96V21h-4V9Z"/>',
-    github: '<path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.93 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.83-2.34 4.68-4.57 4.92.36.31.68.92.68 1.85v2.75c0 .26.18.58.69.48A10 10 0 0 0 12 2Z"/>',
     twitter: '<path d="M18.9 3H21l-6.53 7.46L22.5 21h-6.9l-4.8-6.27L4.6 21H2.5l7-8L2 3h7.06l4.34 5.73L18.9 3Zm-1.2 16h1.15L7.36 4.9H6.1L17.7 19Z"/>',
-    dribbble: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.6 4.7a8.2 8.2 0 0 1 1.8 5c-.26-.05-2.86-.58-5.48-.25-.06-.14-.11-.29-.17-.43a20 20 0 0 0-.5-1.16c2.9-1.18 4.2-2.86 4.35-3.16ZM12 3.8c1.83 0 3.5.66 4.8 1.75-.13.27-1.3 1.8-4.1 2.86A44.6 44.6 0 0 0 9.6 4.2c.77-.26 1.57-.4 2.4-.4Zm-4.05 1.1a45 45 0 0 1 3.1 4.4c-3.9 1.04-7.34 1-7.7 1a8.24 8.24 0 0 1 4.6-5.4Zm-4.75 7.13v-.2c.35.01 4.4.06 8.56-1.18.24.46.46.93.67 1.4l-.4.12c-4.32 1.4-6.62 5.22-6.81 5.54a8.16 8.16 0 0 1-2.02-5.68Zm7.5 8.16A8.2 8.2 0 0 1 5.9 17.7c.15-.26 1.85-3.15 6.6-4.75.02-.01.03 0 .05-.01a37 37 0 0 1 1.87 6.99 8.2 8.2 0 0 1-3.72.16Zm5-.72a38.8 38.8 0 0 0-1.72-6.5c2.42-.38 4.54.24 4.8.32a8.25 8.25 0 0 1-3.08 6.18Z"/>'
+    facebook: '<path d="M13.5 21v-7.5H16l.4-3H13.5V8.4c0-.87.24-1.46 1.5-1.46H16.5V4.35c-.26-.03-1.15-.11-2.19-.11-2.17 0-3.66 1.32-3.66 3.75V10.5H8.2v3h2.45V21h2.85Z"/>',
+    instagram: '<path d="M12 2c2.72 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.89 1.11 1.15 1.77.25.64.42 1.37.47 2.43C21.99 8.94 22 9.28 22 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.64.25-1.37.42-2.43.47-1.06.05-1.4.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.72 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77A4.9 4.9 0 0 1 5.45 2.53c.64-.25 1.37-.42 2.43-.47C8.94 2.01 9.28 2 12 2Zm0 2.16c-2.67 0-2.99.01-4.04.06-.87.04-1.34.18-1.65.3-.42.16-.71.35-1.02.66-.31.31-.5.6-.66 1.02-.12.31-.26.78-.3 1.65-.05 1.05-.06 1.37-.06 4.04s.01 2.99.06 4.04c.04.87.18 1.34.3 1.65.16.42.35.71.66 1.02.31.31.6.5 1.02.66.31.12.78.26 1.65.3 1.05.05 1.37.06 4.04.06s2.99-.01 4.04-.06c.87-.04 1.34-.18 1.65-.3.42-.16.71-.35 1.02-.66.31-.31.5-.6.66-1.02.12-.31.26-.78.3-1.65.05-1.05.06-1.37.06-4.04s-.01-2.99-.06-4.04c-.04-.87-.18-1.34-.3-1.65a2.7 2.7 0 0 0-.66-1.02 2.7 2.7 0 0 0-1.02-.66c-.31-.12-.78-.26-1.65-.3-1.05-.05-1.37-.06-4.04-.06Zm0 3.68a4.16 4.16 0 1 1 0 8.32 4.16 4.16 0 0 1 0-8.32Zm0 6.86a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4Zm5.3-7.04a.97.97 0 1 1-1.94 0 .97.97 0 0 1 1.94 0Z"/>'
   };
 
   function svg(iconKey, viewBox, filled) {
@@ -60,14 +60,13 @@
 
     var logoMark = data.profile.logoFirst + data.profile.logoLast;
     document.getElementById('logo').textContent = logoMark;
+    document.getElementById('introBrand').textContent = logoMark;
 
     document.getElementById('heroEyebrow').textContent = data.profile.eyebrow;
     document.getElementById('heroWordTop').textContent = data.profile.heroWordTop;
     document.getElementById('heroWordBottom').textContent = data.profile.heroWordBottom;
     document.getElementById('heroBio').textContent = data.profile.bio;
     renderSocial('heroSocialList', true);
-
-    document.getElementById('basedInCity').textContent = data.profile.city;
 
     var footerName = document.getElementById('footerName');
     footerName.textContent = data.footer.name;
@@ -113,14 +112,6 @@
 
     document.getElementById('aboutSignature').textContent = data.about.signature;
     document.getElementById('aboutCta').querySelector('span').textContent = data.about.ctaLabel;
-  }
-
-  function renderWorkedWith() {
-    document.getElementById('workedWithHeading').textContent = data.workedWith.heading;
-    var list = document.getElementById('workedWithList');
-    data.workedWith.companies.forEach(function (name) {
-      list.appendChild(el('span', 'worked-with-item', name));
-    });
   }
 
   function renderSkillBar(container, skill) {
@@ -507,9 +498,8 @@
 
   function renderAll() {
     renderProfile();
-    renderWhatIDo();
+    /* what-i-do section is commented out in index.html */
     renderAbout();
-    renderWorkedWith();
     renderSkills();
     renderExperience();
     renderAchievements();
@@ -520,6 +510,108 @@
   }
 
   renderAll();
+  initHeroMorph();
+
+  /* ===========================================================
+     Hero intro morph (Figma Frame 1 -> Frame 2)
+
+     The splash brand + portrait hold on screen until the visitor's
+     first pointer move. At that point we measure where the intro
+     copies currently sit and where the real navbar logo / hero photo
+     live, then hand the flight off to GSAP as a from-rect-to-rect
+     tween (a manual FLIP) while cross-fading the two pairs of
+     elements at the midpoint. Nav links and the hero copy column get
+     a simpler CSS opacity/translate reveal at the same moment.
+  =========================================================== */
+  function initHeroMorph() {
+    var overlay = document.getElementById('introOverlay');
+    var introBrand = document.getElementById('introBrand');
+    var introPortrait = document.getElementById('introPortrait');
+    var finalLogo = document.getElementById('logo');
+    var finalPhotoWrap = document.getElementById('heroPhotoWrap');
+
+    if (!overlay || !introBrand || !introPortrait || !finalLogo || !finalPhotoWrap) return;
+
+    function reveal() {
+      document.body.classList.remove('intro-active');
+      overlay.style.display = 'none';
+    }
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !window.gsap) {
+      reveal();
+      return;
+    }
+
+    var ENTRANCE_DONE = 2100; /* matches the intro-brand/-portrait CSS entrance delays+durations */
+    var armed = false;
+    var requested = false;
+    var fired = false;
+
+    function morph() {
+      if (fired) return;
+      fired = true;
+
+      /* Freeze the CSS entrance animation at its settled state so GSAP
+         owns `transform`/`opacity` cleanly from here on. */
+      introBrand.style.opacity = 1;
+      introBrand.style.transform = 'translateY(0)';
+      introBrand.style.animation = 'none';
+      introPortrait.style.opacity = 1;
+      introPortrait.style.transform = 'translateY(0) scale(1)';
+      introPortrait.style.animation = 'none';
+
+      var brandFrom = introBrand.getBoundingClientRect();
+      var brandTo = finalLogo.getBoundingClientRect();
+      var brandScale = brandTo.width / brandFrom.width;
+      var brandX = (brandTo.left + brandTo.width / 2) - (brandFrom.left + brandFrom.width / 2);
+      var brandY = (brandTo.top + brandTo.height / 2) - (brandFrom.top + brandFrom.height / 2);
+
+      var photoFrom = introPortrait.getBoundingClientRect();
+      var photoTo = finalPhotoWrap.getBoundingClientRect();
+      var photoScale = photoTo.width / photoFrom.width;
+      var photoX = (photoTo.left + photoTo.width / 2) - (photoFrom.left + photoFrom.width / 2);
+      var photoY = (photoTo.top + photoTo.height / 2) - (photoFrom.top + photoFrom.height / 2);
+
+      gsap.set(finalLogo, { opacity: 0 });
+      gsap.set(finalPhotoWrap, { opacity: 0 });
+
+      /* Nav links + hero copy: plain CSS fade/slide, defined in styles.css. */
+      document.body.classList.remove('intro-active');
+
+      var tl = gsap.timeline({
+        defaults: { duration: 1.1, ease: 'power3.inOut' },
+        onComplete: function () {
+          overlay.style.display = 'none';
+        }
+      });
+
+      tl.to(introBrand, { x: brandX, y: brandY, scale: brandScale }, 0)
+        .to(introBrand, { opacity: 0, duration: 0.45 }, 0.5)
+        .to(finalLogo, { opacity: 1, duration: 0.45 }, 0.5)
+        .to(introPortrait, { x: photoX, y: photoY, scale: photoScale }, 0)
+        .to(introPortrait, { opacity: 0, duration: 0.45 }, 0.55)
+        .to(finalPhotoWrap, { opacity: 1, duration: 0.45 }, 0.55);
+    }
+
+    function advance() {
+      if (!armed) {
+        requested = true;
+        return;
+      }
+      morph();
+    }
+
+    var armId = window.setTimeout(function () {
+      armed = true;
+      if (requested) morph();
+    }, ENTRANCE_DONE);
+
+    var events = ['mousemove', 'pointerdown', 'touchstart', 'wheel', 'keydown'];
+    events.forEach(function (evt) {
+      window.addEventListener(evt, advance, { passive: true });
+    });
+  }
 
   /* ===========================================================
      Pinned scroll decks — GSAP ScrollTrigger

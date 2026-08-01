@@ -8,22 +8,39 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@300;400;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="intro-active">
 
 <a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ===================== INTRO SPLASH =====================
+     Frame 1 of the Figma reference: the brand name and portrait shown
+     large and centered, before the visitor's first mouse move morphs
+     them into the navbar logo and hero portrait (Frame 2). Purely
+     decorative — hidden from assistive tech and removed from the DOM
+     flow once the morph completes (see initHeroMorph in script.js). -->
+<div class="intro-overlay" id="introOverlay" aria-hidden="true">
+  <div class="intro-brand-layer">
+    <span class="intro-brand" id="introBrand"></span>
+  </div>
+  <div class="intro-portrait-layer">
+    <div class="intro-portrait" id="introPortrait">
+      <img src="public/rakhi-portrait-cutout.png" alt="" draggable="false">
+    </div>
+  </div>
+</div>
 
 <header class="site-header" id="siteHeader">
   <nav class="navbar" aria-label="Primary navigation">
     <ul class="nav-menu" id="navMenu">
-      <li><a href="#about" class="nav-link">About</a></li>
-      <li><a href="#case-studies" class="nav-link">Case Studies</a></li>
+      <li><a href="#about" class="nav-link">Meet kai</a></li>
+      <li><a href="#case-studies" class="nav-link">Book online</a></li>
       <li class="nav-logo"><a href="#home" class="logo" id="logo"></a></li>
-      <li><a href="#experience" class="nav-link">Experience</a></li>
-      <li><a href="#achievements" class="nav-link">Achievements</a></li>
+      <li><a href="#experience" class="nav-link">Photo Gallery</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
     </ul>
 
     <div class="nav-actions">
@@ -60,11 +77,11 @@
 
         <div class="hero-cta">
           <a href="#case-studies" class="btn btn-primary">
-            View Work
+            Book A Call
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
           </a>
           <a href="#contact" class="btn btn-text">
-            Contact Me
+            Get Started
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
           </a>
         </div>
@@ -75,22 +92,15 @@
         </div>
       </div>
 
-      <div class="hero-photo-wrap">
-        <div class="hero-photo">
-          <img src="public/rakhi-portrait.png" alt="Rakhi Das, UI/UX Designer" />
+      <div class="hero-photo-wrap" id="heroPhotoWrap">
+        <div class="hero-photo hero-photo--cutout">
+          <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" id="heroPortrait" />
         </div>
       </div>
     </div>
   </section>
 
-  <div class="based-in-bar">
-    <div class="container based-in-inner">
-      <span>Based in</span>
-      <span class="based-in-city" id="basedInCity"></span>
-    </div>
-  </div>
-
-  <!-- ===================== WHAT I DO ===================== -->
+  <!-- ===================== WHAT I DO =====================
   <section id="what-i-do" class="what-i-do">
     <div class="container">
       <p class="eyebrow eyebrow-dot" id="whatIDoEyebrow"></p>
@@ -99,6 +109,7 @@
       <div class="what-i-do-stats" id="whatIDoStats"></div>
     </div>
   </section>
+  ===================== /WHAT I DO ===================== -->
 
   <!-- ===================== ABOUT ===================== -->
   <section id="about" class="about">
@@ -126,14 +137,6 @@
       </div>
 
       <div class="about-stats" id="statsGrid"></div>
-    </div>
-  </section>
-
-  <!-- ===================== WORKED WITH ===================== -->
-  <section id="worked-with" class="worked-with">
-    <div class="container worked-with-inner">
-      <h2 class="worked-with-heading" id="workedWithHeading"></h2>
-      <div class="worked-with-list" id="workedWithList"></div>
     </div>
   </section>
 

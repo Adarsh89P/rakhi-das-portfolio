@@ -579,7 +579,10 @@ section > .container > .section-title + .section-subtitle {
 .hero {
   position: relative;
   padding-top: calc(var(--header-height) + var(--space-6));
-  padding-bottom: var(--section-pad);
+  /* Was var(--section-pad): with the based-in-bar and what-i-do gone,
+     .about's own top padding-block is now the only gap that's needed
+     between the two sections. */
+  padding-bottom: var(--space-4);
   background-color: var(--color-bg);
   color: var(--color-text);
 }
@@ -693,29 +696,221 @@ section > .container > .section-title + .section-subtitle {
 }
 
 .hero-follow .social-list {
-  gap: var(--space-2);
+  gap: 14px;
 }
 
-.based-in-bar {
-  border-block: 1px solid var(--color-border);
-  padding-block: var(--space-3);
-  background-color: var(--color-bg);
+.hero-follow .social-list a {
+  width: 32px;
+  height: 32px;
 }
 
-.based-in-inner {
+/* ==========================================================================
+   Hero — Figma-accurate type, gradient and portrait treatment.
+   Scoped to the hero only; other sections keep the site's own palette.
+   ========================================================================== */
+:root {
+  --hero-ink: #000000;
+  --hero-muted: #767676;
+  --hero-accent-a: #b16cea;
+  --hero-accent-b: #fa5f72;
+  --hero-accent-c: #ffa44c;
+}
+
+.hero .eyebrow {
+  display: none;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: clamp(1.4rem, 1rem + 1.9vw, 2.75rem);
+}
+
+.nav-link {
+  font-weight: 300;
+  font-size: 1rem;
+}
+
+.hero-tagline {
+  font-weight: 300;
+  font-size: clamp(2.75rem, 1.8rem + 3.9vw, 6rem);
+  line-height: 0.885;
+  letter-spacing: -0.02em;
+  color: var(--hero-ink);
+}
+
+.hero-tagline-accent {
+  display: inline;
+  background: linear-gradient(90deg, var(--hero-accent-a) 0%, var(--hero-accent-b) 17.189%, var(--hero-accent-c) 42.972%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-bio {
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 24px;
+  max-width: 33rem;
+  color: var(--hero-muted);
+}
+
+.hero-cta .btn-primary {
+  background-color: var(--hero-ink);
+  color: #fff;
+  box-shadow: none;
+  font-weight: 300;
+  font-size: 16px;
+  padding: 10px 28px;
+}
+
+.hero-cta .btn-primary:hover {
+  background-color: #1a1a1a;
+  box-shadow: none;
+}
+
+.hero-cta .btn-text {
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--hero-ink);
+}
+
+.hero-follow p {
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--hero-ink);
+}
+
+.hero-photo-wrap {
+  justify-content: flex-end;
+}
+
+.hero-photo.hero-photo--cutout {
+  max-width: 640px;
+  aspect-ratio: 624 / 917;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.hero-photo--cutout img {
+  object-fit: contain;
+  object-position: bottom center;
+  filter: grayscale(1);
+  -webkit-mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
+}
+
+/* --------------------------------------------------------------------
+   Intro splash (Figma Frame 1) — giant centered brand + portrait, held
+   until the visitor's first pointer move, then handed off to the
+   navbar logo and hero portrait (Frame 2) by the FLIP crossfade in
+   initHeroMorph (script.js).
+   -------------------------------------------------------------------- */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  /* Always the light splash from the reference, independent of the
+     visitor's dark-mode preference for the rest of the site. */
+  background-color: #ffffff;
+  pointer-events: none;
+}
+
+.intro-brand-layer,
+.intro-portrait-layer {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  font-size: var(--fs-xs);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
-.based-in-city {
+.intro-brand-layer {
+  z-index: 10;
+}
+
+.intro-portrait-layer {
+  z-index: 20;
+}
+
+.intro-brand {
+  display: block;
+  font-family: var(--font-display);
   font-weight: 700;
-  color: var(--color-text);
+  font-size: clamp(64px, 18.8vw, 301px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--hero-ink);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: introBrandIn 0.9s 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.intro-portrait {
+  position: relative;
+  height: 62vh;
+  aspect-ratio: 624 / 917;
+  opacity: 0;
+  transform: translateY(80px) scale(0.96);
+  animation: introPortraitIn 1.4s 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.intro-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: grayscale(1);
+  -webkit-mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
+}
+
+@keyframes introBrandIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introPortraitIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Nav links and hero copy hold at opacity 0 until the morph fires, then
+   fade/slide in on their own CSS transition — the brand and portrait
+   are the only pieces the JS animates directly (see script.js). */
+body.intro-active .site-header .nav-link,
+body.intro-active .site-header .nav-actions {
+  opacity: 0;
+}
+
+body.intro-active .hero-text {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.site-header .nav-link,
+.site-header .nav-actions {
+  opacity: 1;
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-text {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* #logo and #heroPhotoWrap start hidden too, but are revealed by the JS
+   crossfade (gsap sets their opacity directly) rather than this
+   transition, so the two handoffs land on the same frame. */
+body.intro-active #logo,
+body.intro-active #heroPhotoWrap {
+  opacity: 0;
 }
 
 /* ==========================================================================
@@ -891,42 +1086,6 @@ section > .container > .section-title + .section-subtitle {
 .stat-label {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
-}
-
-/* ==========================================================================
-   Worked With — gradient banner listing real past employers as plain text.
-   ========================================================================== */
-.worked-with {
-  background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
-  padding-block: var(--space-7);
-}
-
-.worked-with-inner {
-  text-align: center;
-}
-
-.worked-with-heading {
-  font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: var(--space-6);
-}
-
-.worked-with-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: var(--space-3) var(--space-6);
-}
-
-.worked-with-item {
-  font-family: var(--font-display);
-  font-size: clamp(1.1rem, 0.9rem + 1vw, 1.6rem);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
-  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -2669,10 +2828,6 @@ section > .container > .section-title + .section-subtitle {
 
   .hero-photo {
     max-width: 260px;
-  }
-
-  .worked-with-list {
-    gap: var(--space-3) var(--space-4);
   }
 
   .testimonial-card {

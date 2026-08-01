@@ -17,8 +17,8 @@ var PORTFOLIO_DATA = {
     eyebrow: "Hey, I'm Rakhi",
     /* Two-part hero headline: heroWordTop is the gradient-accented lead word/phrase,
        heroWordBottom is the rest of the sentence in the normal text color. */
-    heroWordTop: 'Designing',
-    heroWordBottom: 'products people actually enjoy using.',
+    heroWordTop: 'Revitalize',
+    heroWordBottom: 'Your Daily Journey.',
     headline: 'UI/UX Designer — crafting intuitive apps & websites',
     bio: 'UI/UX Designer with 4+ years of experience creating intuitive mobile apps, SaaS platforms, and product interfaces. Skilled at turning complex problems into simple, user-friendly solutions through research-driven, user-centered design.',
     availabilityBadge: 'Available for freelance & collab work',
@@ -59,12 +59,6 @@ var PORTFOLIO_DATA = {
     { number: '2', label: 'Design Certifications' },
     { number: '1,034', label: 'Professional Connections' }
   ],
-
-  /* Gradient banner listing real past employers as plain text — edit freely. */
-  workedWith: {
-    heading: "Companies I've Worked With",
-    companies: ['Sundew', 'Fortmindz', 'Pixel Consultancy', 'Granicus']
-  },
 
   skills: {
     design: [
@@ -313,12 +307,12 @@ var PORTFOLIO_DATA = {
     bgWord: 'RAKHI'
   },
 
-  /* Replace # with your real GitHub / Twitter / Dribbble profiles. */
+  /* Order matches the Figma reference: X, Facebook, Instagram, LinkedIn. */
   social: {
-    linkedin: 'https://www.linkedin.com/in/rakhi-das-183381158/',
-    github: '#',
     twitter: '#',
-    dribbble: '#'
+    facebook: '#',
+    instagram: '#',
+    linkedin: 'https://www.linkedin.com/in/rakhi-das-183381158/'
   },
 
   footer: {
