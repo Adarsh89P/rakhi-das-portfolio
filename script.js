@@ -543,7 +543,7 @@
       return;
     }
 
-    var ENTRANCE_DONE = 2100; /* matches the intro-brand/-portrait CSS entrance delays+durations */
+    var ENTRANCE_DONE = 1400; /* matches the intro-portrait CSS entrance duration (delays removed) */
     var armed = false;
     var requested = false;
     var fired = false;

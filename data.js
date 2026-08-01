@@ -17,8 +17,8 @@ var PORTFOLIO_DATA = {
     eyebrow: "Hey, I'm Rakhi",
     /* Two-part hero headline: heroWordTop is the gradient-accented lead word/phrase,
        heroWordBottom is the rest of the sentence in the normal text color. */
-    heroWordTop: 'Revitalize',
-    heroWordBottom: 'Your Daily Journey.',
+    heroWordTop: 'Revitalize Your',
+    heroWordBottom: 'Daily Journey.',
     headline: 'UI/UX Designer — crafting intuitive apps & websites',
     bio: 'UI/UX Designer with 4+ years of experience creating intuitive mobile apps, SaaS platforms, and product interfaces. Skilled at turning complex problems into simple, user-friendly solutions through research-driven, user-centered design.',
     availabilityBadge: 'Available for freelance & collab work',
