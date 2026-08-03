@@ -31,6 +31,7 @@
   function renderNav() {
     var logoMark = data.profile.logoFirst + data.profile.logoLast;
     document.getElementById('logo').textContent = logoMark;
+    document.getElementById('introBrand').textContent = logoMark;
     document.title = data.meta.title;
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', data.meta.description);
@@ -88,6 +89,9 @@
     var photo = document.getElementById('heroPhoto');
     photo.src = data.hero.photo;
     photo.alt = data.hero.photoAlt;
+
+    var introPhoto = document.getElementById('introPortraitImg');
+    introPhoto.src = data.hero.photo;
   }
 
   /* -----------------------------------------------------------
@@ -256,6 +260,134 @@
   }
 
   renderAll();
+  initHeroMorph();
+
+  /* ===========================================================
+     Hero intro morph (giant splash -> navbar logo + hero photo)
+
+     The splash brand + portrait hold on screen until the visitor's
+     first pointer move. At that point we measure where the intro
+     copies currently sit and where the real navbar logo / hero photo
+     live, then hand the flight off to a manual FLIP: set a CSS
+     transition, move the intro elements to the target rect, and
+     crossfade with the real elements once the move is most of the
+     way there. Nav links and the hero copy column get a simpler CSS
+     opacity/translate reveal at the same moment. No animation
+     library needed — this is the only motion left on the page.
+  =========================================================== */
+  function initHeroMorph() {
+    var overlay = document.getElementById('introOverlay');
+    var introBrand = document.getElementById('introBrand');
+    var introPortrait = document.getElementById('introPortrait');
+    var finalLogo = document.getElementById('logo');
+    var finalPhotoWrap = document.getElementById('heroPhotoWrap');
+
+    if (!overlay || !introBrand || !introPortrait || !finalLogo || !finalPhotoWrap) return;
+
+    function reveal() {
+      document.body.classList.remove('intro-active');
+      overlay.style.display = 'none';
+    }
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      reveal();
+      return;
+    }
+
+    var ENTRANCE_DONE = 1400; /* matches the intro-portrait CSS entrance duration */
+    var MOVE_MS = 1100;
+    var CROSSFADE_MS = 450;
+    var EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    var armed = false;
+    var requested = false;
+    var fired = false;
+
+    function morph() {
+      if (fired) return;
+      fired = true;
+
+      /* Freeze the CSS entrance animation at its settled state so this
+         function owns transform/opacity cleanly from here on. */
+      introBrand.style.animation = 'none';
+      introBrand.style.opacity = '1';
+      introBrand.style.transform = 'translateY(0)';
+      introPortrait.style.animation = 'none';
+      introPortrait.style.opacity = '1';
+      introPortrait.style.transform = 'translateY(0) scale(1)';
+
+      var brandFrom = introBrand.getBoundingClientRect();
+      var brandTo = finalLogo.getBoundingClientRect();
+      var brandScale = brandTo.width / brandFrom.width;
+      var brandX = (brandTo.left + brandTo.width / 2) - (brandFrom.left + brandFrom.width / 2);
+      var brandY = (brandTo.top + brandTo.height / 2) - (brandFrom.top + brandFrom.height / 2);
+
+      var photoFrom = introPortrait.getBoundingClientRect();
+      var photoTo = finalPhotoWrap.getBoundingClientRect();
+      var photoScale = photoTo.width / photoFrom.width;
+      var photoX = (photoTo.left + photoTo.width / 2) - (photoFrom.left + photoFrom.width / 2);
+      var photoY = (photoTo.top + photoTo.height / 2) - (photoFrom.top + photoFrom.height / 2);
+
+      /* Nav links + hero copy: plain CSS fade/slide, defined in styles.css. */
+      document.body.classList.remove('intro-active');
+      /* The class removal above would also reveal the real logo/photo —
+         hold them at 0 a little longer, until the crossfade below. */
+      finalLogo.style.transition = 'none';
+      finalLogo.style.opacity = '0';
+      finalPhotoWrap.style.transition = 'none';
+      finalPhotoWrap.style.opacity = '0';
+
+      /* Two rAFs so the browser commits the styles above before the
+         transitioned move starts — otherwise it can coalesce into the
+         final frame and skip the animation entirely. */
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          introBrand.style.transition = 'transform ' + MOVE_MS + 'ms ' + EASE;
+          introBrand.style.transform = 'translate(' + brandX + 'px, ' + brandY + 'px) scale(' + brandScale + ')';
+
+          introPortrait.style.transition = 'transform ' + MOVE_MS + 'ms ' + EASE;
+          introPortrait.style.transform = 'translate(' + photoX + 'px, ' + photoY + 'px) scale(' + photoScale + ')';
+        });
+      });
+
+      window.setTimeout(function () {
+        introBrand.style.transition += ', opacity ' + CROSSFADE_MS + 'ms ease';
+        introBrand.style.opacity = '0';
+        introPortrait.style.transition += ', opacity ' + CROSSFADE_MS + 'ms ease';
+        introPortrait.style.opacity = '0';
+
+        finalLogo.style.transition = 'opacity ' + CROSSFADE_MS + 'ms ease';
+        finalLogo.style.opacity = '1';
+        finalPhotoWrap.style.transition = 'opacity ' + CROSSFADE_MS + 'ms ease';
+        finalPhotoWrap.style.opacity = '1';
+      }, MOVE_MS * 0.5);
+
+      /* Hidden right as the crossfade finishes, not after the (longer)
+         move — otherwise the overlay's opaque white sits over the
+         already-faded-in real elements for a beat, a dead blank gap. */
+      window.setTimeout(function () {
+        overlay.style.display = 'none';
+      }, MOVE_MS * 0.5 + CROSSFADE_MS);
+    }
+
+    function advance() {
+      if (!armed) {
+        requested = true;
+        return;
+      }
+      morph();
+    }
+
+    window.setTimeout(function () {
+      armed = true;
+      if (requested) morph();
+    }, ENTRANCE_DONE);
+
+    var events = ['mousemove', 'pointerdown', 'touchstart', 'wheel', 'keydown'];
+    events.forEach(function (evt) {
+      window.addEventListener(evt, advance, { passive: true });
+    });
+  }
 
   /* ===========================================================
      Mobile nav drawer

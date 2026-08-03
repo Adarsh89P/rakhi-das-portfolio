@@ -12,9 +12,26 @@
 
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="intro-active">
 
 <a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ===================== INTRO SPLASH =====================
+     Giant centered brand name + portrait, held until the visitor's
+     first pointer move (or ~1.4s), then morphed into the navbar logo
+     and hero photo. Purely decorative — hidden from assistive tech
+     and removed from the DOM flow once the morph completes (see
+     initHeroMorph in script.js). -->
+<div class="intro-overlay" id="introOverlay" aria-hidden="true">
+  <div class="intro-brand-layer">
+    <span class="intro-brand" id="introBrand"></span>
+  </div>
+  <div class="intro-portrait-layer">
+    <div class="intro-portrait" id="introPortrait">
+      <img src="" alt="" id="introPortraitImg" draggable="false">
+    </div>
+  </div>
+</div>
 
 <header class="site-header" id="siteHeader">
   <nav class="navbar" aria-label="Primary navigation">
@@ -53,7 +70,7 @@
         </div>
       </div>
 
-      <div class="hero-photo-wrap">
+      <div class="hero-photo-wrap" id="heroPhotoWrap">
         <div class="hero-photo">
           <img src="" alt="" id="heroPhoto">
         </div>
