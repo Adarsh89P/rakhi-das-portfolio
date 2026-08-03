@@ -8,57 +8,28 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@300;400;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
 </head>
-<body class="intro-active">
+<body>
 
 <a class="skip-link" href="#main">Skip to main content</a>
 
-<!-- ===================== INTRO SPLASH =====================
-     Frame 1 of the Figma reference: the brand name and portrait shown
-     large and centered, before the visitor's first mouse move morphs
-     them into the navbar logo and hero portrait (Frame 2). Purely
-     decorative — hidden from assistive tech and removed from the DOM
-     flow once the morph completes (see initHeroMorph in script.js). -->
-<div class="intro-overlay" id="introOverlay" aria-hidden="true">
-  <div class="intro-brand-layer">
-    <span class="intro-brand" id="introBrand"></span>
-  </div>
-  <div class="intro-portrait-layer">
-    <div class="intro-portrait" id="introPortrait">
-      <img src="public/rakhi-portrait-cutout.png" alt="" draggable="false">
-    </div>
-  </div>
-</div>
-
 <header class="site-header" id="siteHeader">
   <nav class="navbar" aria-label="Primary navigation">
-    <ul class="nav-menu" id="navMenu">
-      <li><a href="#about" class="nav-link">Meet kai</a></li>
-      <li><a href="#case-studies" class="nav-link">Book online</a></li>
-      <li class="nav-logo"><a href="#home" class="logo" id="logo"></a></li>
-      <li><a href="#experience" class="nav-link">Photo Gallery</a></li>
-      <li><a href="#contact" class="nav-link">Contact</a></li>
-    </ul>
+    <ul class="nav-group nav-group-left" id="navLeft"></ul>
 
-    <div class="nav-actions">
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
-        <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-        </svg>
-        <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
+    <a href="#home" class="logo" id="logo"></a>
 
-      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navMenu">
-        <span class="hamburger" aria-hidden="true"></span>
-      </button>
-    </div>
+    <ul class="nav-group nav-group-right" id="navRight"></ul>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navMenuMobile">
+      <span class="hamburger" aria-hidden="true"></span>
+    </button>
   </nav>
+
+  <ul class="nav-menu-mobile" id="navMenuMobile"></ul>
 </header>
 
 <main id="main">
@@ -67,244 +38,115 @@
   <section id="home" class="hero">
     <div class="container hero-inner">
       <div class="hero-text">
-        <p class="eyebrow" id="heroEyebrow"></p>
-        <p class="hero-tagline">
-          <span class="hero-tagline-accent" id="heroWordTop"></span>
-          <span id="heroWordBottom"></span>
-        </p>
-
-        <p class="hero-bio" id="heroBio"></p>
+        <p class="hero-badge" id="heroBadge"></p>
+        <p class="hero-headline" id="heroHeadline"></p>
 
         <div class="hero-cta">
-          <a href="#case-studies" class="btn btn-primary">
-            Book A Call
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-          </a>
-          <a href="#contact" class="btn btn-text">
-            Get Started
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-          </a>
-        </div>
-
-        <div class="hero-follow">
-          <p>Follow me on:</p>
-          <ul class="social-list footer-social" id="heroSocialList"></ul>
-        </div>
-      </div>
-
-      <div class="hero-photo-wrap" id="heroPhotoWrap">
-        <div class="hero-photo hero-photo--cutout">
-          <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" id="heroPortrait" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== WHAT I DO =====================
-  <section id="what-i-do" class="what-i-do">
-    <div class="container">
-      <p class="eyebrow eyebrow-dot" id="whatIDoEyebrow"></p>
-      <p class="statement" id="whatIDoStatement"></p>
-
-      <div class="what-i-do-stats" id="whatIDoStats"></div>
-    </div>
-  </section>
-  ===================== /WHAT I DO ===================== -->
-
-  <!-- ===================== ABOUT ===================== -->
-  <section id="about" class="about">
-    <div class="container">
-      <p class="eyebrow">About Me</p>
-      <h2 class="section-title section-title-left about-heading" id="aboutHeading"></h2>
-
-      <div class="about-grid">
-        <div class="about-photo-wrap">
-          <div class="polaroid">
-            <div class="polaroid-photo">
-              <img src="public/rakhi-portrait-cutout.png" alt="Rakhi Das, UI/UX Designer" />
-            </div>
-          </div>
-        </div>
-
-        <div class="about-text-wrap">
-          <div class="about-text" id="aboutText"></div>
-          <p class="signature" id="aboutSignature"></p>
-          <a href="#case-studies" class="btn btn-primary about-cta" id="aboutCta">
+          <a href="#" class="btn btn-primary" id="heroCtaPrimary">
             <span></span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#" class="btn btn-outline" id="heroCtaSecondary">
+            <span></span>
+            <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
         </div>
       </div>
 
-      <div class="about-stats" id="statsGrid"></div>
-    </div>
-  </section>
-
-  <!-- ===================== CASE STUDIES =====================
-       Scroll-pinned deck: the .stack-pin element is pinned by GSAP
-       ScrollTrigger while cards are scrubbed one at a time. Card markup is
-       generated in script.js from PORTFOLIO_DATA.projects. -->
-  <section id="case-studies" class="case-studies stack-section">
-    <div class="stack-pin" id="csPin">
-      <div class="container stack-inner">
-        <div class="stack-head">
-          <div class="stack-head-text">
-            <p class="eyebrow eyebrow-dot">Selected Work</p>
-            <h2 class="section-title section-title-left">Case Studies</h2>
-          </div>
-          <div class="stack-progress" id="csProgress"></div>
+      <div class="hero-photo-wrap">
+        <div class="hero-photo">
+          <img src="" alt="" id="heroPhoto">
         </div>
-
-        <div class="stack-stage cs-stage" id="caseStudyStage"></div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== EXPERIENCE =====================
-       Pinned horizontal story. #expPin is pinned by GSAP ScrollTrigger and
-       vertical scroll scrubs one full-viewport slide across the stage at a
-       time. Slide markup is generated in script.js from
-       PORTFOLIO_DATA.experience; below 900px the whole thing collapses to a
-       stacked vertical list (see the media query in styles.css). -->
-  <section id="experience" class="experience exp-section stack-section"
-           aria-roledescription="carousel" aria-label="Career experience">
-    <div class="exp-pin" id="expPin">
-      <div class="exp-aura" aria-hidden="true">
-        <span class="exp-aura-a"></span>
-        <span class="exp-aura-b"></span>
-      </div>
-
-      <div class="exp-canvas" id="expCanvas">
-        <div class="exp-topbar exp-gutter">
-          <p class="eyebrow eyebrow-dot exp-eyebrow">Career</p>
-          <h2 class="section-title section-title-left exp-title">
-            <span class="exp-title-mask"><span class="exp-title-line">My Journey</span></span>
-          </h2>
-        </div>
-
-        <div class="exp-viewport">
-          <div class="exp-track" id="experienceTrack"></div>
-          <div class="exp-rail" id="expRail"></div>
-        </div>
-      </div>
-    </div>
-
-    <p class="exp-sr" id="expLive" aria-live="polite"></p>
-  </section>
-
-  <!-- ===================== ACHIEVEMENTS ===================== -->
-  <section id="achievements" class="achievements">
+  <!-- ===================== MY WORKS ===================== -->
+  <section id="works" class="works">
     <div class="container">
-      <h2 class="section-title">Achievements</h2>
-      <p class="section-subtitle">Certifications and milestones along the way.</p>
+      <p class="eyebrow-rule" id="worksEyebrow"></p>
 
-      <div class="achievements-grid" id="achievementsGrid"></div>
+      <div class="works-head">
+        <p class="works-heading" id="worksHeading"></p>
+        <a href="#" class="btn btn-primary" id="worksCta">
+          <span></span>
+          <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="works-list" id="worksList"></div>
     </div>
   </section>
 
   <!-- ===================== TESTIMONIALS ===================== -->
   <section id="testimonials" class="testimonials">
     <div class="container">
-      <h2 class="section-title">What People Say</h2>
-      <p class="section-subtitle">
-        A few words from people I've worked with. Replace these placeholders with real recommendations.
-      </p>
+      <p class="eyebrow-rule" id="testimonialsEyebrow"></p>
+
+      <div class="testimonials-head">
+        <p class="testimonials-heading" id="testimonialsHeading"></p>
+        <div class="carousel-nav">
+          <button type="button" class="carousel-arrow" id="testimonialsPrev" aria-label="Previous testimonial">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="carousel-arrow" id="testimonialsNext" aria-label="Next testimonial">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
 
       <div class="testimonials-track" id="testimonialsTrack"></div>
     </div>
   </section>
 
-  <!-- ===================== SKILLS ===================== -->
-  <section id="skills" class="skills">
+  <!-- ===================== MY GALLERY ===================== -->
+  <section id="gallery" class="gallery">
     <div class="container">
-      <h2 class="section-title">Skills</h2>
-      <p class="section-subtitle">Tools and practices I use to design and validate great products.</p>
+      <p class="eyebrow-rule" id="galleryEyebrow"></p>
 
-      <div class="skills-grid">
-        <div class="skills-column">
-          <h3>Design &amp; Research</h3>
-          <div id="skillsDesign"></div>
-        </div>
-
-        <div class="skills-column">
-          <h3>Front-End Basics</h3>
-          <div id="skillsFrontend"></div>
-
-          <h3 class="skills-subhead">Also familiar with</h3>
-          <div class="tag-list" id="skillsTags"></div>
-        </div>
+      <div class="gallery-head">
+        <p class="gallery-heading" id="galleryHeading"></p>
+        <p class="gallery-paragraph" id="galleryParagraph"></p>
       </div>
-    </div>
-  </section>
 
-  <!-- ===================== CTA ===================== -->
-  <section class="cta">
-    <div class="container cta-inner">
-      <h2 class="cta-heading" id="ctaHeading"></h2>
-      <p class="cta-body" id="ctaBody"></p>
-      <div class="cta-actions">
-        <a href="#contact" class="btn btn-primary">Say Hello</a>
-      </div>
-    </div>
-    <div class="cta-bg-word" id="ctaBgWord" aria-hidden="true"></div>
-  </section>
-
-  <!-- ===================== CONTACT ===================== -->
-  <section id="contact" class="contact">
-    <div class="container">
-      <h2 class="section-title">Contact</h2>
-      <p class="section-subtitle">Have a project in mind or just want to say hi? Send a message.</p>
-
-      <div class="contact-grid">
-        <form class="contact-form" id="contactForm" novalidate>
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" autocomplete="name" required aria-describedby="nameError">
-            <span class="form-error" id="nameError" aria-live="polite"></span>
-          </div>
-
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" autocomplete="email" required aria-describedby="emailError">
-            <span class="form-error" id="emailError" aria-live="polite"></span>
-          </div>
-
-          <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" rows="5" required aria-describedby="messageError"></textarea>
-            <span class="form-error" id="messageError" aria-live="polite"></span>
-          </div>
-
-          <button type="submit" class="btn btn-primary form-submit">
-            <span class="btn-label">Send Message</span>
-          </button>
-
-          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
-        </form>
-
-        <div class="contact-info">
-          <p id="contactBlurb">Based in Kolkata, India. Open to freelance work and interesting collaborations.</p>
-          <ul class="social-list" id="socialList"></ul>
-        </div>
-      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
     </div>
   </section>
 
 </main>
 
-<footer class="site-footer">
+<footer class="site-footer" id="footer">
   <div class="container footer-inner">
-    <p>&copy; <span id="year"></span> <span id="footerName"></span>. All rights reserved.</p>
-    <ul class="social-list footer-social" id="footerSocialList"></ul>
+    <p class="footer-watermark" id="footerWatermark" aria-hidden="true"></p>
+
+    <div class="footer-intro">
+      <div class="footer-avatar">
+        <img src="" alt="" id="footerAvatar">
+      </div>
+      <div class="footer-intro-text">
+        <p class="footer-heading" id="footerHeading"></p>
+        <p class="footer-tagline" id="footerTagline"></p>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <a href="#" class="btn btn-dark" id="footerEmail">
+        <span></span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#" class="btn btn-outline-light" id="footerCv">
+        <span>Download CV</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <ul class="footer-social" id="footerSocialList"></ul>
+
+    <div class="footer-bottom">
+      <p id="footerCopyright"></p>
+    </div>
   </div>
 </footer>
-
-<!-- GSAP + ScrollTrigger power the pinned case-study deck and the Experience
-     story; Lenis smooths the vertical scroll that drives them. If any of
-     these fail to load, script.js falls back to a static stacked layout. -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
 
 <script src="data.js"></script>
 <script src="script.js"></script>
