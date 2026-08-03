@@ -11,7 +11,7 @@
   };
 
   var ARROW_SVG = '<svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var LINK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 5h6v6M19 5 10 14M18 13v6a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h6"/></svg>';
+  var ARROW_DIAGONAL_SVG = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   function el(tag, className, html) {
     var node = document.createElement(tag);
@@ -20,8 +20,18 @@
     return node;
   }
 
-  function tile(fill) {
-    return fill.image ? 'url(' + fill.image + ')' : fill.color;
+  /* Fills a tile with its placeholder color, then layers a real, lazy-loaded
+     <img> on top the moment `fill.image` is set in data.js — so dropping in
+     a real photo later gets correct alt text and lazy-loading for free. */
+  function applyTileFill(container, fill, altText) {
+    container.style.backgroundColor = fill.color;
+    if (!fill.image) return;
+    var img = el('img', 'tile-img');
+    img.src = fill.image;
+    img.alt = altText || '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    container.appendChild(img);
   }
 
   /* -----------------------------------------------------------
@@ -110,9 +120,16 @@
     headingRow.appendChild(el('p', 'work-desc', project.description));
     item.appendChild(headingRow);
 
-    var image = el('div', 'work-image');
-    image.style.background = tile(project);
-    item.appendChild(image);
+    var frame = el('a', 'work-image');
+    frame.href = project.href || '#';
+    frame.setAttribute('aria-label', 'View project: ' + project.heading);
+
+    var fill = el('div', 'work-image-fill');
+    applyTileFill(fill, project, project.heading + ' — project preview');
+    frame.appendChild(fill);
+
+    frame.appendChild(el('span', 'work-image-arrow', ARROW_DIAGONAL_SVG));
+    item.appendChild(frame);
 
     return item;
   }
@@ -141,6 +158,42 @@
   }
 
   /* -----------------------------------------------------------
+     Experience — a loose stack of role cards. Add/remove/reorder
+     entries in data.js; nothing here needs to change.
+  ----------------------------------------------------------- */
+  function renderExperience() {
+    document.getElementById('experienceEyebrow').textContent = data.experience.eyebrow;
+    document.getElementById('experienceHeading').textContent = data.experience.heading;
+
+    var list = document.getElementById('experienceList');
+    data.experience.items.forEach(function (job) {
+      var card = el('div', 'exp-card');
+      if (job.color) card.style.backgroundColor = job.color;
+
+      var top = el('div', 'exp-card-top');
+      var logo = el('span', 'exp-logo');
+      if (job.logo) {
+        var logoImg = el('img');
+        logoImg.src = job.logo;
+        logoImg.alt = job.company + ' logo';
+        logo.appendChild(logoImg);
+      } else {
+        logo.textContent = job.logoLetter;
+        logo.setAttribute('aria-hidden', 'true');
+      }
+      top.appendChild(logo);
+      top.appendChild(el('span', 'exp-date gradient-text', job.dateRange));
+      card.appendChild(top);
+
+      card.appendChild(el('p', 'exp-role', job.role));
+      card.appendChild(el('p', 'exp-company', job.company));
+      card.appendChild(el('p', 'exp-desc', job.description));
+
+      list.appendChild(card);
+    });
+  }
+
+  /* -----------------------------------------------------------
      Testimonials — horizontally-scrolling cards; the arrow buttons
      just page the track by one card width.
   ----------------------------------------------------------- */
@@ -157,7 +210,7 @@
       var card = el('div', 'testimonial-card');
 
       var photo = el('div', 'testimonial-photo');
-      photo.style.background = tile(t);
+      applyTileFill(photo, t, t.name + ' — headshot');
       card.appendChild(photo);
 
       var body = el('div', 'testimonial-body');
@@ -200,7 +253,7 @@
       if (item.size === 'tall') className += ' is-tall';
       if (item.size === 'wide') className += ' is-wide';
       var t = el('div', className);
-      t.style.background = tile(item);
+      applyTileFill(t, item, item.alt);
       grid.appendChild(t);
     });
   }
@@ -213,7 +266,7 @@
 
     var avatar = document.getElementById('footerAvatar');
     avatar.src = data.footer.avatar;
-    avatar.alt = '';
+    avatar.alt = data.footer.avatarAlt || '';
 
     document.getElementById('footerHeading').textContent = data.footer.heading;
     document.getElementById('footerTagline').textContent = data.footer.tagline;
@@ -224,7 +277,10 @@
 
     var cv = document.getElementById('footerCv');
     cv.href = data.footer.cvHref || '#';
-    if (!data.footer.cvHref) cv.setAttribute('aria-disabled', 'true');
+    if (!data.footer.cvHref) {
+      cv.setAttribute('aria-disabled', 'true');
+      cv.addEventListener('click', function (e) { e.preventDefault(); });
+    }
 
     var socialList = document.getElementById('footerSocialList');
     Object.keys(data.social).forEach(function (key) {
@@ -250,13 +306,37 @@
       '© ' + new Date().getFullYear() + ' • ' + data.footer.copyright;
   }
 
+  /* -----------------------------------------------------------
+     SEO: Person structured data, built from the same fields the
+     page already renders — nothing to keep in sync by hand.
+  ----------------------------------------------------------- */
+  function renderSEO() {
+    var node = document.getElementById('personSchema');
+    if (!node) return;
+
+    var sameAs = Object.keys(data.social)
+      .map(function (key) { return data.social[key]; })
+      .filter(function (url) { return url && url.indexOf('http') === 0; });
+
+    node.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: data.profile.name,
+      jobTitle: data.profile.jobTitle,
+      email: data.profile.email,
+      sameAs: sameAs
+    });
+  }
+
   function renderAll() {
     renderNav();
     renderHero();
     renderWorks();
+    renderExperience();
     renderTestimonials();
     renderGallery();
     renderFooter();
+    renderSEO();
   }
 
   renderAll();
@@ -432,7 +512,7 @@
      Scroll reveal — simple fade/rise the first time each element
      enters the viewport.
   =========================================================== */
-  var revealTargets = document.querySelectorAll('.work-item, .testimonial-card, .gallery-tile');
+  var revealTargets = document.querySelectorAll('.work-item, .exp-card, .testimonial-card, .gallery-tile');
   revealTargets.forEach(function (target) {
     target.setAttribute('data-reveal', '');
   });

@@ -14,6 +14,12 @@
   --accent-orange: #ff8d28;
   --gradient-accent: linear-gradient(96deg, #b16cea 41%, #fa5f72 59%, #ffa44c 86%);
 
+  /* The same 3 pastels already used for the Works image placeholders,
+     named for reuse on the Experience cascade. */
+  --exp-blue: #c4e8ff;
+  --exp-peach: #ffe9d1;
+  --exp-pink: #fedfe7;
+
   --footer-bg: #000000;
   --footer-ink: #ffffff;
   --footer-pill: #505050;
@@ -23,14 +29,21 @@
   --radius-md: 12px;
   --radius-sm: 8px;
 
-  --space-1: 4px;
+  /* Spacing scale: 8 / 16 / 24 / 32 / 48 / 64 / 80 / 96 / 120. Used for
+     generic layout rhythm (gaps, section padding). Component measurements
+     that come directly from the Figma file — icon sizes, the 44px button
+     height, the 82px avatar, card radii — stay literal: they're exact
+     design geometry, not spacing, so forcing them onto this scale would
+     just be a coincidence dressed up as a system. */
   --space-2: 8px;
   --space-3: 16px;
   --space-4: 24px;
   --space-5: 32px;
   --space-6: 48px;
   --space-7: 64px;
+  --space-9: 80px;
   --space-8: 96px;
+  --space-10: 120px;
 
   --container-width: 1320px;
   --header-height: 100px;
@@ -100,6 +113,22 @@ button {
 
 p {
   margin: 0;
+}
+
+/* .hero-badge and .works-heading/.testimonials-heading/.gallery-heading are
+   semantic h1/h2 elements now (for document outline and SEO), but every
+   visual property — size, weight, spacing — still comes from those classes.
+   This just strips the browser's default heading margin/bold/size so the
+   tag swap is invisible on screen. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .container {
@@ -640,7 +669,7 @@ body.intro-active #heroPhotoWrap {
 .works-list {
   display: flex;
   flex-direction: column;
-  gap: clamp(40px, 5vw, 80px);
+  gap: clamp(40px, 5vw, var(--space-9));
 }
 
 .work-row {
@@ -709,15 +738,194 @@ body.intro-active #heroPhotoWrap {
   max-width: 34rem;
 }
 
+/* .work-image is the fixed-size clipping frame (rounded corners, overflow
+   hidden); .work-image-fill is what actually scales on hover. Splitting
+   them means the zoom never distorts the frame's own rounded corners or
+   spills into the heading/description above and below it. */
 .work-image {
+  position: relative;
+  display: block;
+  overflow: hidden;
   border-radius: var(--radius-lg);
   aspect-ratio: 1314 / 580;
-  background-size: cover;
-  background-position: center;
 }
 
 .work-row .work-image {
   aspect-ratio: 642 / 580;
+}
+
+.work-image-fill {
+  position: absolute;
+  inset: 0;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.work-item:hover .work-image-fill {
+  transform: scale(1.06);
+}
+
+/* Real photo, layered over the placeholder color the instant `image` is
+   set in data.js (see applyTileFill in script.js). Shared by work images,
+   testimonial photos and gallery tiles. */
+.tile-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Hidden until hover, then eases in — the "view project" affordance. */
+.work-image-arrow {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--ink);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px) scale(0.7);
+  transition: opacity 350ms ease, transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.work-item:hover .work-image-arrow {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.work-image-arrow svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ==========================================================================
+   Experience — a fanned, overlapping cascade of cards (like a spread hand
+   of cards), styled after the reference "My Journey" layout but in the
+   site's own pastel palette instead of a dark theme. Colors come from
+   data.js per item (--exp-blue/-peach/-pink, defined in :root above).
+
+   Layout notes:
+   - Overlap is plain negative margin-left — no absolute positioning.
+   - Rotation, the resting vertical stagger, and the hover lift are all
+     composed through custom properties on the shared [data-reveal] rule
+     (see the Scroll reveal section), so the reveal-in animation, the
+     fan's tilt, and the hover state never fight over one `transform`.
+   - Stacking order also comes from nth-child rather than inline z-index,
+     for the same reason: one source of truth per property, no !important
+     needed to win a specificity fight against JS-set inline styles.
+   ========================================================================== */
+.experience {
+  padding-block: var(--section-pad);
+}
+
+.experience-heading {
+  font-weight: 300;
+  font-size: var(--fs-section-heading);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 30ch;
+  margin-bottom: clamp(40px, 6vw, 68px);
+}
+
+.experience-list {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding-block: var(--space-3) var(--space-6);
+}
+
+.exp-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(300px, 72vw);
+  padding: var(--space-4);
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
+  /* Background color comes from data.js per item (applied inline in
+     script.js) — one of --exp-blue/-peach/-pink. */
+}
+
+.exp-card:not(:first-child) {
+  margin-left: -68px;
+}
+
+/* Rotation, resting stagger and stacking order — cycled per position so
+   any number of cards still reads as a loose fan rather than a rigid grid. */
+.exp-card:nth-child(6n+1) { --card-rotate: -6deg; --base-y: 6px; z-index: 6; }
+.exp-card:nth-child(6n+2) { --card-rotate: 4deg; --base-y: 22px; z-index: 5; }
+.exp-card:nth-child(6n+3) { --card-rotate: -4deg; --base-y: 2px; z-index: 4; }
+.exp-card:nth-child(6n+4) { --card-rotate: 6deg; --base-y: 26px; z-index: 3; }
+.exp-card:nth-child(6n+5) { --card-rotate: -3deg; --base-y: 10px; z-index: 2; }
+.exp-card:nth-child(6n+6) { --card-rotate: 3deg; --base-y: 16px; z-index: 1; }
+
+.exp-card:hover {
+  --card-rotate: 0deg;
+  --lift: -22px;
+  z-index: 20;
+  box-shadow: 0 32px 60px -24px rgba(20, 20, 30, 0.4);
+}
+
+.exp-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.exp-logo {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background-color: var(--ink);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  overflow: hidden;
+}
+
+.exp-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.exp-date {
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.exp-role {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.exp-company {
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--ink-dim);
+  margin-bottom: var(--space-3);
+}
+
+.exp-desc {
+  font-weight: 300;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-paragraph);
 }
 
 /* ==========================================================================
@@ -740,6 +948,13 @@ body.intro-active #heroPhotoWrap {
   display: none;
 }
 
+/* The track is keyboard-scrollable (tabindex="0" in index.html) since the
+   cards themselves have no focusable content of their own. */
+.testimonials-track:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 4px;
+}
+
 .testimonial-card {
   flex: 0 0 min(642px, 88vw);
   scroll-snap-align: start;
@@ -748,10 +963,10 @@ body.intro-active #heroPhotoWrap {
 }
 
 .testimonial-photo {
+  position: relative;
+  overflow: hidden;
   flex: 0 0 306px;
   border-radius: var(--radius-md);
-  background-size: cover;
-  background-position: center;
 }
 
 .testimonial-body {
@@ -822,9 +1037,9 @@ body.intro-active #heroPhotoWrap {
 }
 
 .gallery-tile {
+  position: relative;
+  overflow: hidden;
   border-radius: var(--radius-sm);
-  background-size: cover;
-  background-position: center;
   grid-column: span 2;
   grid-row: span 2;
 }
@@ -910,7 +1125,7 @@ body.intro-active #heroPhotoWrap {
 .footer-tagline {
   font-weight: 300;
   font-size: 1.125rem;
-  color: #ffffff;
+  color: var(--footer-ink);
 }
 
 .footer-actions {
@@ -956,15 +1171,23 @@ body.intro-active #heroPhotoWrap {
 /* ==========================================================================
    Scroll reveal
    ========================================================================== */
+/* Composed through custom properties rather than a second `transform`
+   declaration: .exp-card sets --card-rotate/--lift for its own rotated-stack
+   look (see the Experience section above), and .in-view only ever changes
+   --reveal-y. If both a reveal state and a card's own transform wrote
+   `transform:` directly, whichever rule came later in the file would win
+   outright and silently cancel the other — this way they compose instead. */
 [data-reveal] {
+  --reveal-y: 24px;
+  --lift: 0px;
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 600ms ease, transform 600ms ease;
+  transform: translateY(calc(var(--reveal-y) + var(--base-y, 0px) + var(--lift))) rotate(var(--card-rotate, 0deg));
+  transition: opacity 600ms ease, transform 600ms ease, box-shadow var(--transition-base);
 }
 
 [data-reveal].in-view {
+  --reveal-y: 0px;
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* ==========================================================================
@@ -1003,6 +1226,28 @@ body.intro-active #heroPhotoWrap {
   .work-heading-row {
     flex-direction: column;
     gap: var(--space-2);
+  }
+
+  /* The overlapping fan only reads as intentional with room to spread —
+     below 900px it collapses to a plain vertical stack of full-width cards. */
+  .experience-list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+  }
+
+  .exp-card {
+    width: 100%;
+  }
+
+  .exp-card:not(:first-child) {
+    margin-left: 0;
+  }
+
+  .exp-card:nth-child(n) {
+    --card-rotate: 0deg;
+    --base-y: 0px;
+    z-index: auto;
   }
 
   .gallery-grid {

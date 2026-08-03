@@ -3,8 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
 <title>Rakhi Das | UI/UX Designer</title>
 <meta name="description" content="Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and intuitive product design.">
+
+<!-- Open Graph / Twitter card — text fields only. `og:url` and `og:image`
+     need an absolute URL once this is deployed; add them then, e.g.:
+     <meta property="og:url" content="https://your-deployed-domain/">
+     <meta property="og:image" content="https://your-deployed-domain/public/rakhi-portrait.png"> -->
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Rakhi Das">
+<meta property="og:title" content="Rakhi Das | UI/UX Designer">
+<meta property="og:description" content="Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and intuitive product design.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rakhi Das | UI/UX Designer">
+<meta name="twitter:description" content="Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and intuitive product design.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23fff' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +30,17 @@
 <body class="intro-active">
 
 <a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- All page copy is rendered from data.js by script.js. Real crawlers and
+     browsers run JS and see the full page; this is only for the rare
+     no-JS visitor / scraper, so it isn't kept in sync field-by-field. -->
+<noscript>
+  <div style="max-width:640px;margin:64px auto;padding:0 24px;font-family:sans-serif;line-height:1.6;">
+    <h1>Rakhi Das — UI/UX Designer</h1>
+    <p>Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and intuitive product design.</p>
+    <p>This site needs JavaScript enabled to display. Get in touch: <a href="mailto:dasrakhi303@gmail.com">dasrakhi303@gmail.com</a></p>
+  </div>
+</noscript>
 
 <!-- ===================== INTRO SPLASH =====================
      Giant centered brand name + portrait, held until the visitor's
@@ -28,7 +54,7 @@
   </div>
   <div class="intro-portrait-layer">
     <div class="intro-portrait" id="introPortrait">
-      <img src="" alt="" id="introPortraitImg" draggable="false">
+      <img src="" alt="" id="introPortraitImg" width="406" height="661" fetchpriority="high" draggable="false">
     </div>
   </div>
 </div>
@@ -52,10 +78,10 @@
 <main id="main">
 
   <!-- ===================== HERO ===================== -->
-  <section id="home" class="hero">
+  <section id="home" class="hero" aria-labelledby="heroBadge">
     <div class="container hero-inner">
       <div class="hero-text">
-        <p class="hero-badge" id="heroBadge"></p>
+        <h1 class="hero-badge" id="heroBadge"></h1>
         <p class="hero-headline" id="heroHeadline"></p>
 
         <div class="hero-cta">
@@ -72,19 +98,19 @@
 
       <div class="hero-photo-wrap" id="heroPhotoWrap">
         <div class="hero-photo">
-          <img src="" alt="" id="heroPhoto">
+          <img src="" alt="" id="heroPhoto" width="406" height="661" fetchpriority="high">
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===================== MY WORKS ===================== -->
-  <section id="works" class="works">
+  <section id="works" class="works" aria-labelledby="worksHeading">
     <div class="container">
       <p class="eyebrow-rule" id="worksEyebrow"></p>
 
       <div class="works-head">
-        <p class="works-heading" id="worksHeading"></p>
+        <h2 class="works-heading" id="worksHeading"></h2>
         <a href="#" class="btn btn-primary" id="worksCta">
           <span></span>
           <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -95,13 +121,23 @@
     </div>
   </section>
 
+  <!-- ===================== EXPERIENCE ===================== -->
+  <section id="experience" class="experience" aria-labelledby="experienceHeading">
+    <div class="container">
+      <p class="eyebrow-rule" id="experienceEyebrow"></p>
+      <h2 class="experience-heading" id="experienceHeading"></h2>
+
+      <div class="experience-list" id="experienceList"></div>
+    </div>
+  </section>
+
   <!-- ===================== TESTIMONIALS ===================== -->
-  <section id="testimonials" class="testimonials">
+  <section id="testimonials" class="testimonials" aria-labelledby="testimonialsHeading">
     <div class="container">
       <p class="eyebrow-rule" id="testimonialsEyebrow"></p>
 
       <div class="testimonials-head">
-        <p class="testimonials-heading" id="testimonialsHeading"></p>
+        <h2 class="testimonials-heading" id="testimonialsHeading"></h2>
         <div class="carousel-nav">
           <button type="button" class="carousel-arrow" id="testimonialsPrev" aria-label="Previous testimonial">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -112,17 +148,17 @@
         </div>
       </div>
 
-      <div class="testimonials-track" id="testimonialsTrack"></div>
+      <div class="testimonials-track" id="testimonialsTrack" role="region" aria-label="Testimonials" tabindex="0"></div>
     </div>
   </section>
 
   <!-- ===================== MY GALLERY ===================== -->
-  <section id="gallery" class="gallery">
+  <section id="gallery" class="gallery" aria-labelledby="galleryHeading">
     <div class="container">
       <p class="eyebrow-rule" id="galleryEyebrow"></p>
 
       <div class="gallery-head">
-        <p class="gallery-heading" id="galleryHeading"></p>
+        <h2 class="gallery-heading" id="galleryHeading"></h2>
         <p class="gallery-paragraph" id="galleryParagraph"></p>
       </div>
 
@@ -138,7 +174,7 @@
 
     <div class="footer-intro">
       <div class="footer-avatar">
-        <img src="" alt="" id="footerAvatar">
+        <img src="" alt="" id="footerAvatar" width="82" height="82" loading="lazy" decoding="async">
       </div>
       <div class="footer-intro-text">
         <p class="footer-heading" id="footerHeading"></p>
@@ -164,6 +200,8 @@
     </div>
   </div>
 </footer>
+
+<script type="application/ld+json" id="personSchema"></script>
 
 <script src="data.js"></script>
 <script src="script.js"></script>

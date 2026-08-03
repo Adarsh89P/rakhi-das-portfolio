@@ -13,6 +13,8 @@ var PORTFOLIO_DATA = {
   profile: {
     logoFirst: 'Rakhi',
     logoLast: '.UX',
+    name: 'Rakhi Das',
+    jobTitle: 'UI/UX Designer',
     email: 'dasrakhi303@gmail.com'
   },
 
@@ -52,6 +54,8 @@ var PORTFOLIO_DATA = {
       Each project renders as a full-width row (the first two) or paired
       side-by-side (the rest, two per row). `color` fills the image box
       until a real screenshot is supplied via an optional `image` url.
+      `href` is where the hover arrow / whole image tile links to —
+      point it at a real case-study page any time; '#' until then.
     */
     projects: [
       {
@@ -59,28 +63,79 @@ var PORTFOLIO_DATA = {
         dateRange: 'Mar 2025 – Jul 2025',
         description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
         color: '#49acea',
-        image: ''
+        image: '',
+        href: '#'
       },
       {
         heading: 'Mobile Banking Onboarding',
         dateRange: 'Jan 2024 – Nov 2024',
         description: 'Streamlined the onboarding journey for a fintech mobile app, reducing drop-off through iterative usability testing.',
         color: '#fedfe7',
-        image: ''
+        image: '',
+        href: '#'
       },
       {
         heading: 'E-Commerce Usability Audit',
         dateRange: 'Jun 2023 – Sep 2023',
         description: 'Ran a heuristic evaluation and proposed a refreshed component library to improve consistency across the platform.',
         color: '#c4e8ff',
-        image: ''
+        image: '',
+        href: '#'
       },
       {
         heading: 'Add your fourth case study',
         dateRange: 'Add a date range',
         description: 'Add a short summary of the problem, your approach, and the outcome for this project.',
         color: '#ffe9d1',
-        image: ''
+        image: '',
+        href: '#'
+      }
+    ]
+  },
+
+  experience: {
+    eyebrow: 'My Journey',
+    heading: "Where I've worked",
+    /* `logoLetter` renders as a lettermark badge; swap in a real `logo`
+       image url per item any time (falls back to the letter until then).
+       `color` is one of the site's 3 pastel tokens (see --exp-blue/-peach/
+       -pink below) — cards cascade in a fanned stack, so keep them varied. */
+    items: [
+      {
+        role: 'Associate UI/UX Designer',
+        company: 'Sundew',
+        dateRange: 'Dec 2024 – Present',
+        logoLetter: 'S',
+        logo: '',
+        color: 'var(--exp-blue)',
+        description: 'Designing research-led product experiences for a fast-moving startup, from first interview to shipped interface.'
+      },
+      {
+        role: 'Associate UI/UX Designer',
+        company: 'Fortmindz',
+        dateRange: 'Jun 2023 – Feb 2025',
+        logoLetter: 'F',
+        logo: '',
+        color: 'var(--exp-peach)',
+        description: 'Owned interface design for web and mobile products, backed by a reusable component library.'
+      },
+      {
+        role: 'User Experience Designer',
+        company: 'Pixel Consultancy',
+        dateRange: 'Nov 2022 – Jun 2023',
+        logoLetter: 'P',
+        logo: '',
+        color: 'var(--exp-pink)',
+        description: 'Translated client briefs into interactive prototypes that made design decisions easy to review.'
+      },
+      {
+        role: 'Jr. Implementation Associate',
+        company: 'Granicus',
+        dateRange: 'Oct 2020 – Feb 2023',
+        logoLetter: 'G',
+        logo: '',
+        color: 'var(--exp-blue)',
+        description: 'Client-facing implementation work that became the foundation for a move into UX design.'
       }
     ]
   },
@@ -103,14 +158,15 @@ var PORTFOLIO_DATA = {
     headingPre: 'An Artistic Expedition Awaits in ',
     headingHighlight: 'My Gallery',
     paragraph: "A few frames from outside the design tools — travel, light and moments worth keeping. Swap these placeholder tiles for real photos any time by adding an `image` url in data.js.",
-    /* `size` controls the tile's footprint in the collage grid: tall | wide | normal. */
+    /* `size` controls the tile's footprint in the collage grid: tall | wide | normal.
+       `alt` only matters once `image` is filled in — give it a real description then. */
     tiles: [
-      { size: 'tall', color: '#e7d9c9', image: '' },
-      { size: 'normal', color: '#d8c9e0', image: '' },
-      { size: 'wide', color: '#c9dce0', image: '' },
-      { size: 'normal', color: '#e0d3c9', image: '' },
-      { size: 'tall', color: '#d0dde5', image: '' },
-      { size: 'normal', color: '#e5d6d0', image: '' }
+      { size: 'tall', color: '#e7d9c9', image: '', alt: '' },
+      { size: 'normal', color: '#d8c9e0', image: '', alt: '' },
+      { size: 'wide', color: '#c9dce0', image: '', alt: '' },
+      { size: 'normal', color: '#e0d3c9', image: '', alt: '' },
+      { size: 'tall', color: '#d0dde5', image: '', alt: '' },
+      { size: 'normal', color: '#e5d6d0', image: '', alt: '' }
     ]
   },
 
@@ -127,6 +183,7 @@ var PORTFOLIO_DATA = {
     heading: "Want to get in touch? I'd love to connect with you!",
     tagline: "I'm currently open to full-time opportunities! Let's create something amazing together! ✨",
     avatar: 'public/rakhi-portrait.png',
+    avatarAlt: 'Rakhi Das',
     cvHref: '',
     copyright: 'Rakhi Das • Built with pixels, prototypes, and plenty of late-night ideas.'
   }
