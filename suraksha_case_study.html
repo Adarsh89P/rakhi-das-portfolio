@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Suraksha — Diagnostic Ecosystem Redesign | Rakhi Das</title>
+<meta name="description" content="Case study: redesigning the complete Suraksha diagnostic ecosystem — website, admin dashboard, front desk dashboard, patient app and home collector app.">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rakhi Das">
+<meta property="og:title" content="Suraksha — Diagnostic Ecosystem Redesign">
+<meta property="og:description" content="Redesigned the complete diagnostic ecosystem to improve efficiency, accessibility, and patient experience.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Suraksha — Diagnostic Ecosystem Redesign">
+<meta name="twitter:description" content="Redesigned the complete diagnostic ecosystem to improve efficiency, accessibility, and patient experience.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23fff' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
+
+<!-- styles.css supplies the font, ink/gradient tokens and the footer
+     component; case-study.css only adds what this page needs. -->
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="case-study.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<main id="main" class="cs-page">
+
+  <!-- ===================== HERO ===================== -->
+  <header class="cs-wide">
+    <a class="cs-back" href="index.html#works">
+      <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M14 5H2M7 1 2 5l5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to work
+    </a>
+
+    <h1 class="cs-hero-title">Making Diagnostic Services Faster, Smarter, Better</h1>
+    <p class="cs-hero-sub">Redesigned the complete diagnostic ecosystem including Website, Admin Dashboard, Front Desk Dashboard, Patient App, and Home Collector App to improve efficiency, accessibility, and patient experience.</p>
+
+    <ul class="cs-tags">
+      <li class="cs-tag">Diagnosis &amp; Treatment</li>
+      <li class="cs-tag">Diagnosis &amp; Treatment</li>
+      <li class="cs-tag">Diagnosis &amp; Treatment</li>
+    </ul>
+
+    <figure class="cs-figure">
+      <img src="public/Frame%2021.png" alt="The Suraksha product suite — admin dashboard, patient record and three mobile app screens" width="1540" height="603">
+    </figure>
+  </header>
+
+  <!-- ===================== BACKGROUND ===================== -->
+  <section class="cs-col cs-section" aria-labelledby="csBackground">
+    <h2 class="cs-eyebrow" id="csBackground">Background</h2>
+    <p class="cs-heading">The challenge of accessible healthcare in underserved communities</p>
+    <p class="cs-body">Diagnostic services are often fragmented and time-consuming. Patients struggle with booking tests, tracking reports, and navigating multiple touchpoints.</p>
+    <p class="cs-body">At the same time, internal teams face <strong>unorganized workflows across front desk, admin, and home collection</strong>—leading to <strong>delays, errors, and poor coordination</strong>.</p>
+    <p class="cs-body">The lack of a unified system impacts both patient experience and operational efficiency, <strong>highlighting the need for a complete redesign.</strong></p>
+
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 1006 / 572;">Figma “image 212” — 1006 × 572</div>
+    </figure>
+  </section>
+
+  <!-- ===================== THE PROBLEM ===================== -->
+  <section class="cs-col cs-section" aria-labelledby="csProblem">
+    <h2 class="cs-eyebrow" id="csProblem">THE PROBLEM</h2>
+    <p class="cs-heading">Existing healthcare services are not designed to serve marginalized populations</p>
+    <p class="cs-lead">Hospitals were struggling with outdated processes:</p>
+
+    <ul class="cs-list">
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">The old system was over the place and did not work well.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">The existing system had a lot of problems.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Patients had a time booking things and keeping track of their reports.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">The people at the desk had to do a lot of work by hand which meant they made mistakes.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">The people who collected things from homes did not have a plan of what to do.</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ===================== OUR GOAL ===================== -->
+  <section class="cs-col cs-section" aria-labelledby="csGoal">
+    <h2 class="cs-eyebrow" id="csGoal">OUR GOAL</h2>
+    <p class="cs-heading">Create a connected, user-friendly system that simplifies operations for all stakeholders.</p>
+    <p class="cs-body">We want to make a system that's easy for people to use when they need to get diagnosed. This system should make things simple for patients.</p>
+    <p class="cs-body">The main idea is to make it easy for people to book tests get their reports and have everyone work together smoothly. The people at the desk the administrators and the ones who collect samples from homes. We want to reduce mistakes save time and make the service better, for ecosystem. This will help the diagnostic ecosystem to work better.</p>
+  </section>
+
+  <!-- ===================== UX STRATEGY ===================== -->
+  <section class="cs-col cs-section" aria-labelledby="csStrategy">
+    <h2 class="cs-eyebrow" id="csStrategy">UX Strategy (MVP Process)</h2>
+    <p class="cs-heading">MVP: Quickly test core features, gather feedback, and refine</p>
+    <p class="cs-lead">Hospitals were struggling with outdated processes:</p>
+
+    <ul class="cs-list">
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Analyze Current System<span class="cs-list-sub">Study workflows &amp; identify pain points</span></span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Define User Journeys<span class="cs-list-sub">Patient • Admin • Front Desk • Phlebotomist • Home Collector</span></span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Brainstorm Solutions<span class="cs-list-sub">Explore ideas for key problems</span></span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Validate Concepts<span class="cs-list-sub">With stakeholders &amp; SMEs</span></span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Wireframing &amp; UI Design<span class="cs-list-sub">Create intuitive interfaces</span></span>
+      </li>
+      <li>
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span class="cs-list-text">Test &amp; Iterate<span class="cs-list-sub">Improve based on feedback</span></span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ===================== DESIGN METHODOLOGY ===================== -->
+  <section class="cs-wide cs-section" aria-label="Suraksha design methodology">
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 1402 / 593;">Figma “Frame 29” — Suraksha Design Methodology timeline — 1402 × 593</div>
+    </figure>
+  </section>
+
+  <!-- ===================== USER-WISE PROBLEM → SOLUTION ===================== -->
+  <section class="cs-col cs-section" aria-labelledby="csUserWise">
+    <h2 class="cs-eyebrow" id="csUserWise">User-wise Problem → Solution</h2>
+
+    <!-- Patient App -->
+    <h3 class="cs-role">Patient App</h3>
+    <div class="cs-ba">
+      <div class="cs-ba-card is-before">
+        <p class="cs-ba-label">Before</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Confusing booking flow</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">No real-time updates</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Hard to access reports</span></li>
+        </ul>
+      </div>
+      <div class="cs-ba-card is-after">
+        <p class="cs-ba-label">After</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Simple test booking in few steps</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Real-time status tracking</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Easy digital report access</span></li>
+        </ul>
+      </div>
+    </div>
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 493 / 650;">Patient App screens — 493 × 650</div>
+    </figure>
+
+    <!-- Front Desk Executive Dashboard -->
+    <h3 class="cs-role">Front Desk Executive Dashboard</h3>
+    <div class="cs-ba">
+      <div class="cs-ba-card is-before">
+        <p class="cs-ba-label">Before</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Confusing and outdated workflow</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Multiple steps for simple tasks</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Time-consuming patient handling</span></li>
+        </ul>
+      </div>
+      <div class="cs-ba-card is-after">
+        <p class="cs-ba-label">After</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">We made our system simpler and more intuitive.</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">The patient registration process is now really quick.</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">We made managing tests and appointments easier.</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Now we can serve patients with less work.</span></li>
+        </ul>
+      </div>
+    </div>
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 1016 / 539;">FOE Portal screen — 1016 × 539</div>
+    </figure>
+
+    <!-- Admin Dashboard -->
+    <h3 class="cs-role">Admin Dashboard</h3>
+    <div class="cs-ba">
+      <div class="cs-ba-card is-before">
+        <p class="cs-ba-label">Before</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">No centralized control</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Difficult to manage staff, reports, operations</span></li>
+        </ul>
+      </div>
+      <div class="cs-ba-card is-after">
+        <p class="cs-ba-label">After</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Complete system control in one place</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Manage users, reports, analytics</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Better decision-making with insights</span></li>
+        </ul>
+      </div>
+    </div>
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 1016 / 539;">Admin Dashboard screen — 1016 × 539</div>
+    </figure>
+
+    <!-- Home Collector App -->
+    <h3 class="cs-role">Home Collector App</h3>
+    <div class="cs-ba">
+      <div class="cs-ba-card is-before">
+        <p class="cs-ba-label">Before</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">No proper task tracking</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Inefficient route &amp; scheduling</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Communication gaps</span></li>
+        </ul>
+      </div>
+      <div class="cs-ba-card is-after">
+        <p class="cs-ba-label">After</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Assigned tasks with clear details</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Optimized visit flow</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Better coordination with system</span></li>
+        </ul>
+      </div>
+    </div>
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 1016 / 650;">Home Collector App screens — 1016 × 650</div>
+    </figure>
+
+    <!-- Website Redesign -->
+    <h3 class="cs-role">Website Redesign</h3>
+    <div class="cs-ba">
+      <div class="cs-ba-card is-before">
+        <p class="cs-ba-label">Before</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Outdated UI</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Poor navigation</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Low trust &amp; engagement</span></li>
+        </ul>
+      </div>
+      <div class="cs-ba-card is-after">
+        <p class="cs-ba-label">After</p>
+        <ul class="cs-list">
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Clean, modern design</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Easy test discovery &amp; booking</span></li>
+          <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Improved user trust</span></li>
+        </ul>
+      </div>
+    </div>
+    <figure class="cs-figure">
+      <div class="cs-placeholder" style="aspect-ratio: 1016 / 650;">Website UI Screen — 1016 × 650</div>
+    </figure>
+  </section>
+
+  <!-- ===================== KEY HIGHLIGHTS ===================== -->
+  <section class="cs-col" aria-labelledby="csHighlights">
+    <div class="cs-highlights">
+      <h2 class="cs-highlights-title" id="csHighlights">Key highlights</h2>
+      <ul class="cs-list">
+        <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Unified ecosystem for all users</span></li>
+        <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Reduced manual work &amp; errors</span></li>
+        <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Improved patient experience</span></li>
+        <li><svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3.75v10.5M3.75 9h10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="cs-list-text">Scalable design system</span></li>
+      </ul>
+    </div>
+
+    <p class="cs-thanks">Thank you.</p>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER =====================
+     Same component as the portfolio (styles.css owns every class here).
+     Content is written inline rather than rendered from data.js, because
+     script.js is a single pass that expects the full home-page DOM and
+     would throw on this page's missing elements. -->
+<footer class="site-footer" id="footer">
+  <div class="container footer-inner">
+    <p class="footer-watermark" aria-hidden="true">Rakhi.UX</p>
+
+    <div class="footer-intro">
+      <div class="footer-avatar">
+        <img src="public/footer-image.png" alt="Rakhi Das" width="82" height="82" loading="lazy" decoding="async">
+      </div>
+      <div class="footer-intro-text">
+        <p class="footer-heading">Want to get in touch? I'd love to connect with you!</p>
+        <p class="footer-tagline">I'm currently open to full-time opportunities! Let's create something amazing together! ✨</p>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <a href="mailto:dasrakhi303@gmail.com" class="btn btn-dark">
+        <span>dasrakhi303@gmail.com</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#" class="btn btn-outline-light">
+        <span>Download CV</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 • Rakhi Das • Built with pixels, prototypes, and plenty of late-night ideas.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

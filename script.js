@@ -439,11 +439,40 @@
       overlay.style.display = 'none';
     }
 
+    /* sessionStorage throws in private mode and with storage blocked, so
+       both accesses are guarded and simply fall back to playing the intro. */
+    var SEEN_KEY = 'rakhi:introSeen';
+
+    function hasSeenIntro() {
+      try {
+        return window.sessionStorage.getItem(SEEN_KEY) === '1';
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function rememberIntro() {
+      try {
+        window.sessionStorage.setItem(SEEN_KEY, '1');
+      } catch (err) {
+        /* Nothing to do — it just plays again next time. */
+      }
+    }
+
+    /* Three reasons to skip straight to the page. The visitor asked for no
+       motion; or they deep-linked to a section — arriving at index.html#works
+       from a case study, where a full-screen splash would hijack the jump
+       they actually asked for; or the splash already played in this tab, so
+       it has done its job as a first impression. */
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
+    var deepLinked = window.location.hash.length > 1;
+
+    if (reduceMotion || deepLinked || hasSeenIntro()) {
       reveal();
       return;
     }
+
+    rememberIntro();
 
     var ENTRANCE_DONE = 1400; /* matches the intro-portrait CSS entrance duration */
     var MOVE_MS = 1100;

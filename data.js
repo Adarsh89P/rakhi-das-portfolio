@@ -66,7 +66,7 @@ var PORTFOLIO_DATA = {
         description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
         color: '#49acea',
         image: 'public/Frame%2021.png',
-        href: 'https://www.figma.com/proto/rpqUY3GVptRWDIKuy3Bfmy/Portfolio?node-id=2189-1339&t=QSoZhTFnWBMCFo8J-1&scaling=scale-down-width&content-scaling=fixed&page-id=2165%3A1024'
+        href: 'suraksha_case_study.html'
       },
       {
         heading: 'Mobile Banking Onboarding',
