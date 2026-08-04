@@ -472,12 +472,20 @@ section {
    visitor's first pointer move, then handed off to the navbar logo
    and hero photo by the FLIP morph in initHeroMorph (script.js).
    ========================================================================== */
+/* One measure drives the whole splash. In the reference the figure spans the
+   full viewport height, so `100vh` is the natural size — but on a tall window
+   that would make it wide enough to swallow the wordmark, so it's also capped
+   against `vw`. At the reference's own 2.05 aspect the two are equal, and the
+   cap is what keeps the figure a constant ~38% of the wordmark's width at
+   every other aspect. The brand is positioned from the same measure so the
+   two never drift apart. */
 .intro-overlay {
   position: fixed;
   inset: 0;
   z-index: 900;
   background-color: #ffffff;
   pointer-events: none;
+  --figure-h: min(100vh, 49vw);
 }
 
 .intro-brand-layer,
@@ -489,18 +497,24 @@ section {
   justify-content: center;
 }
 
+/* Both layers anchor from the bottom, like the reference: the figure stands
+   on the viewport floor and the wordmark is lifted a fixed fraction of the
+   figure's own height above it, so the head always clears the cap line. */
 .intro-brand-layer {
   z-index: 10;
+  align-items: flex-end;
+  padding-bottom: calc(var(--figure-h) * 0.556);
 }
 
 .intro-portrait-layer {
   z-index: 20;
+  align-items: flex-end;
 }
 
 .intro-brand {
   display: block;
   font-weight: 700;
-  font-size: clamp(64px, 18.8vw, 301px);
+  font-size: clamp(48px, 17.7vw, 420px);
   line-height: 0.9;
   letter-spacing: -0.02em;
   color: var(--ink);
@@ -510,23 +524,28 @@ section {
   animation: introBrandIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Box matches rakhi.png's own 472x769 shape so `contain` fills it exactly
+   with no letterboxing. Keep this in step with whatever `introPhoto` points
+   at — a mismatched box changes how large the figure renders, which is what
+   buried the wordmark last time. */
 .intro-portrait {
   position: relative;
-  height: 62vh;
-  aspect-ratio: 405.71 / 661;
+  height: var(--figure-h);
+  aspect-ratio: 472 / 769;
   opacity: 0;
   transform: translateY(80px) scale(0.96);
   animation: introPortraitIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* No mask here: the portrait is bottom-anchored and runs off the bottom of
+   the viewport, so a gradient fade would cut the body off mid-frame instead
+   of at the edge. */
 .intro-portrait img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   object-position: bottom center;
   filter: grayscale(1);
-  -webkit-mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
 }
 
 @keyframes introBrandIn {
@@ -763,10 +782,15 @@ body.intro-active #heroPhotoWrap {
   gap: var(--space-2);
 }
 
+/* An anchor, so `fit-content` keeps the hit area on the words and arrow
+   rather than stretching across the whole heading column — a block-level
+   flex container would otherwise make the empty space to its right
+   clickable too. */
 .work-title {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: fit-content;
   font-weight: 500;
   font-size: var(--fs-work-heading);
   letter-spacing: -0.02em;
@@ -1452,6 +1476,15 @@ body.intro-active #heroPhotoWrap {
   .gallery-head {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* `flex-basis` sets the *main* size, so the moment this stacks into a
+     column the 380px/480px bases stop being widths and become heights —
+     ~860px of empty space wedged between the heading and the collage.
+     Hand the sizing back to the content. */
+  .gallery-heading,
+  .gallery-paragraph {
+    flex: 0 1 auto;
   }
 
   .testimonials-head {

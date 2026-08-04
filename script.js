@@ -101,36 +101,44 @@
     photo.alt = data.hero.photoAlt;
 
     var introPhoto = document.getElementById('introPortraitImg');
-    introPhoto.src = data.hero.photo;
+    introPhoto.src = data.hero.introPhoto || data.hero.photo;
   }
 
   /* -----------------------------------------------------------
      My Works — first two projects render full-width, the rest are
      paired two-per-row, same as the Figma reference.
   ----------------------------------------------------------- */
+  /* Points an <a> at a project. Off-site case studies (a live Figma
+     prototype, a write-up) open in a new tab so the portfolio itself is
+     never navigated away from. Shared by the title and the image, which
+     are two separate links to the same destination. */
+  function linkToProject(anchor, project) {
+    var href = project.href || '#';
+    anchor.href = href;
+    if (/^https?:/i.test(href)) {
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+    }
+  }
+
   function buildWorkItem(project, index) {
     var item = el('div', 'work-item');
 
     var headingRow = el('div', 'work-heading-row');
     var headingCol = el('div', 'work-heading-col');
-    /* Every project carries the arrow — it is the hover affordance for the
-       item, revealed by styles.css rather than shown permanently. */
-    headingCol.appendChild(el('p', 'work-title', project.heading + ' ' + ARROW_SVG));
+    /* The title is an anchor, not a <p>: the arrow beside it is the item's
+       hover affordance, so it has to actually be clickable once revealed. */
+    var title = el('a', 'work-title', project.heading + ' ' + ARROW_SVG);
+    linkToProject(title, project);
+    headingCol.appendChild(title);
     headingCol.appendChild(el('p', 'work-date gradient-text', project.dateRange));
     headingRow.appendChild(headingCol);
     headingRow.appendChild(el('p', 'work-desc', project.description));
     item.appendChild(headingRow);
 
     var frame = el('a', 'work-image');
-    frame.href = project.href || '#';
+    linkToProject(frame, project);
     frame.setAttribute('aria-label', 'View project: ' + project.heading);
-
-    /* Off-site case studies (a live Figma prototype, a write-up) open in a
-       new tab so the portfolio itself is never navigated away from. */
-    if (/^https?:/i.test(project.href || '')) {
-      frame.target = '_blank';
-      frame.rel = 'noopener noreferrer';
-    }
 
     var fill = el('div', 'work-image-fill');
     applyTileFill(fill, project, project.heading + ' — project preview');

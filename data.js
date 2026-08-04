@@ -42,7 +42,9 @@ var PORTFOLIO_DATA = {
     ctaPrimary: { label: 'Book A Call', href: '#footer' },
     ctaSecondary: { label: 'Get Started', href: '#works' },
     photo: 'public/rakhi-portrait-cutout.png',
-    photoAlt: 'Rakhi Das, UI/UX Designer'
+    photoAlt: 'Rakhi Das, UI/UX Designer',
+    /* The splash uses its own square, closer crop; falls back to `photo`. */
+    introPhoto: 'public/rakhi.png'
   },
 
   works: {
