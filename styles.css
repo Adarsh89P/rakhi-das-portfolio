@@ -45,21 +45,29 @@
   --space-8: 96px;
   --space-10: 120px;
 
-  --container-width: 1320px;
+  /* The Figma canvas is 1600 wide with a 1314px content column at x=143.
+     `--gutter` reproduces that inset exactly at 1600 ((1600-1314-2*48)/2 = 95
+     of auto margin + 48 of padding = 143) and keeps the column capped at
+     1314 on wider screens instead of letting it sprawl. */
+  --content-width: 1314px;
+  --gutter: clamp(24px, 3vw, 64px);
   --header-height: 100px;
 
   --section-pad: clamp(56px, 4rem + 3vw, 96px);
 
+  /* Hero/nav type is expressed as `vw` that lands on the exact Figma pixel
+     value at the 1600px design width, then caps there — above 1600 the
+     design stops scaling, matching the fixed-width canvas. */
   --fs-nav-link: 1rem;
-  --fs-nav-logo: clamp(1.6rem, 1.1rem + 2vw, 2.6rem);
-  --fs-hero-badge: clamp(2.4rem, 1.5rem + 4.6vw, 5.4rem);
-  --fs-hero-headline: clamp(1.8rem, 1.3rem + 2.6vw, 3.5rem);
+  --fs-nav-logo: clamp(1.6rem, 2.778vw, 44.45px);
+  --fs-hero-badge: clamp(2.4rem, 5.375vw, 86px);
+  --fs-hero-headline: clamp(1.8rem, 3.5vw, 56px);
   --fs-section-heading: clamp(1.7rem, 1.3rem + 2vw, 2.5rem);
   --fs-work-heading: clamp(1.35rem, 1.1rem + 1vw, 2rem);
   --fs-work-date: 1.125rem;
   --fs-work-desc: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
-  --fs-footer-heading: clamp(1.6rem, 1.2rem + 2vw, 2.625rem);
-  --fs-footer-watermark: clamp(3.5rem, 1rem + 18vw, 14rem);
+  --fs-footer-heading: clamp(1.6rem, 2.625vw, 42px);
+  --fs-footer-watermark: clamp(3.5rem, 23.2728vw, 372.365px);
 
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
@@ -133,9 +141,9 @@ h6 {
 
 .container {
   width: 100%;
-  max-width: 1660px;
+  max-width: calc(var(--content-width) + var(--gutter) * 2);
   margin-inline: auto;
-  padding-inline: clamp(24px, 3vw, 64px);
+  padding-inline: var(--gutter);
 }
 
 section {
@@ -186,7 +194,7 @@ section {
 
 /* Small "EYEBROW —— divider line" heading used above every section title. */
 .eyebrow-rule {
-  font-weight: 300;
+  font-weight: 500;
   font-size: 1rem;
   color: var(--ink);
   padding-bottom: var(--space-4);
@@ -200,7 +208,7 @@ section {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   height: 44px;
   padding: 10px 19px;
   border-radius: var(--radius-pill);
@@ -229,23 +237,16 @@ section {
 .btn-outline {
   background-color: transparent;
   color: var(--ink);
-  border: 1px solid var(--ink);
 }
 
 .btn-outline:hover {
   transform: translateY(-2px);
-  background-color: var(--ink);
-  color: #fff;
+  opacity: 0.6;
 }
 
 .btn-dark {
   background-color: var(--footer-pill);
   color: #ffffff;
-}
-
-.btn-dark:hover {
-  transform: translateY(-2px);
-  opacity: 0.85;
 }
 
 .btn-outline-light {
@@ -254,9 +255,47 @@ section {
   border: 1px solid var(--footer-pill);
 }
 
+/* Gradient hover for the two footer pills. The gradient rides on a
+   pseudo-element whose opacity is animated rather than on the element's own
+   background: `background-image` can't be transitioned, so swapping it
+   directly would snap instead of easing. `isolation` gives each button its
+   own stacking context so the z-index:-1 layer sits under the label without
+   falling behind the footer's black background. */
+.btn-dark,
+.btn-outline-light {
+  position: relative;
+  isolation: isolate;
+}
+
+.btn-dark::before,
+.btn-outline-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--gradient-accent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+/* Pulled out to the border box so the wash covers the 1px ring too. */
+.btn-outline-light::before {
+  inset: -1px;
+}
+
+.btn-dark:hover::before,
+.btn-outline-light:hover::before {
+  opacity: 1;
+}
+
+.btn-dark:hover,
 .btn-outline-light:hover {
   transform: translateY(-2px);
-  border-color: #ffffff;
+}
+
+.btn-outline-light:hover {
+  border-color: transparent;
 }
 
 /* ==========================================================================
@@ -269,6 +308,16 @@ section {
   z-index: 500;
   height: var(--header-height);
   pointer-events: none;
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+
+/* Scrolling down tucks the bar away so it stops sitting on top of the
+   content; scrolling up brings it straight back. The mobile drawer is a
+   child of this element, so script.js suppresses the hide while the menu
+   is open — otherwise the open drawer would ride off-screen with it. */
+.site-header.is-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .navbar {
@@ -530,10 +579,17 @@ body.intro-active #heroPhotoWrap {
 /* ==========================================================================
    Hero
    ========================================================================== */
+/* Figma's Banner frame is 784 tall on a 1600 canvas. The portrait is the
+   tall item (661) and sits at y=82 — deliberately rising behind the
+   transparent nav — so the frame resolves as 82 + 661 + 41 = 784. The text
+   column is bottom-aligned against the portrait and lifted by 142px, which
+   puts its top edge at y=272 exactly as designed. Every offset is `min()`
+   against a vw equivalent so the block scales down proportionally but never
+   grows past the design. */
 .hero {
   position: relative;
-  padding-top: calc(var() + 12px);
-  padding-bottom: 48px;
+  padding-top: min(82px, 5.125vw);
+  padding-bottom: min(41px, 2.5625vw);
   overflow: hidden;
   display: grid;
   align-items: center;
@@ -542,22 +598,23 @@ body.intro-active #heroPhotoWrap {
 .hero-inner {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 844fr) minmax(0, 406fr);
   align-items: end;
-  gap: clamp(24px, 3vw, 56px);
+  column-gap: 4.795%;
 }
 
 .hero-text {
-  max-width: 52rem;
+  margin-bottom: min(142px, 8.875vw);
 }
 
 .hero-badge {
   font-weight: 400;
-  font-size: 86px;
-  line-height: 85px;
+  font-size: var(--fs-hero-badge);
+  line-height: 0.9884;
   letter-spacing: -0.02em;
   color: var(--ink);
   margin-bottom: 10px;
+  white-space: nowrap;
 }
 
 .hero-badge .icon {
@@ -571,11 +628,11 @@ body.intro-active #heroPhotoWrap {
 .hero-headline {
   font-weight: 300;
   font-size: var(--fs-hero-headline);
-  line-height: 1.05;
+  line-height: 1.3393;
   letter-spacing: -0.02em;
   color: var(--ink);
-  max-width: 34ch;
-  margin-bottom: 28px;
+  max-width: 825px;
+  margin-bottom: min(40px, 2.5vw);
 }
 
 .hero-headline .gradient-text {
@@ -594,21 +651,20 @@ body.intro-active #heroPhotoWrap {
 }
 
 .hero-photo {
-  justify-self: end;
   position: relative;
   width: 100%;
-  max-width: 406px;
-  aspect-ratio: 405.71 / 661;
-   justify-self: end;
+  max-width: 405.711px;
+  aspect-ratio: 405.711 / 661;
 }
 
+/* Figma fills this box edge-to-edge (the source is cover-cropped ~11% on
+   each side) and desaturates it via mix-blend-luminosity. */
 .hero-photo img {
-  width: min(620px, 100%);
-  transform: scale(1.1);
+  width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  filter: grayscale(0.2);
+  object-fit: cover;
+  object-position: center;
+  filter: grayscale(1);
   -webkit-mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 62.159%, transparent 100%);
 }
@@ -668,7 +724,7 @@ body.intro-active #heroPhotoWrap {
    My Works
    ========================================================================== */
 .works {
-  padding-block: var(--section-pad);
+  padding-block: 12px;
 }
 
 .works-list {
@@ -717,15 +773,23 @@ body.intro-active #heroPhotoWrap {
   color: var(--ink);
 }
 
+/* The arrow is the item's hover affordance: it eases out of the title
+   instead of sitting there permanently. Its box is laid out even while
+   hidden, so revealing it slides nothing else around. `focus-within` keeps
+   the cue for keyboard users, since the image below is the real link. */
 .work-title svg {
   width: 24px;
   height: 24px;
   color: var(--ink);
-  transition: transform var(--transition-fast);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity var(--transition-base), transform var(--transition-base);
 }
 
-.work-item:hover .work-title svg {
-  transform: translateX(4px);
+.work-item:hover .work-title svg,
+.work-item:focus-within .work-title svg {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .work-date {
@@ -842,6 +906,8 @@ body.intro-active #heroPhotoWrap {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(12px, 1.5vw, 24px);
   padding-block: var(--space-3) var(--space-6);
 }
 
@@ -857,12 +923,11 @@ body.intro-active #heroPhotoWrap {
      script.js) — one of --exp-blue/-peach/-pink. */
 }
 
-.exp-card:not(:first-child) {
-  margin-left: -68px;
-}
-
 /* Rotation, resting stagger and stacking order — cycled per position so
-   any number of cards still reads as a loose fan rather than a rigid grid. */
+   any number of cards still reads as a loose fan rather than a rigid grid.
+   The cards sit side by side with a real gap; only their rotated corners
+   overlap, which keeps the fan feel without burying each card's text under
+   the next one. */
 .exp-card:nth-child(6n+1) { --card-rotate: -6deg; --base-y: 6px; z-index: 6; }
 .exp-card:nth-child(6n+2) { --card-rotate: 4deg; --base-y: 22px; z-index: 5; }
 .exp-card:nth-child(6n+3) { --card-rotate: -4deg; --base-y: 2px; z-index: 4; }
@@ -900,10 +965,19 @@ body.intro-active #heroPhotoWrap {
   overflow: hidden;
 }
 
+/* A real company mark comes on its own light artwork, so the dark lettermark
+   plate is swapped for white and the image is *contained* rather than
+   cropped — these sources aren't square (Sundew is 207x256), and `cover`
+   would slice the mark's own edges off. */
+.exp-logo.has-logo {
+  background-color: #ffffff;
+  padding: 6px;
+}
+
 .exp-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 70px;
+  height: 45px;
+  object-fit: contain;
 }
 
 .exp-date {
@@ -940,10 +1014,13 @@ body.intro-active #heroPhotoWrap {
   padding-block: var(--section-pad);
 }
 
+/* A continuous marquee. script.js renders the card list twice (the copy is
+   hidden from assistive tech) and the strip slides exactly one set's width
+   before looping, so the seam never shows. Spacing is `margin-right` on the
+   cards rather than flex `gap`: with a gap, one set plus its trailing gap
+   would not equal half the strip and the loop would visibly jump each cycle. */
 .testimonials-track {
-  display: flex;
-  gap: 31px;
-  overflow-x: auto;
+  overflow: hidden;
   scroll-snap-type: x mandatory;
   padding-bottom: var(--space-3);
   scrollbar-width: none;
@@ -960,11 +1037,50 @@ body.intro-active #heroPhotoWrap {
   outline-offset: 4px;
 }
 
+.testimonials-marquee {
+  display: flex;
+  width: max-content;
+  /* Duration is set per-strip in script.js from the measured width, so the
+     cards travel at a constant speed no matter how many there are. */
+  animation: testimonials-marquee var(--marquee-duration, 60s) linear infinite;
+}
+
+/* Hovering or tabbing in holds the strip still so a quote can be read. */
+.testimonials-track:hover .testimonials-marquee,
+.testimonials-track:focus-within .testimonials-marquee {
+  animation-play-state: paused;
+}
+
+.testimonials-marquee.is-reversed {
+  animation-direction: reverse;
+}
+
+@keyframes testimonials-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* The global reduced-motion reset collapses every animation to 0.001ms,
+   which here would slam the strip to its end position and strand it there.
+   Drop the animation outright instead and hand the track back to the user
+   as an ordinary horizontal scroller. */
+@media (prefers-reduced-motion: reduce) {
+  .testimonials-marquee {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .testimonials-track {
+    overflow-x: auto;
+  }
+}
+
 .testimonial-card {
   flex: 0 0 min(642px, 88vw);
   scroll-snap-align: start;
   display: flex;
   gap: 30px;
+  margin-right: 31px;
 }
 
 .testimonial-photo {
@@ -1010,7 +1126,7 @@ body.intro-active #heroPhotoWrap {
    My Gallery
    ========================================================================== */
 .gallery {
-  padding-block: var(--section-pad);
+  padding-block: 38px;
 }
 
 .gallery-head {
@@ -1018,7 +1134,7 @@ body.intro-active #heroPhotoWrap {
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-5);
-  margin-bottom: clamp(40px, 6vw, 68px);
+  margin-bottom: min(60px, 3.75vw);
 }
 
 .gallery-heading {
@@ -1034,28 +1150,40 @@ body.intro-active #heroPhotoWrap {
   max-width: 40rem;
 }
 
+/* The collage is a bespoke 5x3 grid matching Figma's 1314x485 footprint.
+   Tiles are placed by explicit grid-area rather than by a span-based size
+   class: column 1 splits at 213px while columns 3-4 split at 148px, so no
+   single "tall/wide/normal" vocabulary can describe the arrangement.
+   Column and row tracks are `fr` so the whole collage scales as one unit.
+
+     +-----+-------+-------+-------+-------+
+     |  1  |       |   4   |   5   |       |
+     |     |   3   +-------+-------+   7   |
+     +-----+       |               |       |
+     |  2  |       |       6       |       |
+     +-----+-------+---------------+-------+ */
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-auto-rows: 110px;
-  gap: 14px;
+  grid-template-columns: 209fr 306fr 216.5fr 216.5fr 306fr;
+  grid-template-rows: 148fr 49fr 256fr;
+  height: min(485px, 30.3125vw);
+  gap: 16px;
 }
 
 .gallery-tile {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  grid-column: span 2;
-  grid-row: span 2;
 }
 
-.gallery-tile.is-tall {
-  grid-row: span 3;
-}
-
-.gallery-tile.is-wide {
-  grid-column: span 4;
-}
+/* grid-area: row-start / column-start / row-end / column-end */
+.gallery-tile:nth-child(1) { grid-area: 1 / 1 / 3 / 2; }
+.gallery-tile:nth-child(2) { grid-area: 3 / 1 / 4 / 2; }
+.gallery-tile:nth-child(3) { grid-area: 1 / 2 / 4 / 3; }
+.gallery-tile:nth-child(4) { grid-area: 1 / 3 / 2 / 4; }
+.gallery-tile:nth-child(5) { grid-area: 1 / 4 / 2 / 5; }
+.gallery-tile:nth-child(6) { grid-area: 2 / 3 / 4 / 5; }
+.gallery-tile:nth-child(7) { grid-area: 1 / 5 / 4 / 6; }
 
 /* ==========================================================================
    Footer
@@ -1065,84 +1193,112 @@ body.intro-active #heroPhotoWrap {
   background-color: var(--footer-bg);
   color: var(--footer-ink);
   overflow: hidden;
-  padding-block: var(--space-7) var(--space-5);
+  padding-block: min(80px, 5vw) 12px;
 }
 
+/* The watermark is a backdrop, not a flow item: in Figma it sits behind the
+   content with its top edge 275px above the footer's bottom edge and its
+   lower half deliberately bleeding past it (the footer's overflow clips the
+   rest). Anchoring from the bottom + translateY(100%) reproduces that, and
+   the -51.23% X shift is Figma's `left: calc(50% - 814px)` expressed against
+   the text's own 1589px width so it holds as the type scales. */
 .footer-watermark {
+  position: absolute;
+  left: 50%;
+  bottom: min(275px, 17.1875vw);
+  transform: translate(-51.23%, 100%);
+  z-index: 0;
   font-weight: 700;
   font-size: var(--fs-footer-watermark);
-  line-height: 1;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: #ffffff;
   opacity: 0.06;
   white-space: nowrap;
-  margin-bottom: clamp(24px, 6vw, 64px);
-  overflow: hidden;
+}
+
+/* Positioned so they paint above the absolutely-positioned watermark —
+   without this the watermark would sit on top of the content. */
+.footer-intro,
+.footer-actions,
+.footer-social,
+.footer-bottom {
+  position: relative;
+  z-index: 1;
 }
 
 .footer-intro {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-5);
+  gap: 16px;
+  margin-bottom: min(42px, 2.625vw);
 }
 
+/* The circular crop lives on the img, not here — a clipping container would
+   also cut off the status dot, which Figma places flush with the avatar's
+   bottom-right corner and therefore half outside the circle. */
 .footer-avatar {
   position: relative;
   flex-shrink: 0;
   width: 82px;
   height: 82px;
-  border-radius: 50%;
-  overflow: hidden;
 }
 
 .footer-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
+/* Figma draws this as a #34C759 core (r5) inside a #3D795F ring (r8.75),
+   knocked out of the black footer by a 2.5px stroke. With border-box the
+   border occupies r7.5–10, so the core ends at 5/7.5 of the padding box. */
 .footer-avatar::after {
   content: '';
   position: absolute;
-  right: -2px;
-  bottom: -2px;
+  right: 0;
+  bottom: 0;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: var(--accent-orange);
-  border: 3px solid var(--footer-bg);
+  background: radial-gradient(circle, #34c759 0 66.67%, #3d795f 66.67% 100%);
+  border: 2.5px solid var(--footer-bg);
 }
 
 .footer-intro-text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 10px;
 }
 
 .footer-heading {
   font-weight: 600;
   font-size: var(--fs-footer-heading);
   letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 .footer-tagline {
-  font-weight: 300;
-  font-size: 1.125rem;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.2222;
   color: var(--footer-ink);
 }
 
 .footer-actions {
   display: flex;
-  gap: var(--space-3);
-  margin-bottom: var(--space-6);
+  gap: 10px;
+  margin-bottom: min(42px, 2.625vw);
 }
 
+/* 16px gap puts the unrotated 56px tiles at x = 0 / 72 / 144 / 216, matching
+   Figma — the per-tile rotation is applied in script.js and, being a
+   transform, does not disturb this layout. */
 .footer-social {
   display: flex;
-  gap: 14px;
-  margin-bottom: var(--space-6);
+  gap: 16px;
+  margin-bottom: min(145px, 9.0625vw);
 }
 
 .footer-social-link {
@@ -1161,16 +1317,17 @@ body.intro-active #heroPhotoWrap {
 }
 
 .footer-social-link svg {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
 }
 
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  padding-top: var(--space-3);
+  padding-top: 14px;
   font-weight: 400;
-  font-size: 0.875rem;
-  color: #999999;
+  font-size: 14px;
+  line-height: 1.5714;
+  color: var(--grey-text);
 }
 
 /* ==========================================================================
@@ -1207,8 +1364,17 @@ body.intro-active #heroPhotoWrap {
     display: inline-flex;
   }
 
+  /* Stacked layout puts the portrait first, so the hero can no longer let it
+     ride up behind the nav — restore a clearing pad and drop the 142px lift
+     that only exists to bottom-align text against the portrait. */
+  .hero {
+    padding-top: calc(var(--header-height) + 12px);
+    padding-bottom: 48px;
+  }
+
   .hero-inner {
     grid-template-columns: 1fr;
+    row-gap: clamp(24px, 3vw, 56px);
   }
 
   .hero-photo-wrap {
@@ -1221,7 +1387,11 @@ body.intro-active #heroPhotoWrap {
   }
 
   .hero-text {
-    max-width: none;
+    margin-bottom: 0;
+  }
+
+  .hero-badge {
+    white-space: normal;
   }
 
   .work-row {
@@ -1245,26 +1415,31 @@ body.intro-active #heroPhotoWrap {
     width: 100%;
   }
 
-  .exp-card:not(:first-child) {
-    margin-left: 0;
-  }
-
   .exp-card:nth-child(n) {
     --card-rotate: 0deg;
     --base-y: 0px;
     z-index: auto;
   }
 
+  /* The collage's fixed 5x3 placement can't survive this width — unwind it
+     into a plain 2-column masonry-ish grid and let the tiles flow. Every
+     nth-child placement above is reset, otherwise the explicit grid-areas
+     would keep pointing at tracks that no longer exist. */
   .gallery-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: 180px;
+    height: auto;
   }
 
-  .gallery-tile {
-    grid-column: span 2;
+  .gallery-tile:nth-child(n) {
+    grid-area: auto;
   }
 
-  .gallery-tile.is-wide {
-    grid-column: span 4;
+  .gallery-tile:nth-child(3),
+  .gallery-tile:nth-child(6),
+  .gallery-tile:nth-child(7) {
+    grid-row: span 2;
   }
 
   .footer-intro {

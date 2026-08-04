@@ -21,7 +21,7 @@ var PORTFOLIO_DATA = {
   /* Nav links either side of the centered logo, left-to-right. */
   nav: {
     left: [
-      { label: 'Meet kai', href: '#home' },
+      { label: 'Meet Rakhi', href: '#home' },
       { label: 'Book online', href: '#footer' }
     ],
     right: [
@@ -63,8 +63,8 @@ var PORTFOLIO_DATA = {
         dateRange: 'Mar 2025 – Jul 2025',
         description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
         color: '#49acea',
-        image: '',
-        href: '#'
+        image: 'public/Frame%2021.png',
+        href: 'https://www.figma.com/proto/rpqUY3GVptRWDIKuy3Bfmy/Portfolio?node-id=2189-1339&t=QSoZhTFnWBMCFo8J-1&scaling=scale-down-width&content-scaling=fixed&page-id=2165%3A1024'
       },
       {
         heading: 'Mobile Banking Onboarding',
@@ -106,7 +106,7 @@ var PORTFOLIO_DATA = {
         company: 'Sundew',
         dateRange: 'Dec 2024 – Present',
         logoLetter: 'S',
-        logo: '',
+        logo: 'public/sundew.png',
         color: 'var(--exp-blue)',
         description: 'Designing research-led product experiences for a fast-moving startup, from first interview to shipped interface.'
       },
@@ -115,7 +115,7 @@ var PORTFOLIO_DATA = {
         company: 'Fortmindz',
         dateRange: 'Jun 2023 – Feb 2025',
         logoLetter: 'F',
-        logo: '',
+        logo: 'public/Fortmindz.png',
         color: 'var(--exp-peach)',
         description: 'Owned interface design for web and mobile products, backed by a reusable component library.'
       },
@@ -133,7 +133,7 @@ var PORTFOLIO_DATA = {
         company: 'Granicus',
         dateRange: 'Oct 2020 – Feb 2023',
         logoLetter: 'G',
-        logo: '',
+        logo: 'public/Granicus.png',
         color: 'var(--exp-blue)',
         description: 'Client-facing implementation work that became the foundation for a move into UX design.'
       }
@@ -158,15 +158,30 @@ var PORTFOLIO_DATA = {
     headingPre: 'An Artistic Expedition Awaits in ',
     headingHighlight: 'My Gallery',
     paragraph: "A few frames from outside the design tools — travel, light and moments worth keeping. Swap these placeholder tiles for real photos any time by adding an `image` url in data.js.",
-    /* `size` controls the tile's footprint in the collage grid: tall | wide | normal.
-       `alt` only matters once `image` is filled in — give it a real description then. */
+    /* Order here IS position in the collage — the grid places tiles by
+       nth-child, so moving an entry moves the photo. Slot shapes below are
+       the Figma sizes at 1314px wide; pick photos whose crop suits them,
+       since every tile is `object-fit: cover` and centred.
+
+         1. 209x213  square-ish   top-left
+         2. 209x256  portrait     bottom-left
+         3. 306x485  tall         full-height, left of centre
+         4. 216x148  landscape    top strip
+         5. 216x148  landscape    top strip
+         6. 449x321  landscape    large centre block
+         7. 306x485  tall         full-height, far right
+
+       `color` shows through until `image` is set, so unfilled slots stay
+       visible rather than collapsing. Fill in `alt` with a real
+       description whenever you add an `image`. */
     tiles: [
-      { size: 'tall', color: '#e7d9c9', image: '', alt: '' },
-      { size: 'normal', color: '#d8c9e0', image: '', alt: '' },
-      { size: 'wide', color: '#c9dce0', image: '', alt: '' },
-      { size: 'normal', color: '#e0d3c9', image: '', alt: '' },
-      { size: 'tall', color: '#d0dde5', image: '', alt: '' },
-      { size: 'normal', color: '#e5d6d0', image: '', alt: '' }
+      { color: '#e7d9c9', image: 'public/Rectangle%2011.png', alt: 'A whitewashed stone house built into a rust-coloured cliff face, prayer flags strung above it' },
+      { color: '#d8c9e0', image: 'public/Rectangle%2010.png', alt: 'Pine branches in the foreground with a valley town half-swallowed by low cloud behind' },
+      { color: '#c9dce0', image: 'public/image5.png', alt: 'Rakhi in a denim jacket standing on a rock in a wide green glacial valley' },
+      { color: '#e0d3c9', image: 'public/Rectangle%2012.png', alt: 'Cloud spilling over a dark ridgeline at dawn, a corrugated rooftop in the foreground' },
+      { color: '#d0dde5', image: 'public/Rectangle%208.png', alt: 'Sun rising through a notch between two ridges, power lines crossing the sky' },
+      { color: '#e5d6d0', image: 'public/Rectangle%206.png', alt: 'A timber and stone house beside a village road, snow-dusted peaks catching the evening light' },
+      { color: '#dfe0d3', image: 'public/Rectangle%207.png', alt: 'Rakhi standing with arms outstretched above terraced fields, a hillside monastery in the distance' }
     ]
   },
 
@@ -182,7 +197,7 @@ var PORTFOLIO_DATA = {
     watermark: 'Rakhi.UX',
     heading: "Want to get in touch? I'd love to connect with you!",
     tagline: "I'm currently open to full-time opportunities! Let's create something amazing together! ✨",
-    avatar: 'public/rakhi-portrait.png',
+    avatar: 'public/footer-image.png',
     avatarAlt: 'Rakhi Das',
     cvHref: '',
     copyright: 'Rakhi Das • Built with pixels, prototypes, and plenty of late-night ideas.'
