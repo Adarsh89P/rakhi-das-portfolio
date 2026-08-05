@@ -578,12 +578,18 @@
     navMenu.classList.remove('open');
     navToggle.setAttribute('aria-expanded', 'false');
     navToggle.setAttribute('aria-label', 'Open navigation menu');
+    /* Put the bar back under scroll's control. Sits here rather than on the
+       toggle's click so Escape and outside-clicks are covered too. */
+    updateScrollChrome();
   }
 
   function openMenu() {
     navMenu.classList.add('open');
     navToggle.setAttribute('aria-expanded', 'true');
     navToggle.setAttribute('aria-label', 'Close navigation menu');
+    /* The drawer lives inside the header — if the header is tucked away,
+       the menu would open off-screen. */
+    updateScrollChrome();
   }
 
   navToggle.addEventListener('click', function () {
@@ -608,34 +614,45 @@
   });
 
   /* ===========================================================
-     Nav — hides on scroll down, returns on scroll up, so the fixed
-     bar stops covering content once you're past the hero.
+     Scroll chrome — the nav tucks away as soon as you leave the top
+     of the page and stays away, rather than flying back in on every
+     upward flick. The back-to-top button is what brings it back, so
+     the two are driven from one scroll pass.
   =========================================================== */
   var siteHeader = document.getElementById('siteHeader');
-  /* Only start hiding past the bar's own height, so the very top of the
-     page never flickers. The 4px delta ignores scroll jitter. */
+  var toTop = document.getElementById('toTop');
+  /* Past the bar's own height, so the very top of the page never flickers. */
   var HIDE_AFTER = 100;
-  var SCROLL_DELTA = 4;
-  var lastScrollY = window.pageYOffset;
+  /* Far enough down that the button is a genuine shortcut, not clutter. */
+  var TO_TOP_AFTER = 600;
   var headerTicking = false;
 
-  function updateHeader() {
+  function updateScrollChrome() {
     headerTicking = false;
     var y = window.pageYOffset;
-    if (Math.abs(y - lastScrollY) < SCROLL_DELTA) return;
 
-    if (navMenu.classList.contains('open')) siteHeader.classList.remove('is-hidden');
-    else if (y > lastScrollY && y > HIDE_AFTER) siteHeader.classList.add('is-hidden');
-    else if (y < lastScrollY) siteHeader.classList.remove('is-hidden');
+    /* The drawer is a child of the header, so hiding it would drag an open
+       menu off-screen with it. */
+    var scrolledAway = y > HIDE_AFTER && !navMenu.classList.contains('open');
+    siteHeader.classList.toggle('is-hidden', scrolledAway);
 
-    lastScrollY = y < 0 ? 0 : y;
+    if (toTop) toTop.classList.toggle('is-visible', y > TO_TOP_AFTER);
   }
 
   window.addEventListener('scroll', function () {
     if (headerTicking) return;
     headerTicking = true;
-    window.requestAnimationFrame(updateHeader);
+    window.requestAnimationFrame(updateScrollChrome);
   }, { passive: true });
+
+  if (toTop) {
+    toTop.addEventListener('click', function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+
+  updateScrollChrome();
 
   /* ===========================================================
      Scroll reveal — simple fade/rise the first time each element

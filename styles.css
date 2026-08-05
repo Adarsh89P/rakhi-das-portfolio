@@ -1355,6 +1355,47 @@ body.intro-active #heroPhotoWrap {
 }
 
 /* ==========================================================================
+   Back to top — the nav now stays hidden until you're back at the top of
+   the page, so this is the way back up from anywhere further down.
+   `visibility` rides along with the fade so the button can't be tabbed to
+   or clicked while it's invisible.
+   ========================================================================== */
+.to-top {
+  position: fixed;
+  right: clamp(16px, 3vw, 32px);
+  bottom: clamp(16px, 3vw, 32px);
+  z-index: 600;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--ink);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity var(--transition-base), transform var(--transition-base), visibility var(--transition-base);
+}
+
+.to-top svg {
+  width: 20px;
+  height: 20px;
+}
+
+.to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.to-top.is-visible:hover {
+  transform: translateY(-3px);
+  opacity: 0.85;
+}
+
+/* ==========================================================================
    Scroll reveal
    ========================================================================== */
 /* Composed through custom properties rather than a second `transform`
@@ -1384,8 +1425,16 @@ body.intro-active #heroPhotoWrap {
     display: none;
   }
 
+  /* Taking the toggle out of the flow leaves the logo as the only item the
+     centring applies to, so it lands dead centre instead of being pushed
+     left by the button beside it. Left offset matches .navbar's own
+     padding-inline so it lines up with the page edge. */
   .nav-toggle {
     display: inline-flex;
+    position: absolute;
+    left: clamp(20px, 4vw, 32px);
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   /* Stacked layout puts the portrait first, so the hero can no longer let it
@@ -1493,14 +1542,25 @@ body.intro-active #heroPhotoWrap {
     gap: var(--space-3);
   }
 
+  /* Stacked, the 30px column gap reads as two unrelated blocks rather than
+     one testimonial — the photo and the quote stop looking connected. Tighten
+     it so the pair holds together, and shorten the photo so a card doesn't
+     tower over a phone screen. */
   .testimonial-card {
     flex-direction: column;
     flex-basis: 82vw;
+    gap: 12px;
   }
 
   .testimonial-photo {
-    flex-basis: 220px;
+    flex-basis: 180px;
     width: 100%;
+  }
+
+  /* Only meaningful when the body stretches beside a photo; stacked, it just
+     strands the quote at the bottom of its box. */
+  .testimonial-body {
+    justify-content: flex-start;
   }
 
   .footer-intro {
