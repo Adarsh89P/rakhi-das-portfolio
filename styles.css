@@ -52,6 +52,13 @@
   --content-width: 1314px;
   --gutter: clamp(24px, 3vw, 64px);
   --header-height: 100px;
+  /* The nav is a floating glass pill inside the header band rather than a
+     full-bleed bar, so its own size is tracked separately — the mobile
+     drawer positions itself off these so it always lands just under the
+     pill's real bottom edge, whatever the breakpoint sets them to. */
+  --nav-pill-h: 72px;
+  --nav-pill-top: 14px;
+  --nav-pill-inset: clamp(16px, 4vw, 32px);
 
   --section-pad: clamp(56px, 4rem + 3vw, 96px);
 
@@ -320,18 +327,91 @@ section {
   opacity: 0;
 }
 
+/* Liquid glass. Four layers stacked in one element:
+     1. `backdrop-filter` blurs + over-saturates the page behind it, which is
+        what makes the material read as glass rather than as tinted plastic.
+     2. a translucent white body tint so text stays legible over anything.
+     3. ::before — a vertical specular gradient (bright lip at the top, a
+        second softer bounce off the bottom) that gives the pill volume.
+     4. ::after — a 1px gradient ring drawn with a mask, standing in for the
+        way a real bevel catches light unevenly around its edge.
+   Both pseudo-elements sit at z-index -1 against `isolation: isolate`, so
+   they paint over the pill's own background but under the links, and the
+   isolation keeps that negative index from escaping behind the header. */
 .navbar {
   pointer-events: auto;
   position: relative;
-  height: 100%;
-  width: 100%;
-  max-width: 1600px;
-  margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 32px);
+  isolation: isolate;
+  height: var(--nav-pill-h);
+  width: max-content;
+  max-width: calc(min(1600px, 100%) - 2 * var(--nav-pill-inset));
+  margin: var(--nav-pill-top) auto 0;
+  padding-inline: clamp(14px, 2vw, 26px);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 22px;
+  border-radius: var(--radius-pill);
+  /* Near-opaque base: this is what browsers without backdrop-filter get, and
+     there the links must never sit unreadably over live content. The
+     @supports block below is the frosted version. */
+  background-color: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.09),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .navbar {
+    background-color: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    backdrop-filter: blur(28px) saturate(190%);
+  }
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(255, 255, 255, 0.16) 38%,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(255, 255, 255, 0.26) 100%
+  );
+}
+
+/* Ring only: fill the padding box, then punch the content box back out.
+   Gated behind @supports because without mask compositing the same rule
+   would render as a solid gradient slab over the whole pill — the fallback
+   is simply no bevel highlight, which the tint and shadow survive fine. */
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  .navbar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    padding: 1px;
+    background-image: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.22) 34%,
+      rgba(0, 0, 0, 0.05) 58%,
+      rgba(255, 255, 255, 0.8) 100%
+    );
+    -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+  }
 }
 
 .nav-group {
@@ -446,21 +526,26 @@ section {
 .nav-menu-mobile {
   display: none;
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  /* Tracks the pill rather than the header band, so it hangs 8px under the
+     pill's real bottom edge at every breakpoint. */
+  top: calc(var(--nav-pill-top) + var(--nav-pill-h) + 8px);
+  left: var(--nav-pill-inset);
+  right: var(--nav-pill-inset);
   flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
   background-color: rgba(255, 255, 255, 0.96);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.55) inset;
   pointer-events: auto;
 }
 
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .nav-menu-mobile {
-    background-color: rgba(255, 255, 255, 0.6);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
+    background-color: rgba(255, 255, 255, 0.62);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    backdrop-filter: blur(28px) saturate(190%);
   }
 }
 
@@ -498,6 +583,21 @@ section {
    cap is what keeps the figure a constant ~38% of the wordmark's width at
    every other aspect. The brand is positioned from the same measure so the
    two never drift apart. */
+/* The splash is a fixed, opaque, full-viewport layer, and the FLIP morph
+   measures both its start and end rects against the viewport. If the page
+   scrolls while it is up, the page slides out from under a sheet of white
+   and the morph flies to coordinates that have since moved — a blank gap
+   with the wordmark and portrait drifting over whatever section you landed
+   on. Freezing the scroll for the ~0.8s the overlay is alive is what keeps
+   the handoff coherent; script.js adds and removes this class, and also
+   snaps the morph to its end state if a scroll gets through anyway. */
+html.intro-lock,
+html.intro-lock body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
 .intro-overlay {
   position: fixed;
   inset: 0;
@@ -1468,18 +1568,31 @@ body.intro-active #heroPhotoWrap {
    Responsive
    ========================================================================== */
 @media (max-width: 900px) {
+  :root {
+    --nav-pill-h: 60px;
+    --nav-pill-top: 12px;
+  }
+
   .nav-group {
     display: none;
   }
 
+  /* With only a logo left in the flow, `width: max-content` would shrink the
+     pill to the wordmark and leave the absolutely-positioned toggle sitting
+     on top of it. Span the row instead — which is also the shape the drawer
+     hangs off. */
+  .navbar {
+    width: calc(100% - 2 * var(--nav-pill-inset));
+    padding-inline: 10px;
+  }
+
   /* Taking the toggle out of the flow leaves the logo as the only item the
      centring applies to, so it lands dead centre instead of being pushed
-     left by the button beside it. Left offset matches .navbar's own
-     padding-inline so it lines up with the page edge. */
+     left by the button beside it. */
   .nav-toggle {
     display: inline-flex;
     position: absolute;
-    left: clamp(20px, 4vw, 32px);
+    left: 8px;
     top: 50%;
     transform: translateY(-50%);
   }

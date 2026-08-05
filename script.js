@@ -439,9 +439,16 @@
 
     if (!overlay || !introBrand || !introPortrait || !finalLogo || !finalPhotoWrap) return;
 
+    var docEl = document.documentElement;
+
+    function unlockScroll() {
+      docEl.classList.remove('intro-lock');
+    }
+
     function reveal() {
       document.body.classList.remove('intro-active');
       overlay.style.display = 'none';
+      unlockScroll();
     }
 
     /* sessionStorage throws in private mode and with storage blocked, so
@@ -471,24 +478,35 @@
        it has done its job as a first impression. */
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var deepLinked = window.location.hash.length > 1;
+    /* A reload restores the previous scroll offset, so the page can already
+       be at "My Works" before a single frame is drawn. A full-screen splash
+       over the middle of the page is never right, and the morph's target
+       rects would be off-screen. */
+    var alreadyScrolled = window.pageYOffset > 4;
 
-    if (reduceMotion || deepLinked || hasSeenIntro()) {
+    if (reduceMotion || deepLinked || alreadyScrolled || hasSeenIntro()) {
       reveal();
       return;
     }
 
     rememberIntro();
+    docEl.classList.add('intro-lock');
 
     var ENTRANCE_DONE = 1400; /* matches the intro-portrait CSS entrance duration */
-    var MOVE_MS = 1100;
-    var CROSSFADE_MS = 450;
+    /* Kept deliberately short: the whole point of the splash is the handoff,
+       and every extra millisecond is another millisecond the page is frozen
+       under an opaque overlay waiting on it. */
+    var MOVE_MS = 900;
+    var CROSSFADE_MS = 380;
     var EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
     var armed = false;
-    var requested = false;
     var fired = false;
+    var finished = false;
 
     function morph() {
-      if (fired) return;
+      /* `finished` covers the bail-out case: the overlay is already gone, so
+         starting a flight now would only re-hide the real logo and photo. */
+      if (fired || finished) return;
       fired = true;
 
       /* Freeze the CSS entrance animation at its settled state so this
@@ -535,6 +553,16 @@
       });
 
       window.setTimeout(function () {
+        /* The overlay's own white is what the intro elements sit on. Leaving
+           it opaque through the crossfade means they fade out against a
+           blank sheet with the real page still hidden behind it — a beat
+           where the viewport is simply empty, and then everything pops in
+           at once when the overlay is removed. Fading the backdrop out on
+           the same curve turns that into an actual crossfade: the hero copy
+           and photo rise into view underneath as the splash thins out. */
+        overlay.style.transition = 'background-color ' + CROSSFADE_MS + 'ms ease';
+        overlay.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+
         introBrand.style.transition += ', opacity ' + CROSSFADE_MS + 'ms ease';
         introBrand.style.opacity = '0';
         introPortrait.style.transition += ', opacity ' + CROSSFADE_MS + 'ms ease';
@@ -549,22 +577,45 @@
       /* Hidden right as the crossfade finishes, not after the (longer)
          move — otherwise the overlay's opaque white sits over the
          already-faded-in real elements for a beat, a dead blank gap. */
-      window.setTimeout(function () {
-        overlay.style.display = 'none';
-      }, MOVE_MS * 0.5 + CROSSFADE_MS);
+      window.setTimeout(finish, MOVE_MS * 0.5 + CROSSFADE_MS);
     }
+
+    /* End state, reachable from any point in the flight. Normally this is
+       just the last step of morph(); it is also the escape hatch if a scroll
+       slips past the lock (iOS momentum, a focus jump, an extension), where
+       carrying on would strand a fixed overlay over the wrong section. */
+    function finish() {
+      if (finished) return;
+      finished = true;
+
+      overlay.style.display = 'none';
+      document.body.classList.remove('intro-active');
+      finalLogo.style.transition = 'none';
+      finalLogo.style.opacity = '1';
+      finalPhotoWrap.style.transition = 'none';
+      finalPhotoWrap.style.opacity = '1';
+      unlockScroll();
+      window.removeEventListener('scroll', onIntroScroll);
+    }
+
+    function onIntroScroll() {
+      if (window.pageYOffset > 4) finish();
+    }
+
+    window.addEventListener('scroll', onIntroScroll, { passive: true });
 
     function advance() {
-      if (!armed) {
-        requested = true;
-        return;
-      }
-      morph();
+      if (armed) morph();
     }
 
+    /* Arms *and* fires. The entrance needs to finish before the morph can
+       measure anything, so early input only queues the flight — but once the
+       entrance is done the splash hands over on its own rather than waiting
+       on an interaction that may never come. With the scroll frozen behind
+       it, a splash that waits indefinitely is a page that never opens. */
     window.setTimeout(function () {
       armed = true;
-      if (requested) morph();
+      morph();
     }, ENTRANCE_DONE);
 
     var events = ['mousemove', 'pointerdown', 'touchstart', 'wheel', 'keydown'];
@@ -632,6 +683,32 @@
   var TO_TOP_AFTER = 600;
   var headerTicking = false;
 
+  /* The floating button is parked in the bottom-right corner, which on a
+     phone is exactly where a full-width CTA row ends up as it scrolls past
+     — "Book A Call" in the hero and the footer's email/CV pair both land
+     under it, two tap targets stacked on the same pixels. Rather than guess
+     at safe offsets, the real rects are compared each frame and the button
+     stands down while it would sit on top of something else clickable. */
+  var toTopConflicts = document.querySelectorAll('.hero-cta, .footer-actions');
+  var CONFLICT_PAD = 12;
+
+  function toTopIsBlocked() {
+    /* `visibility: hidden` still lays the button out, so its box is
+       measurable even while it's faded out. */
+    var box = toTop.getBoundingClientRect();
+    var top = box.top - CONFLICT_PAD;
+    var bottom = box.bottom + CONFLICT_PAD;
+    var left = box.left - CONFLICT_PAD;
+    var right = box.right + CONFLICT_PAD;
+
+    for (var i = 0; i < toTopConflicts.length; i++) {
+      var r = toTopConflicts[i].getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      if (r.left < right && r.right > left && r.top < bottom && r.bottom > top) return true;
+    }
+    return false;
+  }
+
   function updateScrollChrome() {
     headerTicking = false;
     var y = window.pageYOffset;
@@ -641,14 +718,19 @@
     var scrolledAway = y > HIDE_AFTER && !navMenu.classList.contains('open');
     siteHeader.classList.toggle('is-hidden', scrolledAway);
 
-    if (toTop) toTop.classList.toggle('is-visible', y > TO_TOP_AFTER);
+    if (toTop) toTop.classList.toggle('is-visible', y > TO_TOP_AFTER && !toTopIsBlocked());
   }
 
-  window.addEventListener('scroll', function () {
+  function requestScrollChrome() {
     if (headerTicking) return;
     headerTicking = true;
     window.requestAnimationFrame(updateScrollChrome);
-  }, { passive: true });
+  }
+
+  window.addEventListener('scroll', requestScrollChrome, { passive: true });
+  /* Rotating a phone re-flows the CTA rows without scrolling, which can move
+     one into or out of the button's corner. */
+  window.addEventListener('resize', requestScrollChrome, { passive: true });
 
   if (toTop) {
     toTop.addEventListener('click', function () {
