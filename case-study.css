@@ -279,22 +279,11 @@
 /* --------------------------------------------------------------------------
    Key highlights + sign-off
    -------------------------------------------------------------------------- */
-.cs-highlights {
-  margin-top: clamp(64px, 7vw, 120px);
-  padding: clamp(32px, 4vw, 64px);
-  border-radius: var(--radius-lg);
-  background-color: var(--cs-surface);
-}
-
-.cs-highlights-title {
-  font-weight: 500;
-  font-size: var(--cs-fs-heading);
-  color: var(--ink);
-  margin-bottom: 36px;
-}
-
-.cs-highlights .cs-list {
-  margin-top: 0;
+/* Frame 20 is 1278 wide — narrower than the 1540 wide column it sits in, so
+   it is capped at its own size rather than being stretched past it. */
+.cs-figure-highlights {
+  max-width: 1278px;
+  margin-inline: auto;
 }
 
 .cs-thanks {

@@ -437,6 +437,12 @@ section {
   transform: rotate(-45deg);
 }
 
+/* Frosted rather than a solid white slab. The drawer covers a real chunk of
+   a phone screen, so letting the page blur through underneath keeps it
+   reading as a temporary overlay instead of a second page dropped on top.
+   This base rule stays near-opaque: it is what browsers without
+   backdrop-filter get, and there the links must never sit unreadably over
+   live content. The @supports block below is the frosted version. */
 .nav-menu-mobile {
   display: none;
   position: absolute;
@@ -444,10 +450,18 @@ section {
   left: 0;
   right: 0;
   flex-direction: column;
-  background-color: #ffffff;
-  border-top: 1px solid #eee;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  background-color: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
   pointer-events: auto;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .nav-menu-mobile {
+    background-color: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+  }
 }
 
 .nav-menu-mobile.open {
@@ -456,11 +470,16 @@ section {
 
 .nav-menu-mobile a {
   display: block;
-  padding: 14px clamp(20px, 6vw, 32px);
+  padding: 12px clamp(20px, 6vw, 32px);
   font-weight: 300;
   font-size: 1.05rem;
   color: var(--ink-dim);
-  border-bottom: 1px solid #f2f2f2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* No trailing rule against the drawer's own bottom edge. */
+.nav-menu-mobile a:last-child {
+  border-bottom: 0;
 }
 
 .nav-menu-mobile a:hover {
@@ -785,6 +804,15 @@ body.intro-active #heroPhotoWrap {
 .work-row .work-item {
   flex: 1 1 0;
   min-width: 0;
+}
+
+/* Paired items sit in a stretch row, so both columns are already the same
+   height — but a two-line description next to a three-line one still starts
+   its image higher. Letting the heading block absorb the slack pushes both
+   image frames to the bottom of their column, which lines their tops up too
+   (equal widths + one aspect-ratio means equal heights). */
+.work-row .work-heading-row {
+  flex-grow: 1;
 }
 
 .work-heading-row {

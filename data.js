@@ -41,10 +41,10 @@ var PORTFOLIO_DATA = {
     headlinePost: ', even when they are not.',
     ctaPrimary: { label: 'Book A Call', href: '#footer' },
     ctaSecondary: { label: 'Get Started', href: '#works' },
-    photo: 'public/rakhi-portrait-cutout.png',
+    photo: 'public/hero/rakhi-portrait-cutout.png',
     photoAlt: 'Rakhi Das, UI/UX Designer',
     /* The splash uses its own square, closer crop; falls back to `photo`. */
-    introPhoto: 'public/rakhi.png'
+    introPhoto: 'public/hero/rakhi.png'
   },
 
   works: {
@@ -65,7 +65,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Mar 2025 – Jul 2025',
         description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
         color: '#49acea',
-        image: 'public/Frame%2021.png',
+        image: 'public/works/Frame%2021.png',
         href: 'suraksha_case_study.html'
       },
       {
@@ -73,7 +73,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Jan 2024 – Nov 2024',
         description: 'Streamlined the onboarding journey for a fintech mobile app, reducing drop-off through iterative usability testing.',
         color: '#fedfe7',
-        image: '',
+        image: 'public/MobileBanking/imga22.png',
         href: '#'
       },
       {
@@ -81,7 +81,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Jun 2023 – Sep 2023',
         description: 'Ran a heuristic evaluation and proposed a refreshed component library to improve consistency across the platform.',
         color: '#c4e8ff',
-        image: '',
+        image: 'public/E-Commerce/ecom.png',
         href: '#'
       },
       {
@@ -89,7 +89,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Add a date range',
         description: 'Add a short summary of the problem, your approach, and the outcome for this project.',
         color: '#ffe9d1',
-        image: '',
+        image: 'public/gallery/Rectangle 6.png',
         href: '#'
       }
     ]
@@ -108,7 +108,7 @@ var PORTFOLIO_DATA = {
         company: 'Sundew',
         dateRange: 'Dec 2024 – Present',
         logoLetter: 'S',
-        logo: 'public/sundew.png',
+        logo: 'public/logos/sundew.png',
         color: 'var(--exp-blue)',
         description: 'Designing research-led product experiences for a fast-moving startup, from first interview to shipped interface.'
       },
@@ -117,7 +117,7 @@ var PORTFOLIO_DATA = {
         company: 'Fortmindz',
         dateRange: 'Jun 2023 – Feb 2025',
         logoLetter: 'F',
-        logo: 'public/Fortmindz.png',
+        logo: 'public/logos/Fortmindz.png',
         color: 'var(--exp-peach)',
         description: 'Owned interface design for web and mobile products, backed by a reusable component library.'
       },
@@ -135,7 +135,7 @@ var PORTFOLIO_DATA = {
         company: 'Granicus',
         dateRange: 'Oct 2020 – Feb 2023',
         logoLetter: 'G',
-        logo: 'public/Granicus.png',
+        logo: 'public/logos/Granicus.png',
         color: 'var(--exp-blue)',
         description: 'Client-facing implementation work that became the foundation for a move into UX design.'
       }
@@ -177,20 +177,21 @@ var PORTFOLIO_DATA = {
        visible rather than collapsing. Fill in `alt` with a real
        description whenever you add an `image`. */
     tiles: [
-      { color: '#e7d9c9', image: 'public/Rectangle%2011.png', alt: 'A whitewashed stone house built into a rust-coloured cliff face, prayer flags strung above it' },
-      { color: '#d8c9e0', image: 'public/Rectangle%2010.png', alt: 'Pine branches in the foreground with a valley town half-swallowed by low cloud behind' },
-      { color: '#c9dce0', image: 'public/image5.png', alt: 'Rakhi in a denim jacket standing on a rock in a wide green glacial valley' },
-      { color: '#e0d3c9', image: 'public/Rectangle%2012.png', alt: 'Cloud spilling over a dark ridgeline at dawn, a corrugated rooftop in the foreground' },
-      { color: '#d0dde5', image: 'public/Rectangle%208.png', alt: 'Sun rising through a notch between two ridges, power lines crossing the sky' },
-      { color: '#e5d6d0', image: 'public/Rectangle%206.png', alt: 'A timber and stone house beside a village road, snow-dusted peaks catching the evening light' },
-      { color: '#dfe0d3', image: 'public/Rectangle%207.png', alt: 'Rakhi standing with arms outstretched above terraced fields, a hillside monastery in the distance' }
+      { color: '#e7d9c9', image: 'public/gallery/Rectangle%2011.png', alt: 'A whitewashed stone house built into a rust-coloured cliff face, prayer flags strung above it' },
+      { color: '#d8c9e0', image: 'public/gallery/Rectangle%2010.png', alt: 'Pine branches in the foreground with a valley town half-swallowed by low cloud behind' },
+      { color: '#c9dce0', image: 'public/gallery/image5.png', alt: 'Rakhi in a denim jacket standing on a rock in a wide green glacial valley' },
+      { color: '#e0d3c9', image: 'public/gallery/Rectangle%2012.png', alt: 'Cloud spilling over a dark ridgeline at dawn, a corrugated rooftop in the foreground' },
+      { color: '#d0dde5', image: 'public/gallery/Rectangle%208.png', alt: 'Sun rising through a notch between two ridges, power lines crossing the sky' },
+      { color: '#e5d6d0', image: 'public/gallery/Rectangle%206.png', alt: 'A timber and stone house beside a village road, snow-dusted peaks catching the evening light' },
+      { color: '#dfe0d3', image: 'public/gallery/Rectangle%207.png', alt: 'Rakhi standing with arms outstretched above terraced fields, a hillside monastery in the distance' }
     ]
   },
 
-  /* Order matches the Figma reference: X, Facebook, Instagram, LinkedIn. */
+  /* Key order is render order in the footer fan. Each key must have a
+     matching entry in SOCIAL_ICONS (script.js) or it is skipped. */
   social: {
     twitter: '#',
-    facebook: '#',
+    behance: '#',
     instagram: '#',
     linkedin: 'https://www.linkedin.com/in/rakhi-das-183381158/'
   },
@@ -199,7 +200,7 @@ var PORTFOLIO_DATA = {
     watermark: 'Rakhi.UX',
     heading: "Want to get in touch? I'd love to connect with you!",
     tagline: "I'm currently open to full-time opportunities! Let's create something amazing together! ✨",
-    avatar: 'public/footer-image.png',
+    avatar: 'public/footer/footer-image.png',
     avatarAlt: 'Rakhi Das',
     cvHref: '',
     copyright: 'Rakhi Das • Built with pixels, prototypes, and plenty of late-night ideas.'
