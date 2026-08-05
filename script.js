@@ -799,27 +799,8 @@
 
   updateScrollChrome();
 
-  /* ===========================================================
-     Scroll reveal — simple fade/rise the first time each element
-     enters the viewport.
-  =========================================================== */
-  var revealTargets = document.querySelectorAll('.work-item, .exp-card, .testimonial-card, .gallery-tile');
-  revealTargets.forEach(function (target) {
-    target.setAttribute('data-reveal', '');
-  });
-
-  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    revealTargets.forEach(function (target) { observer.observe(target); });
-  } else {
-    revealTargets.forEach(function (target) { target.classList.add('in-view'); });
-  }
+  /* Scroll reveal used to live here. It moved to reveal.js so the case study
+     — which can't load this file, since it has no data.js to render from —
+     gets the same treatment. Loaded straight after this script. */
 
 })();
