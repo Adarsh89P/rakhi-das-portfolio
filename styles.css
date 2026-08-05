@@ -486,6 +486,11 @@ section {
   background-color: #ffffff;
   pointer-events: none;
   --figure-h: min(100vh, 49vw);
+  /* How far the whole composition rides up off the bottom edge. Zero here:
+     on desktop aspects the figure nearly fills the viewport height, so it
+     should stand on the floor exactly as the reference does. Only the phone
+     breakpoint below overrides it. */
+  --figure-lift: 0px;
 }
 
 .intro-brand-layer,
@@ -503,12 +508,13 @@ section {
 .intro-brand-layer {
   z-index: 10;
   align-items: flex-end;
-  padding-bottom: calc(var(--figure-h) * 0.556);
+  padding-bottom: calc(var(--figure-lift) + var(--figure-h) * 0.556);
 }
 
 .intro-portrait-layer {
   z-index: 20;
   align-items: flex-end;
+  padding-bottom: var(--figure-lift);
 }
 
 .intro-brand {
@@ -559,6 +565,19 @@ section {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* On a phone the composition is width-constrained: `49vw` resolves to barely
+   23vh of figure, and bottom-anchoring then strands the wordmark and portrait
+   at the very base under a screenful of empty white. Give the figure a real
+   share of the height, bounded by `vw` so it still can't blanket the
+   wordmark, and centre the leftover space above and below instead of pooling
+   all of it on top. Desktop is untouched — `--figure-lift` stays 0 there. */
+@media (max-width: 720px) {
+  .intro-overlay {
+    --figure-h: min(62vh, 76vw);
+    --figure-lift: calc((100vh - var(--figure-h)) / 2);
   }
 }
 
