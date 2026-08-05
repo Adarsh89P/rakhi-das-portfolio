@@ -14,6 +14,8 @@
   --cs-body-ink: #494949;
   --cs-rule: #d4d4d4;
   --cs-surface: #f4f4f4;
+  --cs-placeholder-rule: #c9c9c9;
+  --cs-placeholder-ink: #9a9a9a;
 
   /* Figma sizes at the 1920 canvas, floored so they stay readable on
      phones. The upper bound is the design value in every case. */
@@ -23,6 +25,28 @@
   --cs-fs-heading: clamp(1.5rem, 2.25vw, 36px);
   --cs-fs-body: clamp(1rem, 1.5vw, 24px);
   --cs-fs-item: clamp(0.95rem, 1vw, 16px);
+}
+
+/* The case study rides on styles.css tokens, so it inherits the theme
+   automatically — except for these five page-local values, which have to
+   be restated. Same contract as the main page: opt-in, and set before
+   first paint by the inline script in the document head. */
+[data-theme='dark'] {
+  --cs-body-ink: #b0b6c0;
+  --cs-rule: #2a303b;
+  --cs-surface: #171b23;
+  --cs-placeholder-rule: #39404c;
+  --cs-placeholder-ink: #79808b;
+}
+
+/* The before/after cards keep their pastel fills in both themes — same
+   situation as .exp-card on the home page, so the same fix: re-point the
+   text tokens on the card itself rather than let dark mode put near-white
+   copy on a pale pink panel. */
+[data-theme='dark'] .cs-ba-card {
+  --ink: #12151c;
+  --ink-dim: #414852;
+  --cs-body-ink: #4b525d;
 }
 
 /* --------------------------------------------------------------------------
@@ -227,10 +251,10 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  border: 1px dashed #c9c9c9;
+  border: 1px dashed var(--cs-placeholder-rule);
   border-radius: var(--radius-lg);
   background-color: var(--cs-surface);
-  color: #9a9a9a;
+  color: var(--cs-placeholder-ink);
   font-size: 0.875rem;
   text-align: center;
   padding: 24px;

@@ -4,6 +4,8 @@
    scale. Everything else in this file rides on these custom properties.
    ========================================================================== */
 :root {
+  color-scheme: light;
+
   --font-base: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
 
   --ink: #000000;
@@ -13,6 +15,19 @@
   --text-paragraph: #767676;
   --accent-orange: #ff8d28;
   --gradient-accent: linear-gradient(96deg, #b16cea 41%, #fa5f72 59%, #ffa44c 86%);
+
+  /* `--ink` doubles as a *surface* — the primary button, the lettermark
+     plate, the back-to-top circle are all filled with it. `--on-ink` is
+     whatever stays legible on top, so the pair can invert together instead
+     of every one of those rules hardcoding white. */
+  --on-ink: #ffffff;
+
+  /* Page surfaces and rules, separated from text colour so the dark theme
+     can move them independently. */
+  --surface: #ffffff;
+  --surface-raised: #f4f4f4;
+  --hairline: #e5e5e5;
+  --hairline-soft: rgba(0, 0, 0, 0.06);
 
   /* The same 3 pastels already used for the Works image placeholders,
      named for reuse on the Experience cascade. */
@@ -56,7 +71,11 @@
      full-bleed bar, so its own size is tracked separately — the mobile
      drawer positions itself off these so it always lands just under the
      pill's real bottom edge, whatever the breakpoint sets them to. */
-  --nav-pill-h: 72px;
+  /* 80 rather than 72 so the pill's lower edge dips into the hero: the
+     portrait's top rides up to y=74 there, and that overlap is the only
+     place at rest where real content passes behind the glass and the blur
+     has something to bend. Still clears --header-height (14 + 80 = 94). */
+  --nav-pill-h: 80px;
   --nav-pill-top: 14px;
   --nav-pill-inset: clamp(16px, 4vw, 32px);
 
@@ -78,6 +97,124 @@
 
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
+
+  /* ---- Liquid glass ----------------------------------------------------
+     The material is one recipe driven entirely by these six values, so the
+     dark theme re-skins the nav, the drawer and the theme button by
+     overriding them once rather than by restating the rules.
+     `--glass-tint-solid` is the no-backdrop-filter fallback: it has to be
+     near-opaque, because there the links would otherwise sit unreadably
+     over live page content. */
+  --glass-tint: rgba(255, 255, 255, 0.42);
+  --glass-tint-solid: rgba(255, 255, 255, 0.94);
+  --glass-blur: blur(30px) saturate(200%);
+  /* Top lip bright, a dip through the middle, a softer bounce off the
+     bottom edge — the vertical falloff is what gives the pill volume. */
+  --glass-specular: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.18) 38%,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  /* A real bevel catches light unevenly around its rim; a single flat
+     border can't, so the ring is a gradient run at an angle. */
+  --glass-ring: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.25) 34%,
+    rgba(0, 0, 0, 0.06) 58%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  --glass-shadow:
+    0 0 0 1px rgba(16, 24, 40, 0.05),
+    0 14px 38px rgba(16, 24, 40, 0.14),
+    0 3px 10px rgba(16, 24, 40, 0.06);
+}
+
+/* ==========================================================================
+   Dark theme
+   ==========================================================================
+   Opt-in only — set by the theme button and replayed from localStorage by
+   the inline script in <head> before first paint, so a returning visitor
+   never sees a white flash. No `prefers-color-scheme` block on purpose:
+   the portfolio should make the same first impression for everyone, and
+   dark is a choice the visitor makes.
+
+   Everything below is a token swap. No layout, no component rules — if a
+   component needs a hardcoded colour here, that's the signal it should
+   have been reading a token in the first place. */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --ink: #f2f3f5;
+  --ink-dim: #b4b9c2;
+  --ink-muted: #838a95;
+  --grey-text: #99a0aa;
+  --text-paragraph: #98a0ab;
+  --on-ink: #0b0d12;
+
+  --surface: #0b0d12;
+  --surface-raised: #171b23;
+  --hairline: #2a303b;
+  --hairline-soft: rgba(255, 255, 255, 0.09);
+
+  /* The footer is the one block that was already dark. Dropping it further
+     than the page keeps it reading as a distinct slab rather than merging
+     into the section above it. */
+  --footer-bg: #05060a;
+  --footer-pill: #363c47;
+
+  /* Smoked glass rather than frosted: a dark tint, and specular highlights
+     pulled right down — on a dark page the same white gradients would read
+     as a milky film instead of as a lit edge. */
+  --glass-tint: rgba(22, 26, 35, 0.52);
+  --glass-tint-solid: rgba(17, 20, 27, 0.94);
+  --glass-specular: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.04) 38%,
+    rgba(255, 255, 255, 0) 62%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
+  --glass-ring: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.1) 34%,
+    rgba(255, 255, 255, 0.03) 58%,
+    rgba(255, 255, 255, 0.34) 100%
+  );
+  --glass-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* The Experience cards keep their light pastel fills in both themes, so
+   their *contents* have to stay on the light palette too — otherwise dark
+   mode would put near-white text on a pale blue card. Re-declaring the
+   tokens on the card re-points every descendant at once. */
+[data-theme='dark'] .exp-card {
+  --ink: #12151c;
+  --ink-dim: #414852;
+  --ink-muted: #6b727d;
+  --text-paragraph: #4b525d;
+  --on-ink: #ffffff;
+  --hairline-soft: rgba(0, 0, 0, 0.08);
+}
+
+/* Flipping the theme changes a colour on nearly every element, and letting
+   them all snap at once reads as a flash. script.js hangs this class on
+   <html> for the length of the fade and then takes it off, so the blanket
+   `transition` only ever exists during the switch and never competes with a
+   component's own hover transitions. Skipped entirely under reduced-motion. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity !important;
+  transition-duration: 300ms !important;
+  transition-timing-function: ease !important;
+  transition-delay: 0s !important;
 }
 
 /* ==========================================================================
@@ -97,7 +234,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font-base);
-  background-color: #ffffff;
+  background-color: var(--surface);
   color: var(--ink);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -162,7 +299,7 @@ section {
   left: -9999px;
   top: 0;
   background: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
   z-index: 1100;
@@ -206,7 +343,7 @@ section {
   color: var(--ink);
   padding-bottom: var(--space-4);
   margin-bottom: var(--space-5);
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--hairline);
 }
 
 /* ==========================================================================
@@ -233,7 +370,7 @@ section {
 
 .btn-primary {
   background-color: var(--ink);
-  color: #ffffff;
+  color: var(--on-ink);
 }
 
 .btn-primary:hover {
@@ -253,12 +390,12 @@ section {
 
 .btn-dark {
   background-color: var(--footer-pill);
-  color: #ffffff;
+  color: var(--footer-ink);
 }
 
 .btn-outline-light {
   background-color: transparent;
-  color: #ffffff;
+  color: var(--footer-ink);
   border: 1px solid var(--footer-pill);
 }
 
@@ -327,21 +464,75 @@ section {
   opacity: 0;
 }
 
-/* Liquid glass. Four layers stacked in one element:
-     1. `backdrop-filter` blurs + over-saturates the page behind it, which is
-        what makes the material read as glass rather than as tinted plastic.
-     2. a translucent white body tint so text stays legible over anything.
-     3. ::before — a vertical specular gradient (bright lip at the top, a
-        second softer bounce off the bottom) that gives the pill volume.
-     4. ::after — a 1px gradient ring drawn with a mask, standing in for the
-        way a real bevel catches light unevenly around its edge.
-   Both pseudo-elements sit at z-index -1 against `isolation: isolate`, so
-   they paint over the pill's own background but under the links, and the
-   isolation keeps that negative index from escaping behind the header. */
-.navbar {
-  pointer-events: auto;
+/* ==========================================================================
+   Liquid glass — one recipe, three surfaces
+   ==========================================================================
+   Applied to the nav pill, the mobile drawer and the theme button. Four
+   layers stacked in a single element:
+     1. `backdrop-filter` blurs + over-saturates whatever is behind it. This
+        is the layer that makes it read as glass rather than tinted plastic,
+        and it's also why the effect only shows where page content actually
+        passes underneath — over flat background there is nothing to bend.
+     2. a translucent body tint, so labels stay legible over anything.
+     3. ::before — a vertical specular gradient giving the surface volume.
+     4. ::after — a 1px gradient ring standing in for a lit bevel.
+   Both pseudo-elements sit at z-index -1 against `isolation: isolate`: that
+   paints them over the element's own background but under its content, and
+   the isolation stops the negative index escaping behind the header.
+   Every colour comes from a --glass-* token, so the dark theme re-skins all
+   three surfaces by overriding those tokens once. */
+.glass {
   position: relative;
   isolation: isolate;
+  /* Near-opaque fallback for browsers with no backdrop-filter; the
+     @supports block below is the frosted version. */
+  background-color: var(--glass-tint-solid);
+  box-shadow: var(--glass-shadow);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glass {
+    background-color: var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: var(--glass-specular);
+}
+
+/* Ring only: fill the padding box, then punch the content box back out.
+   Gated behind @supports because without mask compositing the same rule
+   would render as a solid gradient slab over the whole surface — the
+   fallback is simply no bevel, which the tint and shadow survive fine. */
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  .glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    padding: 1px;
+    background-image: var(--glass-ring);
+    -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+    -webkit-mask-clip: content-box, border-box;
+    -webkit-mask-composite: xor;
+    mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+  }
+}
+
+.navbar {
+  pointer-events: auto;
   height: var(--nav-pill-h);
   width: max-content;
   max-width: calc(min(1600px, 100%) - 2 * var(--nav-pill-inset));
@@ -352,66 +543,75 @@ section {
   justify-content: center;
   gap: 22px;
   border-radius: var(--radius-pill);
-  /* Near-opaque base: this is what browsers without backdrop-filter get, and
-     there the links must never sit unreadably over live content. The
-     @supports block below is the frosted version. */
-  background-color: rgba(255, 255, 255, 0.94);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.09),
-    0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .navbar {
-    background-color: rgba(255, 255, 255, 0.5);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
-    backdrop-filter: blur(28px) saturate(190%);
-  }
-}
-
-.navbar::before {
-  content: '';
+/* ==========================================================================
+   Theme button — its own capsule beside the pill
+   ==========================================================================
+   Deliberately not a fifth item inside the bar: the nav centres its logo
+   between two equal link groups, and adding one more child on the right
+   would push the wordmark off-centre. A separate control keeps that layout
+   untouched, and reads as its own affordance rather than as a nav
+   destination. Vertically centred on the pill at every breakpoint. */
+.theme-toggle {
+  pointer-events: auto;
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.62) 0%,
-    rgba(255, 255, 255, 0.16) 38%,
-    rgba(255, 255, 255, 0) 62%,
-    rgba(255, 255, 255, 0.26) 100%
-  );
+  right: var(--nav-pill-inset);
+  top: calc(var(--nav-pill-top) + var(--nav-pill-h) / 2);
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-dim);
+  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
-/* Ring only: fill the padding box, then punch the content box back out.
-   Gated behind @supports because without mask compositing the same rule
-   would render as a solid gradient slab over the whole pill — the fallback
-   is simply no bevel highlight, which the tint and shadow survive fine. */
-@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
-  .navbar::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-    padding: 1px;
-    background-image: linear-gradient(
-      150deg,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(255, 255, 255, 0.22) 34%,
-      rgba(0, 0, 0, 0.05) 58%,
-      rgba(255, 255, 255, 0.8) 100%
-    );
-    -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-    -webkit-mask-clip: content-box, border-box;
-    -webkit-mask-composite: xor;
-    mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-    mask-clip: content-box, border-box;
-    mask-composite: exclude;
-  }
+.theme-toggle:hover {
+  color: var(--ink);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* One button, two glyphs, crossfaded — swapping `display` would drop the
+   icon in with no transition and make the button feel like it re-rendered.
+   Both are aria-hidden; the button's own aria-label is what gets announced,
+   and script.js keeps that in step with the state. */
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+  grid-area: 1 / 1;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+}
+
+.theme-toggle .icon-sun {
+  opacity: 0;
+  transform: rotate(-70deg) scale(0.6);
+}
+
+.theme-toggle .icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+[data-theme='dark'] .theme-toggle .icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+[data-theme='dark'] .theme-toggle .icon-moon {
+  opacity: 0;
+  transform: rotate(70deg) scale(0.6);
 }
 
 .nav-group {
@@ -523,6 +723,8 @@ section {
    This base rule stays near-opaque: it is what browsers without
    backdrop-filter get, and there the links must never sit unreadably over
    live content. The @supports block below is the frosted version. */
+/* Glass comes from the shared `.glass` recipe above; this rule only owns
+   placement and shape. */
 .nav-menu-mobile {
   display: none;
   position: absolute;
@@ -534,19 +736,7 @@ section {
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background-color: rgba(255, 255, 255, 0.96);
-  box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.12),
-    0 0 0 1px rgba(255, 255, 255, 0.55) inset;
   pointer-events: auto;
-}
-
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .nav-menu-mobile {
-    background-color: rgba(255, 255, 255, 0.62);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
-    backdrop-filter: blur(28px) saturate(190%);
-  }
 }
 
 .nav-menu-mobile.open {
@@ -559,7 +749,7 @@ section {
   font-weight: 300;
   font-size: 1.05rem;
   color: var(--ink-dim);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--hairline-soft);
 }
 
 /* No trailing rule against the drawer's own bottom edge. */
@@ -602,7 +792,7 @@ html.intro-lock body {
   position: fixed;
   inset: 0;
   z-index: 900;
-  background-color: #ffffff;
+  background-color: var(--surface);
   pointer-events: none;
   --figure-h: min(100vh, 49vw);
   /* How far the whole composition rides up off the bottom edge. Zero here:
@@ -858,7 +1048,7 @@ body.intro-active #heroPhotoWrap {
   width: 41px;
   height: 41px;
   border-radius: 50%;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--hairline);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -874,7 +1064,7 @@ body.intro-active #heroPhotoWrap {
 .carousel-arrow:hover {
   background-color: var(--ink);
   border-color: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
 }
 
 /* ==========================================================================
@@ -1024,7 +1214,7 @@ body.intro-active #heroPhotoWrap {
   height: 52px;
   border-radius: 50%;
   background-color: var(--ink);
-  color: #ffffff;
+  color: var(--on-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1088,7 +1278,7 @@ body.intro-active #heroPhotoWrap {
   width: min(300px, 72vw);
   padding: var(--space-4);
   border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--hairline-soft);
   box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
   /* Background color comes from data.js per item (applied inline in
      script.js) — one of --exp-blue/-peach/-pink. */
@@ -1127,7 +1317,7 @@ body.intro-active #heroPhotoWrap {
   flex-shrink: 0;
   border-radius: 13px;
   background-color: var(--ink);
-  color: #ffffff;
+  color: var(--on-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1268,7 +1458,7 @@ body.intro-active #heroPhotoWrap {
   flex-direction: column;
   justify-content: flex-end;
   padding: var(--space-4) 0;
-  background-color: #f4f4f4;
+  background-color: var(--surface-raised);
   border-radius: var(--radius-md);
   padding-inline: var(--space-4);
 }
@@ -1383,7 +1573,7 @@ body.intro-active #heroPhotoWrap {
   font-size: var(--fs-footer-watermark);
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--footer-ink);
   opacity: 0.06;
   white-space: nowrap;
 }
@@ -1479,7 +1669,7 @@ body.intro-active #heroPhotoWrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--footer-ink);
   transition: transform var(--transition-fast);
 }
 
@@ -1516,7 +1706,7 @@ body.intro-active #heroPhotoWrap {
   height: 48px;
   border-radius: 50%;
   background-color: var(--ink);
-  color: #ffffff;
+  color: var(--on-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1595,6 +1785,23 @@ body.intro-active #heroPhotoWrap {
     left: 8px;
     top: 50%;
     transform: translateY(-50%);
+  }
+
+  /* The pill spans the row here, so the theme button lands inside it rather
+     than beside it — mirroring the hamburger at the opposite end. It drops
+     its own glass to do so: stacking a second blurred capsule on top of the
+     first only muddies both, and one pane of glass is the point. */
+  .theme-toggle {
+    right: calc(var(--nav-pill-inset) + 8px);
+    background-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .theme-toggle::before,
+  .theme-toggle::after {
+    content: none;
   }
 
   /* Stacked layout puts the portrait first, so the hero can no longer let it

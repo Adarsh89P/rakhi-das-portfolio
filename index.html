@@ -26,6 +26,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+
+<!-- Theme, replayed before first paint. This has to run here — inline and
+     ahead of the stylesheet's first use — or a returning dark-mode visitor
+     gets a white flash while script.js is still loading. Light is the
+     default: `prefers-color-scheme` is deliberately not consulted, so the
+     portfolio opens the same way for everyone and dark stays a choice. -->
+<script>
+  (function () {
+    try {
+      if (window.localStorage.getItem('rakhi:theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (err) {
+      /* Storage blocked or private mode — light is the default anyway. */
+    }
+  })();
+</script>
 </head>
 <body class="intro-active">
 
@@ -60,7 +77,7 @@
 </div>
 
 <header class="site-header" id="siteHeader">
-  <nav class="navbar" aria-label="Primary navigation">
+  <nav class="navbar glass" aria-label="Primary navigation">
     <ul class="nav-group nav-group-left" id="navLeft"></ul>
 
     <a href="#home" class="logo" id="logo"></a>
@@ -72,7 +89,20 @@
     </button>
   </nav>
 
-  <ul class="nav-menu-mobile" id="navMenuMobile"></ul>
+  <!-- Sits beside the bar rather than inside it, so the nav keeps its
+       centred logo between two equal link groups. Both glyphs are always
+       present and crossfade; the button's aria-label carries the state. -->
+  <button class="theme-toggle glass" id="themeToggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20.4 14.3A8.6 8.6 0 0 1 9.7 3.6a8.6 8.6 0 1 0 10.7 10.7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.1" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <ul class="nav-menu-mobile glass" id="navMenuMobile"></ul>
 </header>
 
 <main id="main">

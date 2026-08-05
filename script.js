@@ -625,6 +625,64 @@
   }
 
   /* ===========================================================
+     Theme
+
+     The <head> script has already applied the stored theme before
+     first paint; this only owns the button and keeps the label,
+     pressed state and address-bar colour in step with it.
+  =========================================================== */
+  var THEME_KEY = 'rakhi:theme';
+  var themeToggle = document.getElementById('themeToggle');
+  var themeMeta = document.querySelector('meta[name="theme-color"]');
+  /* Must match --surface in each theme, or the mobile address bar tears
+     against the top of the page. */
+  var THEME_SURFACE = { dark: '#0b0d12', light: '#ffffff' };
+
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme, animate) {
+    var docEl = document.documentElement;
+
+    /* The blanket transition is hung on <html> only for the length of the
+       fade — see styles.css. Leaving it on permanently would override every
+       component's own transition. */
+    if (animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      docEl.classList.add('theme-switching');
+      window.setTimeout(function () {
+        docEl.classList.remove('theme-switching');
+      }, 320);
+    }
+
+    if (theme === 'dark') docEl.setAttribute('data-theme', 'dark');
+    else docEl.removeAttribute('data-theme');
+
+    if (themeMeta) themeMeta.setAttribute('content', THEME_SURFACE[theme]);
+
+    if (themeToggle) {
+      themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+      themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+  }
+
+  /* No animation on this first pass: it's only catching the button and the
+     meta tag up to what the <head> script already painted. */
+  applyTheme(currentTheme(), false);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      applyTheme(next, true);
+      try {
+        window.localStorage.setItem(THEME_KEY, next);
+      } catch (err) {
+        /* Storage blocked — the choice just won't survive a reload. */
+      }
+    });
+  }
+
+  /* ===========================================================
      Mobile nav drawer
   =========================================================== */
   var navToggle = document.getElementById('navToggle');
