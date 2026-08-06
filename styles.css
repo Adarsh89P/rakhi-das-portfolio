@@ -80,6 +80,11 @@
   --nav-pill-inset: clamp(16px, 4vw, 32px);
 
   --section-pad: clamp(56px, 4rem + 3vw, 96px);
+  /* Half-gap: every top-level section pads itself with this on both edges,
+     so any two adjacent sections always sum to a full --section-pad —
+     one consistent rhythm down the whole page instead of each section
+     inventing its own top/bottom numbers. */
+  --section-pad-half: calc(var(--section-pad) / 2);
 
   /* Hero/nav type is expressed as `vw` that lands on the exact Figma pixel
      value at the 1600px design width, then caps there — above 1600 the
@@ -936,7 +941,7 @@ body.intro-active #heroPhotoWrap {
 .hero {
   position: relative;
   padding-top: min(82px, 5.125vw);
-  padding-bottom: min(41px, 2.5625vw);
+  padding-bottom: var(--section-pad-half);
   overflow: hidden;
   display: grid;
   align-items: center;
@@ -1071,7 +1076,7 @@ body.intro-active #heroPhotoWrap {
    My Works
    ========================================================================== */
 .works {
-  padding-block: 12px;
+  padding-block: var(--section-pad-half);
 }
 
 .works-list {
@@ -1251,7 +1256,7 @@ body.intro-active #heroPhotoWrap {
      needed to win a specificity fight against JS-set inline styles.
    ========================================================================== */
 .experience {
-  padding-block: var(--section-pad);
+  padding-block: var(--section-pad-half);
 }
 
 .experience-heading {
@@ -1372,7 +1377,7 @@ body.intro-active #heroPhotoWrap {
    Testimonials
    ========================================================================== */
 .testimonials {
-  padding-block: var(--section-pad);
+  padding-block: var(--section-pad-half);
 }
 
 /* A continuous marquee. script.js renders the card list twice (the copy is
@@ -1487,7 +1492,7 @@ body.intro-active #heroPhotoWrap {
    My Gallery
    ========================================================================== */
 .gallery {
-  padding-block: 38px;
+  padding-block: var(--section-pad-half);
 }
 
 .gallery-head {
@@ -1554,7 +1559,7 @@ body.intro-active #heroPhotoWrap {
   background-color: var(--footer-bg);
   color: var(--footer-ink);
   overflow: hidden;
-  padding-block: min(80px, 5vw) 12px;
+  padding-block: var(--section-pad-half) 12px;
 }
 
 /* The watermark is a backdrop, not a flow item: in Figma it sits behind the
@@ -1809,7 +1814,7 @@ body.intro-active #heroPhotoWrap {
      that only exists to bottom-align text against the portrait. */
   .hero {
     padding-top: calc(var(--header-height) + 12px);
-    padding-bottom: 48px;
+    padding-bottom: var(--section-pad-half);
   }
 
   .hero-inner {
