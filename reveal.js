@@ -27,6 +27,9 @@
     /* --- home page --- */
     '.eyebrow-rule',
     '.works-head',
+    /* A work item opts out of the fade-and-lift below (see styles.css) and
+       uses `.in-view` purely as the cue to start its own entrance — the
+       frame wipe, the artwork's blur settle and the copy stagger. */
     '.work-item',
     '.experience-heading',
     '.exp-card',

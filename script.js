@@ -25,11 +25,19 @@
     return node;
   }
 
-  /* Fills a tile with its placeholder color, then layers a real, lazy-loaded
-     <img> on top the moment `fill.image` is set in data.js — so dropping in
-     a real photo later gets correct alt text and lazy-loading for free. */
+  /* Fills a tile with its placeholder color, then layers the real media on
+     top the moment `fill.image` (or `fill.video`) is set in data.js — so
+     dropping in a real asset later gets correct alt text and lazy-loading
+     for free. Video wins over image, which becomes its poster. */
   function applyTileFill(container, fill, altText) {
     container.style.backgroundColor = fill.color;
+
+    if (fill.video) {
+      container.classList.add('has-video');
+      container.appendChild(buildTileVideo(fill, altText));
+      return;
+    }
+
     if (!fill.image) return;
     var img = el('img', 'tile-img');
     img.src = fill.image;
@@ -37,6 +45,40 @@
     img.loading = 'lazy';
     img.decoding = 'async';
     container.appendChild(img);
+  }
+
+  /* A silent, looping preview — decorative in the a11y sense, since the
+     frame around it is already a labelled link, so it is hidden from screen
+     readers rather than announced as an unlabelled media element.
+
+     Muted is set as both property and attribute: iOS Safari reads the
+     attribute at parse time and will refuse to autoplay without it, while
+     the property is what every other browser's autoplay gate checks. */
+  function buildTileVideo(fill, altText) {
+    var video = el('video', 'tile-video');
+    video.src = fill.video;
+    if (fill.image) video.poster = fill.image;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.preload = 'metadata';
+    video.setAttribute('aria-hidden', 'true');
+
+    /* Reduced motion gets the poster frame and a set of controls instead of
+       a loop that starts on its own — the preview stays available, it just
+       stops being something that moves without being asked. */
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.controls = true;
+      video.removeAttribute('aria-hidden');
+      video.setAttribute('aria-label', altText || '');
+    } else {
+      video.autoplay = true;
+      video.loop = true;
+    }
+
+    return video;
   }
 
   /* -----------------------------------------------------------
@@ -126,32 +168,65 @@
     }
   }
 
-  function buildWorkItem(project, index) {
+  /* One item per project: the artwork floating on its own tinted mat, then
+     the title, description, dates and CTA centred underneath. The entrance
+     is triggered by reveal.js adding `.in-view` and the keyframes live in
+     styles.css, so there is no observer or animation state to keep here. */
+  function buildWorkItem(project) {
     var item = el('div', 'work-item');
 
-    var headingRow = el('div', 'work-heading-row');
-    var headingCol = el('div', 'work-heading-col');
-    /* The title is an anchor, not a <p>: the arrow beside it is the item's
-       hover affordance, so it has to actually be clickable once revealed. */
-    var title = el('a', 'work-title', project.heading + ' ' + ARROW_SVG);
-    linkToProject(title, project);
-    headingCol.appendChild(title);
-    headingCol.appendChild(el('p', 'work-date gradient-text', project.dateRange));
-    headingRow.appendChild(headingCol);
-    headingRow.appendChild(el('p', 'work-desc', project.description));
-    item.appendChild(headingRow);
-
-    var frame = el('a', 'work-image');
-    linkToProject(frame, project);
-    frame.setAttribute('aria-label', 'View project: ' + project.heading);
+    /* A dead '#' href would be a link that goes nowhere, so the frame is only
+       an anchor once the project actually has a destination — and the hover
+       arrow, which promises a click target, comes with it. */
+    var hasLink = !!project.href && project.href !== '#';
+    var frame = el(hasLink ? 'a' : 'div', 'work-image');
+    /* Marked on the frame as well as the fill, because it is the frame that
+       has to change shape to match the video. */
+    if (project.video) frame.classList.add('has-video');
+    if (hasLink) {
+      linkToProject(frame, project);
+      frame.setAttribute('aria-label', 'View project: ' + project.heading);
+    }
 
     var fill = el('div', 'work-image-fill');
     applyTileFill(fill, project, project.heading + ' — project preview');
     frame.appendChild(fill);
-
-    frame.appendChild(el('span', 'work-image-arrow', ARROW_DIAGONAL_SVG));
+    if (hasLink) frame.appendChild(el('span', 'work-image-arrow', ARROW_DIAGONAL_SVG));
     item.appendChild(frame);
 
+    var body = el('div', 'work-item-body');
+
+    var title = el('h3', 'work-item-title');
+    title.textContent = project.heading;
+    body.appendChild(title);
+
+    var desc = el('p', 'work-item-desc');
+    desc.textContent = project.description;
+    body.appendChild(desc);
+
+    var date = el('p', 'work-item-date gradient-text');
+    date.textContent = project.dateRange;
+    body.appendChild(date);
+
+    /* The button's own transform is its hover nudge, so the entrance
+       animation rides on this wrapper instead of fighting it. */
+    var actions = el('div', 'work-item-actions');
+    var cta = el('a', 'btn btn-primary');
+    var ctaLabel = el('span');
+    ctaLabel.textContent = data.works.ctaProjectLabel;
+    cta.appendChild(ctaLabel);
+    cta.insertAdjacentHTML('beforeend', ARROW_SVG);
+    if (hasLink) {
+      linkToProject(cta, project);
+    } else {
+      cta.href = '#';
+      cta.setAttribute('aria-disabled', 'true');
+      cta.addEventListener('click', function (e) { e.preventDefault(); });
+    }
+    actions.appendChild(cta);
+    body.appendChild(actions);
+
+    item.appendChild(body);
     return item;
   }
 
@@ -159,21 +234,18 @@
     document.getElementById('worksEyebrow').textContent = data.works.eyebrow;
     document.getElementById('worksHeading').textContent = data.works.heading;
 
-    var cta = document.getElementById('worksCta');
-    cta.href = data.works.ctaHref;
-    cta.querySelector('span').textContent = data.works.ctaLabel;
-
     var list = document.getElementById('worksList');
-    var projects = data.works.projects;
 
-    projects.forEach(function (project, index) {
+    data.works.projects.forEach(function (project, index) {
+      /* The lead two carry the section on their own, so they get a full-width
+         row each; everything after them pairs up, two to a row. */
       if (index < 2) {
-        list.appendChild(buildWorkItem(project, index));
+        list.appendChild(buildWorkItem(project));
         return;
       }
       var pairIndex = index - 2;
       var row = pairIndex % 2 === 0 ? el('div', 'work-row') : list.lastElementChild;
-      row.appendChild(buildWorkItem(project, index));
+      row.appendChild(buildWorkItem(project));
       if (pairIndex % 2 === 0) list.appendChild(row);
     });
   }
@@ -730,53 +802,20 @@
   /* ===========================================================
      Scroll chrome — the nav tucks away as soon as you leave the top
      of the page and stays away, rather than flying back in on every
-     upward flick. The back-to-top button is what brings it back, so
-     the two are driven from one scroll pass.
+     upward flick.
   =========================================================== */
   var siteHeader = document.getElementById('siteHeader');
-  var toTop = document.getElementById('toTop');
   /* Past the bar's own height, so the very top of the page never flickers. */
   var HIDE_AFTER = 100;
-  /* Far enough down that the button is a genuine shortcut, not clutter. */
-  var TO_TOP_AFTER = 600;
   var headerTicking = false;
-
-  /* The floating button is parked in the bottom-right corner, which on a
-     phone is exactly where a full-width CTA row ends up as it scrolls past
-     — "Book A Call" in the hero and the footer's email/CV pair both land
-     under it, two tap targets stacked on the same pixels. Rather than guess
-     at safe offsets, the real rects are compared each frame and the button
-     stands down while it would sit on top of something else clickable. */
-  var toTopConflicts = document.querySelectorAll('.hero-cta, .footer-actions');
-  var CONFLICT_PAD = 12;
-
-  function toTopIsBlocked() {
-    /* `visibility: hidden` still lays the button out, so its box is
-       measurable even while it's faded out. */
-    var box = toTop.getBoundingClientRect();
-    var top = box.top - CONFLICT_PAD;
-    var bottom = box.bottom + CONFLICT_PAD;
-    var left = box.left - CONFLICT_PAD;
-    var right = box.right + CONFLICT_PAD;
-
-    for (var i = 0; i < toTopConflicts.length; i++) {
-      var r = toTopConflicts[i].getBoundingClientRect();
-      if (r.width === 0 && r.height === 0) continue;
-      if (r.left < right && r.right > left && r.top < bottom && r.bottom > top) return true;
-    }
-    return false;
-  }
 
   function updateScrollChrome() {
     headerTicking = false;
-    var y = window.pageYOffset;
 
     /* The drawer is a child of the header, so hiding it would drag an open
        menu off-screen with it. */
-    var scrolledAway = y > HIDE_AFTER && !navMenu.classList.contains('open');
+    var scrolledAway = window.pageYOffset > HIDE_AFTER && !navMenu.classList.contains('open');
     siteHeader.classList.toggle('is-hidden', scrolledAway);
-
-    if (toTop) toTop.classList.toggle('is-visible', y > TO_TOP_AFTER && !toTopIsBlocked());
   }
 
   function requestScrollChrome() {
@@ -786,21 +825,11 @@
   }
 
   window.addEventListener('scroll', requestScrollChrome, { passive: true });
-  /* Rotating a phone re-flows the CTA rows without scrolling, which can move
-     one into or out of the button's corner. */
-  window.addEventListener('resize', requestScrollChrome, { passive: true });
-
-  if (toTop) {
-    toTop.addEventListener('click', function () {
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-    });
-  }
-
   updateScrollChrome();
 
-  /* Scroll reveal used to live here. It moved to reveal.js so the case study
-     — which can't load this file, since it has no data.js to render from —
-     gets the same treatment. Loaded straight after this script. */
+  /* Scroll reveal used to live here, and the back-to-top button with it.
+     Both moved to files of their own (reveal.js, to-top.js) so the case
+     study — which can't load this file, since it has no data.js to render
+     from — gets the same treatment. Both load straight after this script. */
 
 })();

@@ -50,21 +50,28 @@ var PORTFOLIO_DATA = {
   works: {
     eyebrow: 'My Works',
     heading: 'Projects you need to see',
-    ctaLabel: 'See All',
-    ctaHref: '#',
     /*
-      Each project renders as a full-width row (the first two) or paired
-      side-by-side (the rest, two per row). `color` fills the image box
-      until a real screenshot is supplied via an optional `image` url.
-      `href` is where the hover arrow / whole image tile links to —
-      point it at a real case-study page any time; '#' until then.
+      In order: the first two projects each take a full-width row, the rest
+      pair up two to a row — so the two you most want seen go first.
+
+      `video` wins if present: it fills its frame edge to edge, with no mat
+      showing, and `image` becomes its poster (what shows before the video
+      has loaded, and instead of it when the visitor asks for reduced
+      motion). Without a video, `image` is the artwork and it is never
+      cropped — `color` is the mat it floats on, which shows around any shot
+      that isn't the frame's exact shape, so pick one that flatters it.
+
+      `href` is the "Read case study" link — point it at a real page any
+      time; '#' renders the button inactive rather than linking nowhere.
     */
+    ctaProjectLabel: 'Read case study',
     projects: [
       {
         heading: 'SaaS Dashboard Redesign',
         dateRange: 'Mar 2025 – Jul 2025',
         description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
         color: '#49acea',
+        video: 'public/Surksha/surkhsaHero.mp4',
         image: 'public/works/Frame%2021.png',
         href: 'suraksha_case_study.html'
       },
