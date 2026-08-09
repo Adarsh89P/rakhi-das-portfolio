@@ -26,7 +26,11 @@
   var SELECTOR = [
     /* --- home page --- */
     '.eyebrow-rule',
+    /* .about-lead / .about-line are deliberately absent: their words are
+       faded individually by initAboutFade in script.js, and a block-level
+       fade on the same element would fight it for opacity. */
     '.works-head',
+    '.works-more',
     /* A work item opts out of the fade-and-lift below (see styles.css) and
        uses `.in-view` purely as the cue to start its own entrance — the
        frame wipe, the artwork's blur settle and the copy stagger. */

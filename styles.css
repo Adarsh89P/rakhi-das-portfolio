@@ -97,8 +97,10 @@
   /* The project title is the centrepiece of each works item, so it outranks
      the section heading above it. The -sm step is for paired items, which
      have half the width to wrap into. */
-  --fs-work-title: clamp(2rem, 1.35rem + 2.6vw, 3.25rem);
-  --fs-work-title-sm: clamp(1.5rem, 1.15rem + 1.5vw, 2.25rem);
+  /* Sized so the longest project title still holds one line beside its
+     summary column — a wrapped title breaks the row of dates below it. */
+  --fs-work-title: clamp(1.6rem, 1.1rem + 1.5vw, 2.125rem);
+  --fs-work-title-sm: clamp(1.4rem, 1.1rem + 1.1vw, 1.75rem);
   --fs-work-date: 1.125rem;
   --fs-work-desc: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
   --fs-footer-heading: clamp(1.6rem, 2.625vw, 42px);
@@ -1081,6 +1083,47 @@ body.intro-active #heroPhotoWrap {
 }
 
 /* ==========================================================================
+   About — a short centered introduction between the hero and the work
+   ========================================================================== */
+.about {
+  padding-block: var(--section-pad-half);
+}
+
+.about-copy {
+  /* Ranged left off the same eyebrow rule as every other section. The cap is
+     the measure, not the layout width — a line that runs the full 1314 is
+     unreadable at this size. */
+  max-width: 68ch;
+}
+
+.about-lead {
+  font-weight: 300;
+  font-size: var(--fs-section-heading);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.about-line {
+  font-weight: 300;
+  font-size: var(--fs-work-desc);
+  line-height: 1.6;
+  color: var(--text-paragraph);
+  margin-top: var(--space-4);
+  text-wrap: pretty;
+}
+
+/* The copy fades in a word at a time as the section scrolls up the viewport,
+   driven by script.js (initAboutFade) writing an opacity per word. The rest
+   state here is the "not yet read" one, so the effect degrades to plain grey
+   text if that script never runs; reduced-motion visitors get every word set
+   to 1 immediately. */
+.about-word {
+  opacity: 0.18;
+}
+
+/* ==========================================================================
    My Works
    ========================================================================== */
 .works {
@@ -1093,17 +1136,37 @@ body.intro-active #heroPhotoWrap {
   gap: clamp(56px, 7vw, var(--space-10));
 }
 
-/* The lead two projects carry the section on their own and take a full-width
-   row each; everything after them pairs up. Equal flex bases keep a pair the
-   same width whatever their titles happen to run to. */
+/* Closes the section: the projects that did not make the page live behind
+   this one link, ranged right so it reads as the end of the list rather than
+   another item in it. */
+.works-more {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+/* A project flagged `fullWidth` in data.js takes a row of its own; the rest
+   pair up. Equal flex bases keep a pair the same width whatever their titles
+   happen to run to. */
 .work-row {
   display: flex;
   gap: 30px;
 }
 
+/* A pair stretches to the taller of the two, so pushing the frame to the
+   bottom of each half lands both frames on the same line — otherwise a title
+   that wraps to two lines drags its whole column down past its neighbour.
+   The frames share an aspect ratio, so aligning their bottoms aligns their
+   tops too. */
 .work-row .work-item {
   flex: 1 1 0;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-row .work-item .work-image {
+  margin-top: auto;
 }
 
 /* Read by the entrance delays further down, so a pair cascades left to right
@@ -1116,29 +1179,73 @@ body.intro-active #heroPhotoWrap {
   --stagger: 110ms;
 }
 
+/* The copy leads and the artwork follows. At full width the summary is a
+   second column beside the title — it fills the space a single 18ch title
+   leaves empty, and holds the eye at the top of the item before the artwork
+   takes over. A paired item has no room for that, so it stacks (see the
+   .work-row override below). */
 .work-item-body {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+
+.work-item-headline {
+  display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  gap: var(--space-2);
+}
+
+.work-row .work-item-body {
+  flex-direction: column;
   gap: var(--space-3);
-  margin-top: clamp(24px, 3vw, 40px);
 }
 
 .work-item-title {
   font-weight: 600;
   font-size: var(--fs-work-title);
-  line-height: 1.06;
+  line-height: 1.15;
   letter-spacing: -0.035em;
   color: var(--ink);
-  max-width: 18ch;
-  text-wrap: balance;
 }
 
 /* A paired item has half the width, so the full display size would wrap to
    four lines and tower over the artwork it belongs to. */
 .work-row .work-item-title {
   font-size: var(--fs-work-title-sm);
+}
+
+/* The title is its own link to the case study, matching the frame below it.
+   The arrow is the hover state, in place of an underline: at display size a
+   rule under the line reads as a graphic element rather than a link. */
+.work-item-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Always in the flow, only invisible — animating opacity rather than adding
+   the arrow on hover keeps the title from reflowing under the cursor. */
+.work-item-arrow {
+  display: inline-flex;
+  opacity: 0;
+  transform: translateX(-0.25em);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.work-item-arrow svg {
+  width: 0.6em;
+  height: 0.45em;
+}
+
+.work-item-link:hover .work-item-arrow,
+.work-item-link:focus-visible .work-item-arrow {
+  opacity: 1;
+  transform: none;
 }
 
 .work-item-desc {
@@ -1151,25 +1258,41 @@ body.intro-active #heroPhotoWrap {
   text-wrap: pretty;
 }
 
+/* As the second column of a full-width item: wide enough that these summaries
+   run about three lines rather than a narrow six-line stack, while still
+   leaving the title room to hold its single line. It shrinks before the title
+   does, so an unusually long heading eats into this column rather than out of
+   the page. The 54ch cap below would bind first, so it is lifted here. */
+.works-list > .work-item .work-item-desc {
+  flex: 0 1 clamp(320px, 42%, 560px);
+  max-width: none;
+}
+
+/* Every project title on one line. Only above 900px, where the copy is not
+   yet stacked and the type is at full size — below that the container is too
+   narrow for the longest title at any size worth reading, and a forced line
+   would push out of the viewport instead of wrapping. */
+@media (min-width: 901px) {
+  .work-item-title {
+    white-space: nowrap;
+  }
+}
+
 .work-item-date {
   font-weight: 500;
   font-size: var(--fs-work-date);
   letter-spacing: -0.02em;
 }
 
-.work-item-actions {
-  margin-top: var(--space-2);
-}
+/* The artwork fills its frame edge to edge. Each shot is composed to the
+   frame's shape in data.js (1314x580 full width, 629x580 paired), including
+   whatever backdrop it wants around the screens inside it — so an inset mat
+   would only add a second, competing border around art that already has one.
+   The project's `color` still backs the frame while the image loads.
 
-/* The artwork floats inset on a tinted mat rather than bleeding to the frame
-   edges. That is the only way these images can share one grid: they run
-   1.5:1, 1.79:1 and 2.55:1, so any single crop would gut at least one of
-   them. `contain` keeps every one whole and the mat — the project's own
-   colour, already in data.js — absorbs the difference.
-
-   .work-image is the frame, .work-image-fill is the mat (and what scales on
-   hover), .tile-img inside it is what the entrance animates: three elements
-   with three owners, so the hover zoom, the entrance blur and the wipe never
+   .work-image is the frame, .work-image-fill is what scales on hover,
+   .tile-img inside it is what the entrance animates: three elements with
+   three owners, so the hover zoom, the entrance blur and the wipe never
    write the same property. */
 .work-image {
   position: relative;
@@ -1180,27 +1303,19 @@ body.intro-active #heroPhotoWrap {
 }
 
 .work-row .work-image {
-  aspect-ratio: 642 / 520;
+  aspect-ratio: 629 / 580;
 }
 
 .work-image-fill {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: clamp(18px, 3.2vw, 52px);
   transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* A video needs no mat. It was recorded to a known shape, so the frame takes
-   that shape instead of the still-image ratio and the footage fills it edge
-   to edge — no padding, no colour showing at the sides at any width. */
+/* Video is the one thing not authored to the frame: it was recorded to a
+   known shape, so the frame takes that shape instead. */
 .work-image.has-video {
   aspect-ratio: 16 / 9;
-}
-
-.work-image.has-video .work-image-fill {
-  padding: 0;
 }
 
 .tile-video {
@@ -1212,20 +1327,6 @@ body.intro-active #heroPhotoWrap {
   object-fit: cover;
 }
 
-/* Overrides the shared .tile-img cover rule defined below, for work frames
-   only — testimonial photos and gallery tiles still want an edge-to-edge
-   crop, and they are the ones shot to fit it. */
-.work-image .tile-img {
-  position: static;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 28px 56px -24px rgba(15, 18, 28, 0.45);
-}
-
 /* Only a linked frame zooms. A project without a case study renders its
    frame as a plain <div>, and a hover response there would promise a click
    that goes nowhere. */
@@ -1235,10 +1336,11 @@ a.work-image:hover .work-image-fill {
 
 /* --------------------------------------------------------------
    The entrance — the section's one authored moment, played once per
-   item as it scrolls up. The frame wipes open from the bottom while
-   the artwork inside settles out of a blur and the copy rises under
-   it. reveal.js supplies the trigger; the item opts out of that
-   file's own fade-and-lift so the two never stack up.
+   item as it scrolls up. The copy rises first, then the frame wipes
+   open from the bottom while the artwork inside settles out of a
+   blur — the same order the item is read in. reveal.js supplies the
+   trigger; the item opts out of that file's own fade-and-lift so the
+   two never stack up.
    (The global prefers-reduced-motion rule near the top of this file
    already collapses every animation below to ~0ms.)
    -------------------------------------------------------------- */
@@ -1250,34 +1352,29 @@ a.work-image:hover .work-image-fill {
 .work-item[data-reveal] .work-image,
 .work-item[data-reveal] .work-item-title,
 .work-item[data-reveal] .work-item-desc,
-.work-item[data-reveal] .work-item-date,
-.work-item[data-reveal] .work-item-actions {
+.work-item[data-reveal] .work-item-date {
   opacity: 0;
 }
 
+.work-item.in-view .work-item-title {
+  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) var(--stagger) both;
+}
+
+.work-item.in-view .work-item-date {
+  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 80ms) both;
+}
+
+.work-item.in-view .work-item-desc {
+  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 120ms) both;
+}
+
 .work-item.in-view .work-image {
-  animation: work-frame-in 860ms cubic-bezier(0.16, 1, 0.3, 1) var(--stagger) both;
+  animation: work-frame-in 860ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 200ms) both;
 }
 
 .work-item.in-view .tile-img,
 .work-item.in-view .tile-video {
-  animation: work-media-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) var(--stagger) both;
-}
-
-.work-item.in-view .work-item-title {
-  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 160ms) both;
-}
-
-.work-item.in-view .work-item-desc {
-  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 240ms) both;
-}
-
-.work-item.in-view .work-item-date {
-  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 300ms) both;
-}
-
-.work-item.in-view .work-item-actions {
-  animation: work-copy-in 700ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 360ms) both;
+  animation: work-media-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--stagger) + 200ms) both;
 }
 
 @keyframes work-frame-in {
@@ -1875,6 +1972,23 @@ a.work-image:focus-visible .work-image-arrow {
 /* ==========================================================================
    Responsive
    ========================================================================== */
+/* Below this the title and its summary column stop both fitting on one line
+   at a readable size, so the summary drops under the headline and hands the
+   full container width back to the title. */
+@media (max-width: 1200px) {
+  .work-item-body {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* Stacked, the summary would otherwise run the full container width — put
+     the reading measure back. */
+  .works-list > .work-item .work-item-desc {
+    flex: 0 1 auto;
+    max-width: 54ch;
+  }
+}
+
 @media (max-width: 900px) {
   :root {
     --nav-pill-h: 60px;
@@ -1968,19 +2082,9 @@ a.work-image:focus-visible .work-image-arrow {
     --stagger: 0ms;
   }
 
-  /* A 2.27:1 frame is only ~160px tall on a phone, and a contained image
-     inside its padding would be a stamp. Taller frames give the artwork
-     back the room the narrow column takes away. Video keeps its own 16:9 —
-     it fills the frame, so a taller box would crop the sides off rather
-     than give anything back. */
-  .work-image:not(.has-video),
-  .work-row .work-image:not(.has-video) {
-    aspect-ratio: 4 / 3;
-  }
-
-  .work-image-fill {
-    padding: clamp(12px, 3vw, 24px);
-  }
+  /* No frame override here: the artwork now fills its frame, so forcing a
+     taller box on a phone would crop the composition instead of giving it
+     room the way it did when the image floated on a mat. */
 
   /* The overlapping fan only reads as intentional with room to spread —
      below 900px it collapses to a plain vertical stack of full-width cards. */

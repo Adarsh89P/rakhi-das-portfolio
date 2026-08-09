@@ -152,8 +152,8 @@
   }
 
   /* -----------------------------------------------------------
-     My Works — first two projects render full-width, the rest are
-     paired two-per-row, same as the Figma reference.
+     My Works — projects flagged `fullWidth` in data.js render on
+     their own row, the rest are paired two-per-row.
   ----------------------------------------------------------- */
   /* Points an <a> at a project. Off-site case studies (a live Figma
      prototype, a write-up) open in a new tab so the portfolio itself is
@@ -168,10 +168,12 @@
     }
   }
 
-  /* One item per project: the artwork floating on its own tinted mat, then
-     the title, description, dates and CTA centred underneath. The entrance
-     is triggered by reveal.js adding `.in-view` and the keyframes live in
-     styles.css, so there is no observer or animation state to keep here. */
+  /* One item per project: the copy first — title, date and summary, all
+     ranged left — then the artwork floating on its own tinted mat beneath it.
+     A full-width item runs the summary as a second column beside the title;
+     a paired one stacks it. The entrance is triggered by reveal.js adding
+     `.in-view` and the keyframes live in styles.css, so there is no observer
+     or animation state to keep here. */
   function buildWorkItem(project) {
     var item = el('div', 'work-item');
 
@@ -192,41 +194,37 @@
     applyTileFill(fill, project, project.heading + ' — project preview');
     frame.appendChild(fill);
     if (hasLink) frame.appendChild(el('span', 'work-image-arrow', ARROW_DIAGONAL_SVG));
-    item.appendChild(frame);
 
     var body = el('div', 'work-item-body');
 
+    /* Title and date travel together: the date is a caption on the title,
+       not a third sibling, so the summary column can sit beside the pair. */
+    var headline = el('div', 'work-item-headline');
+
     var title = el('h3', 'work-item-title');
-    title.textContent = project.heading;
-    body.appendChild(title);
-
-    var desc = el('p', 'work-item-desc');
-    desc.textContent = project.description;
-    body.appendChild(desc);
-
-    var date = el('p', 'work-item-date gradient-text');
-    date.textContent = project.dateRange;
-    body.appendChild(date);
-
-    /* The button's own transform is its hover nudge, so the entrance
-       animation rides on this wrapper instead of fighting it. */
-    var actions = el('div', 'work-item-actions');
-    var cta = el('a', 'btn btn-primary');
-    var ctaLabel = el('span');
-    ctaLabel.textContent = data.works.ctaProjectLabel;
-    cta.appendChild(ctaLabel);
-    cta.insertAdjacentHTML('beforeend', ARROW_SVG);
     if (hasLink) {
-      linkToProject(cta, project);
+      /* With the CTA button gone, the title carries the link alongside the
+         frame — the copy is the first thing read, so it should be clickable
+         too. The arrow is the hover affordance in place of an underline; it
+         is always in the flow (just invisible at rest) so nothing shifts
+         when it appears. Unlinked projects stay plain text rather than a
+         dead anchor. */
+      var titleLink = el('a', 'work-item-link');
+      titleLink.appendChild(document.createTextNode(project.heading));
+      titleLink.insertAdjacentHTML('beforeend', '<span class="work-item-arrow">' + ARROW_SVG + '</span>');
+      linkToProject(titleLink, project);
+      title.appendChild(titleLink);
     } else {
-      cta.href = '#';
-      cta.setAttribute('aria-disabled', 'true');
-      cta.addEventListener('click', function (e) { e.preventDefault(); });
+      title.textContent = project.heading;
     }
-    actions.appendChild(cta);
-    body.appendChild(actions);
+    headline.appendChild(title);
+    headline.appendChild(el('p', 'work-item-date gradient-text', project.dateRange));
+    body.appendChild(headline);
+
+    body.appendChild(el('p', 'work-item-desc', project.description));
 
     item.appendChild(body);
+    item.appendChild(frame);
     return item;
   }
 
@@ -236,18 +234,117 @@
 
     var list = document.getElementById('worksList');
 
-    data.works.projects.forEach(function (project, index) {
-      /* The lead two carry the section on their own, so they get a full-width
-         row each; everything after them pairs up, two to a row. */
-      if (index < 2) {
+    /* A `fullWidth` project takes a row of its own; the rest fill pair rows
+       two at a time, in order. `openRow` is the pair row still waiting for
+       its second half — a full-width item in between closes it, so a pair
+       is always two projects that actually sit side by side. */
+    var openRow = null;
+
+    data.works.projects.forEach(function (project) {
+      if (project.fullWidth) {
         list.appendChild(buildWorkItem(project));
+        openRow = null;
         return;
       }
-      var pairIndex = index - 2;
-      var row = pairIndex % 2 === 0 ? el('div', 'work-row') : list.lastElementChild;
-      row.appendChild(buildWorkItem(project));
-      if (pairIndex % 2 === 0) list.appendChild(row);
+      if (!openRow) {
+        openRow = el('div', 'work-row');
+        list.appendChild(openRow);
+      }
+      openRow.appendChild(buildWorkItem(project));
+      if (openRow.children.length === 2) openRow = null;
     });
+
+    var more = document.getElementById('worksMoreCta');
+    var moreLabel = el('span');
+    moreLabel.textContent = data.works.ctaMore.label;
+    more.appendChild(moreLabel);
+    more.insertAdjacentHTML('beforeend', ARROW_SVG);
+    more.href = data.works.ctaMore.href;
+    if (/^https?:/i.test(more.href)) {
+      more.target = '_blank';
+      more.rel = 'noopener noreferrer';
+    }
+  }
+
+  /* -----------------------------------------------------------
+     About — a block of copy between the hero and the work, whose
+     words light up one after another as the section scrolls past.
+  ----------------------------------------------------------- */
+  function renderAbout() {
+    document.getElementById('aboutEyebrow').textContent = data.about.eyebrow;
+
+    var copy = document.getElementById('aboutCopy');
+    copy.appendChild(fadeParagraph('about-lead', data.about.lead));
+    data.about.paragraphs.forEach(function (text) {
+      copy.appendChild(fadeParagraph('about-line', text));
+    });
+
+    initAboutFade(copy);
+  }
+
+  /* One <span> per word so each can be faded on its own. The spaces stay as
+     plain text nodes between them, which is what keeps the paragraph
+     selectable and copyable as ordinary prose. */
+  function fadeParagraph(className, text) {
+    var p = el('p', className);
+    text.split(' ').forEach(function (word, index) {
+      if (index) p.appendChild(document.createTextNode(' '));
+      var span = el('span', 'about-word');
+      span.textContent = word;
+      p.appendChild(span);
+    });
+    return p;
+  }
+
+  /* The fade is tied to scroll position rather than played once on entry:
+     the block's own travel through the lower half of the viewport is the
+     timeline, so the words arrive at the pace the visitor scrolls and run
+     backwards if they scroll back up.
+
+     Reads are batched into a rAF — a scroll handler that measures on every
+     event forces layout dozens of times a second. */
+  function initAboutFade(copy) {
+    var words = Array.prototype.slice.call(copy.querySelectorAll('.about-word'));
+    if (!words.length) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      words.forEach(function (word) { word.style.opacity = '1'; });
+      return;
+    }
+
+    var queued = false;
+
+    function paint() {
+      queued = false;
+      var box = copy.getBoundingClientRect();
+      var viewport = window.innerHeight || document.documentElement.clientHeight;
+
+      /* 0 when the block's top is still at 85% of the viewport height, 1 once
+         it has risen to 35% — a band tall enough that the last word lands
+         well before the block leaves the screen. */
+      var start = viewport * 0.85;
+      var end = viewport * 0.35;
+      var progress = (start - box.top) / (start - end);
+      progress = Math.max(0, Math.min(1, progress));
+
+      /* Spread over the word count with a one-word-wide ramp, so the light
+         travels through the text instead of the whole block stepping at once. */
+      var head = progress * (words.length + 1);
+      words.forEach(function (word, index) {
+        var lit = Math.max(0, Math.min(1, head - index));
+        word.style.opacity = (0.18 + lit * 0.82).toFixed(3);
+      });
+    }
+
+    function request() {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(paint);
+    }
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    request();
   }
 
   /* -----------------------------------------------------------
@@ -506,6 +603,7 @@
   function renderAll() {
     renderNav();
     renderHero();
+    renderAbout();
     renderWorks();
     renderExperience();
     /* Testimonials are parked: the section is commented out in index.html,

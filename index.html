@@ -134,6 +134,14 @@
     </div>
   </section>
 
+  <!-- ===================== ABOUT ===================== -->
+  <section id="about" class="about" aria-labelledby="aboutEyebrow">
+    <div class="container">
+      <p class="eyebrow-rule" id="aboutEyebrow"></p>
+      <div class="about-copy" id="aboutCopy"></div>
+    </div>
+  </section>
+
   <!-- ===================== MY WORKS ===================== -->
   <section id="works" class="works" aria-labelledby="worksHeading">
     <div class="container">
@@ -143,10 +151,14 @@
         <h2 class="works-heading" id="worksHeading"></h2>
       </div>
 
-      <!-- Filled from data.works.projects by script.js: the first two
-           projects take a full-width row each, the rest pair up two to a
+      <!-- Filled from data.works.projects by script.js: a project flagged
+           `fullWidth` takes a row of its own, the rest pair up two to a
            row. -->
       <div class="works-list" id="worksList"></div>
+
+      <div class="works-more">
+        <a class="btn btn-primary" id="worksMoreCta"></a>
+      </div>
     </div>
   </section>
 

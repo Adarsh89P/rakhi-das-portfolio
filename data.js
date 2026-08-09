@@ -22,11 +22,11 @@ var PORTFOLIO_DATA = {
   nav: {
     left: [
       { label: 'Home', href: '#home' },
-      { label: 'About', href: '#footer' }
+      { label: 'About', href: '#about' }
     ],
     right: [
       { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume_.pdf' },
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/rakhi-das-183381158/' }
+      { label: 'Behance', href: 'https://www.behance.net/rakhidas1' }
     ]
   },
 
@@ -47,57 +47,89 @@ var PORTFOLIO_DATA = {
     introPhoto: 'public/hero/rakhi.png'
   },
 
+  /* A short introduction between the hero and the work, and where the nav's
+     "About" link lands. The first paragraph is set larger than the rest — it
+     is the one line a visitor who reads nothing else should still come away
+     with. Every word fades in as the section scrolls up. */
+  about: {
+    eyebrow: 'About Me',
+    lead: "I'm a product designer who loves crafting calm, clear experiences that users love and teams trust. I design with a systems mindset — simplifying complex workflows, elevating visual clarity, and shaping products that scale with intention.",
+    paragraphs: [
+      'Most projects start with a conversation and end with something a teammate can reuse: a flow, a pattern, a component with the edge cases already answered.',
+      'I care about the quiet decisions — the empty state, the error message, the spacing that makes a dense screen readable — because those are the parts people actually feel.'
+    ]
+  },
+
   works: {
     eyebrow: 'My Works',
     heading: 'Projects you need to see',
+    /* The closing link under the last row — where the projects that did not
+       make the cut live. */
+    ctaMore: { label: 'View more projects', href: 'https://www.behance.net/rakhidas1' },
     /*
-      In order: the first two projects each take a full-width row, the rest
-      pair up two to a row — so the two you most want seen go first.
+      `fullWidth: true` gives a project a row of its own; everything without
+      it pairs up two to a row, in order — so the ones you most want seen go
+      first and get the flag.
 
-      `video` wins if present: it fills its frame edge to edge, with no mat
-      showing, and `image` becomes its poster (what shows before the video
-      has loaded, and instead of it when the visitor asks for reduced
-      motion). Without a video, `image` is the artwork and it is never
-      cropped — `color` is the mat it floats on, which shows around any shot
-      that isn't the frame's exact shape, so pick one that flatters it.
+      `video` wins if present, and must be a real video file — it takes a
+      16:9 frame and `image` becomes its poster.
 
-      `href` is the "Read case study" link — point it at a real page any
-      time; '#' renders the button inactive rather than linking nowhere.
+      Otherwise `image` is the artwork and it fills its frame edge to edge.
+      Author it at the frame's shape so nothing is lost: 1314x580 for a
+      full-width project, 629x580 for a paired one.
+      `color` backs the frame while the image loads and shows through any
+      transparency, so keep it close to the artwork's own background.
+
+      `href` is the case study link, carried by both the title and the
+      artwork — point it at a real page any time; '#' leaves the title as
+      plain text and the frame as a plain div rather than linking nowhere.
     */
+    /* Unused while the layout has no CTA button under each project; kept so
+       the button can come back without re-authoring its label. */
     ctaProjectLabel: 'Read case study',
     projects: [
       {
+        fullWidth: true,
         heading: 'SaaS Dashboard Redesign',
         dateRange: 'Mar 2025 – Jul 2025',
-        description: 'Redesigned a complex analytics dashboard to simplify navigation and improve task completion for enterprise users.',
+        description: 'Simplifying complex healthcare journeys into intuitive digital experiences for patients, doctors, and administrators.',
         color: '#49acea',
-        video: 'public/Surksha/surkhsaHero.mp4',
-        image: 'public/works/Frame%2021.png',
+        image: 'public/Surksha/Frame21.png',
         href: 'suraksha_case_study.html'
       },
       {
-        heading: 'Mobile Banking Onboarding',
+        fullWidth: true,
+        heading: 'Yoga All-in-One Elevate Health & Serenity.',
         dateRange: 'Jan 2024 – Nov 2024',
-        description: 'Streamlined the onboarding journey for a fintech mobile app, reducing drop-off through iterative usability testing.',
+        description: 'A unified app offering guided yoga sessions, personalized routines, progress tracking, and a calming, intuitive experience to support a consistent wellness journey',
         color: '#fedfe7',
-        image: 'public/MobileBanking/imga22.png',
-        href: '#'
+        image: 'public/MobileBanking/yogaapp.jpg',
+        href: 'https://www.behance.net/gallery/227695287/Yoga-Lifestyle'
       },
       {
-        heading: 'E-Commerce Usability Audit',
-        dateRange: 'Jun 2023 – Sep 2023',
-        description: 'Ran a heuristic evaluation and proposed a refreshed component library to improve consistency across the platform.',
+        fullWidth: true,
+        heading: 'Influencer Marketing Platform',
+        dateRange: 'Jan 2023 - Sept 2023',
+        description: 'Designed a centralized platform to simplify influencer–brand collaboration, from discovery and communication to payments and campaign tracking.',
+        color: '#f1f2f4',
+        image: 'public/unused/chekky.png',
+        href: 'https://www.figma.com/deck/7Z5C9KMnP7e2YqW3y3xLEM/Cheeky?node-id=2-1411&t=EG6GvTgBjcCRHNGp-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
+      },
+      {
+        heading: 'Malta Taxi App 🚖 ',
+        dateRange: 'Jan 2024 - July 2024',
+        description: 'Reduced UI inconsistencies, aligned four product teams, and accelerated product delivery through a scalable design system.',
         color: '#c4e8ff',
-        image: 'public/E-Commerce/ecom.png',
-        href: '#'
+        image: 'public/E-Commerce/maltaapp.png',
+        href: 'https://www.figma.com/deck/G1rWYCuzvK9zAcaNAPnUlp/Malta-Taxi-App-%F0%9F%9A%96?node-id=3-135&t=P6Jhoz7hQMnUGJhQ-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
       },
       {
-        heading: 'Add your fourth case study',
-        dateRange: 'Add a date range',
-        description: 'Add a short summary of the problem, your approach, and the outcome for this project.',
+        heading: 'Mobile Banking Onboarding',
+        dateRange: 'Nov 2025 - Nov 2025',
+        description: 'Redesigned QIIB’s digital banking experience with a scalable design system, creating a more consistent and intuitive experience across products.',
         color: '#ffe9d1',
-        image: 'public/gallery/Rectangle 6.png',
-        href: '#'
+        image: 'public/Banking/bankingOnboarding.png',
+        href: 'https://www.figma.com/deck/H9bCGMIJ1tQf27i2qyglc7/Mobile-Banking-Onboarding?node-id=1-152&t=J5FDokLa6WodmhZT-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
       }
     ]
   },
@@ -164,7 +196,7 @@ var PORTFOLIO_DATA = {
 
   gallery: {
     eyebrow: 'MY GALLERY',
-    headingPre: 'An Artistic Expedition Awaits in ',
+    headingPre: 'When I’m Out of Canvas',
     headingHighlight: 'My Gallery',
     paragraph: "A few frames from outside the design tools — travel, light and moments worth keeping. Swap these placeholder tiles for real photos any time by adding an `image` url in data.js.",
     /* Order here IS position in the collage — the grid places tiles by
@@ -184,11 +216,11 @@ var PORTFOLIO_DATA = {
        visible rather than collapsing. Fill in `alt` with a real
        description whenever you add an `image`. */
     tiles: [
-      { color: '#e7d9c9', image: 'public/gallery/Rectangle%2011.png', alt: 'A whitewashed stone house built into a rust-coloured cliff face, prayer flags strung above it' },
-      { color: '#d8c9e0', image: 'public/gallery/Rectangle%2010.png', alt: 'Pine branches in the foreground with a valley town half-swallowed by low cloud behind' },
-      { color: '#c9dce0', image: 'public/gallery/image5.png', alt: 'Rakhi in a denim jacket standing on a rock in a wide green glacial valley' },
-      { color: '#e0d3c9', image: 'public/gallery/Rectangle%2012.png', alt: 'Cloud spilling over a dark ridgeline at dawn, a corrugated rooftop in the foreground' },
-      { color: '#d0dde5', image: 'public/gallery/Rectangle%208.png', alt: 'Sun rising through a notch between two ridges, power lines crossing the sky' },
+      { color: '#e7d9c9', image: 'public/gallery/img1.png', alt: 'A whitewashed stone house built into a rust-coloured cliff face, prayer flags strung above it' },
+      { color: '#d8c9e0', image: 'public/gallery/img2.png', alt: 'Pine branches in the foreground with a valley town half-swallowed by low cloud behind' },
+      { color: '#c9dce0', image: 'public/gallery/img3.png', alt: 'Rakhi in a denim jacket standing on a rock in a wide green glacial valley' },
+      { color: '#e0d3c9', image: 'public/gallery/image5.png', alt: 'Cloud spilling over a dark ridgeline at dawn, a corrugated rooftop in the foreground' },
+      { color: '#d0dde5', image: 'public/gallery/img4.png', alt: 'Sun rising through a notch between two ridges, power lines crossing the sky' },
       { color: '#e5d6d0', image: 'public/gallery/Rectangle%206.png', alt: 'A timber and stone house beside a village road, snow-dusted peaks catching the evening light' },
       { color: '#dfe0d3', image: 'public/gallery/Rectangle%207.png', alt: 'Rakhi standing with arms outstretched above terraced fields, a hillside monastery in the distance' }
     ]
@@ -198,7 +230,7 @@ var PORTFOLIO_DATA = {
      matching entry in SOCIAL_ICONS (script.js) or it is skipped. */
   social: {
     twitter: '#',
-    behance: '#',
+    behance: 'https://www.behance.net/rakhidas1',
     instagram: '#',
     linkedin: 'https://www.linkedin.com/in/rakhi-das-183381158/'
   },
@@ -209,7 +241,7 @@ var PORTFOLIO_DATA = {
     tagline: "I'm currently open to full-time opportunities! Let's create something amazing together! ✨",
     avatar: 'public/footer/footer-image.png',
     avatarAlt: 'Rakhi Das',
-    cvHref: 'public/works/Rakhi_Das_UIUX_Designer_Resume_.pdf',
+    cvHref: 'public/works/Rakhi_Das_UIUX_Designer_Resume.pdf',
     cvDownloadName: 'Rakhi_Das_UIUX_Designer_Resume.pdf',
     copyright: 'Rakhi Das • Built with pixels, prototypes, and plenty of late-night ideas.'
   }
