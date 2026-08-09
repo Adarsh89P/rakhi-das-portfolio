@@ -54,6 +54,7 @@ var PORTFOLIO_DATA = {
   about: {
     eyebrow: 'About Me',
     lead: "I'm a product designer who loves crafting calm, clear experiences that users love and teams trust. I design with a systems mindset — simplifying complex workflows, elevating visual clarity, and shaping products that scale with intention.",
+    /* Renders under the lead in smaller, lighter type. */
     paragraphs: [
       'Most projects start with a conversation and end with something a teammate can reuse: a flow, a pattern, a component with the edge cases already answered.',
       'I care about the quiet decisions — the empty state, the error message, the spacing that makes a dense screen readable — because those are the parts people actually feel.'

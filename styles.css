@@ -1089,29 +1089,38 @@ body.intro-active #heroPhotoWrap {
   padding-block: var(--section-pad-half);
 }
 
+/* The eyebrow keeps its rule across the full container, as in every other
+   section; the copy under it is centered. */
 .about-copy {
-  /* Ranged left off the same eyebrow rule as every other section. The cap is
-     the measure, not the layout width — a line that runs the full 1314 is
-     unreadable at this size. */
-  max-width: 68ch;
+  text-align: center;
 }
 
+/* The measures below live on the paragraphs rather than here so each `ch`
+   resolves against that paragraph's own size — on this wrapper they would
+   all be computed at 16px and come out roughly half as wide as intended.
+   `balance` evens the line lengths, which is what stops centered text from
+   ending in a one-word line. */
 .about-lead {
   font-weight: 300;
   font-size: var(--fs-section-heading);
   line-height: 1.35;
   letter-spacing: -0.02em;
   color: var(--ink);
-  text-wrap: pretty;
+  max-width: 54ch;
+  margin-inline: auto;
+  text-wrap: balance;
 }
 
+/* The supporting lines under the lead, deliberately quieter than it. */
 .about-line {
   font-weight: 300;
   font-size: var(--fs-work-desc);
   line-height: 1.6;
   color: var(--text-paragraph);
+  max-width: 66ch;
   margin-top: var(--space-4);
-  text-wrap: pretty;
+  margin-inline: auto;
+  text-wrap: balance;
 }
 
 /* The copy fades in a word at a time as the section scrolls up the viewport,
@@ -2117,6 +2126,21 @@ a.work-image:focus-visible .work-image-arrow {
 @media (max-width: 640px) {
   .gallery-tile {
     --tiles-visible: 2;
+  }
+
+  /* The badge is a fixed 52px, which reads as a small mark against a 1314px
+     frame and as a huge one against a phone-width frame — the frame shrank,
+     it didn't. Scale it and its inset to the width it actually sits on. */
+  .work-image-arrow {
+    right: var(--space-3);
+    bottom: var(--space-3);
+    width: 36px;
+    height: 36px;
+  }
+
+  .work-image-arrow svg {
+    width: 15px;
+    height: 15px;
   }
 
   .works-head,
