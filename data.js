@@ -21,12 +21,12 @@ var PORTFOLIO_DATA = {
   /* Nav links either side of the centered logo, left-to-right. */
   nav: {
     left: [
-      { label: 'Meet Rakhi', href: '#home' },
-      { label: 'Book online', href: '#footer' }
+      { label: 'Home', href: '#home' },
+      { label: 'About', href: '#footer' }
     ],
     right: [
-      { label: 'Photo Gallery', href: '#gallery' },
-      { label: 'Contact', href: '#footer' }
+      { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume_.pdf' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/rakhi-das-183381158/' }
     ]
   },
 

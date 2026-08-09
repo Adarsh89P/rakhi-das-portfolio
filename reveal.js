@@ -60,11 +60,11 @@
     '.footer-bottom'
   ].join(',');
 
-  /* Containers whose children lie *outside* the viewport by design. The
-     testimonials track is a carousel: eight cards laid out in a row about
-     4500px wide inside an `overflow: hidden` box, so only the first three
+  /* Containers whose children lie *outside* the viewport by design. A
+     marquee track is a carousel: its cards are laid out in a row thousands
+     of pixels wide inside an `overflow: hidden` box, so only the first few
      are ever within the viewport. Observing each card against the viewport
-     means the other five never intersect, never get `.in-view`, and stay at
+     means the rest never intersect, never get `.in-view`, and stay at
      opacity 0 for good — click the carousel's next arrow on the current
      site and the cards you page to are blank. (That bug predates this file;
      the old four-selector version had the same problem.)
@@ -72,7 +72,7 @@
      The fix is to trigger those children off their container instead: when
      the track comes into view, everything inside it reveals, wherever it
      happens to sit on the horizontal axis. */
-  var GROUP_SELECTOR = '.testimonials-track';
+  var GROUP_SELECTOR = '.marquee-track';
 
   var REVEAL_MS = 600; /* keep in step with the [data-reveal] transition */
   var STAGGER_MS = 60;

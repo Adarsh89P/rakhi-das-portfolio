@@ -290,8 +290,85 @@
   }
 
   /* -----------------------------------------------------------
+     Marquee — the looping horizontal strip behind both the
+     testimonials and the gallery. Fill the returned strip with
+     items, then call `start()` on the handle.
+  ----------------------------------------------------------- */
+  var MARQUEE_SPEED_PX_PER_SEC = 55;
+
+  function createMarquee(track) {
+    var strip = el('div', 'marquee-strip');
+    track.appendChild(strip);
+
+    return {
+      strip: strip,
+
+      start: function () {
+        /* The strip is rendered twice so translating it by exactly one set's
+           width lands on an identical frame — that's what makes the loop
+           seamless. The clones are decoration: hidden from screen readers so
+           the content isn't announced twice. */
+        Array.prototype.slice.call(strip.children).forEach(function (item) {
+          var clone = item.cloneNode(true);
+          clone.setAttribute('aria-hidden', 'true');
+          strip.appendChild(clone);
+        });
+
+        /* Constant travel speed regardless of item count: time the half-loop
+           from its measured width rather than hard-coding a duration. */
+        function size() {
+          /* The strip is `max-content` wide, so items inside it have no
+             definite percentage to size against. Publish the track's real
+             width — scrollbar already excluded, unlike 100vw — for any item
+             that wants to fit a whole number of itself into one view. */
+          track.style.setProperty('--track-w', track.clientWidth + 'px');
+
+          var halfWidth = strip.scrollWidth / 2;
+          if (!halfWidth) return;
+          strip.style.setProperty('--marquee-duration', (halfWidth / MARQUEE_SPEED_PX_PER_SEC) + 's');
+        }
+        size();
+        /* Re-measure once everything has settled: if this runs before the
+           strip has been laid out, scrollWidth reads 0 and the duration
+           never gets set. */
+        window.addEventListener('load', size);
+        window.addEventListener('resize', size);
+      },
+
+      /* Flip travel direction. Reversing mid-run would normally jump, because
+         elapsed time maps to the mirrored position — so the current progress
+         is measured and replayed as a negative delay, which puts the strip
+         back exactly where it already was. */
+      setReversed: function (reversed) {
+        if (strip.classList.contains('is-reversed') === reversed) return;
+
+        var half = strip.scrollWidth / 2;
+        var shifted = 0;
+        var transform = window.getComputedStyle(strip).transform;
+        if (transform && transform !== 'none') {
+          var parts = transform.match(/matrix.*\((.+)\)/);
+          if (parts) {
+            var values = parts[1].split(', ');
+            shifted = Math.abs(parseFloat(values[values.length - 2])) || 0;
+          }
+        }
+
+        /* `shifted` is how far along the half-loop the strip already sits.
+           Forward maps elapsed time straight onto that; reverse mirrors it.
+           So the delay that preserves the current position differs per
+           direction — using one formula for both jumps on the way back. */
+        var duration = half / MARQUEE_SPEED_PX_PER_SEC;
+        var progress = half ? shifted / half : 0;
+        var replayed = reversed ? 1 - progress : progress;
+        strip.classList.toggle('is-reversed', reversed);
+        strip.style.animationDelay = -replayed * duration + 's';
+      }
+    };
+  }
+
+  /* -----------------------------------------------------------
      Testimonials — horizontally-scrolling cards; the arrow buttons
-     just page the track by one card width.
+     just flip the direction the strip travels.
   ----------------------------------------------------------- */
   function renderTestimonials() {
     document.getElementById('testimonialsEyebrow').textContent = data.testimonials.eyebrow;
@@ -301,9 +378,7 @@
     heading.appendChild(document.createTextNode(data.testimonials.headingPre));
     heading.appendChild(el('span', 'gradient-text', data.testimonials.headingHighlight));
 
-    var track = document.getElementById('testimonialsTrack');
-    var marquee = el('div', 'testimonials-marquee');
-    track.appendChild(marquee);
+    var marquee = createMarquee(document.getElementById('testimonialsTrack'));
 
     data.testimonials.items.forEach(function (t) {
       var card = el('div', 'testimonial-card');
@@ -318,74 +393,22 @@
       body.appendChild(el('p', 'testimonial-title', t.title));
       card.appendChild(body);
 
-      marquee.appendChild(card);
+      marquee.strip.appendChild(card);
     });
 
-    /* The strip is rendered twice so translating it by exactly one set's
-       width lands on an identical frame — that's what makes the loop
-       seamless. The clones are decoration: hidden from screen readers so
-       the quotes aren't announced twice. */
-    var originals = Array.prototype.slice.call(marquee.children);
-    originals.forEach(function (card) {
-      var clone = card.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      marquee.appendChild(clone);
+    marquee.start();
+
+    document.getElementById('testimonialsPrev').addEventListener('click', function () {
+      marquee.setReversed(true);
     });
-
-    /* Constant travel speed regardless of card count: time the half-loop
-       from its measured width rather than hard-coding a duration. */
-    var SPEED_PX_PER_SEC = 55;
-    function sizeMarquee() {
-      var halfWidth = marquee.scrollWidth / 2;
-      if (!halfWidth) return;
-      marquee.style.setProperty('--marquee-duration', (halfWidth / SPEED_PX_PER_SEC) + 's');
-    }
-    sizeMarquee();
-    /* Re-measure once everything has settled: if this runs before the strip
-       has been laid out, scrollWidth reads 0 and the duration never gets set. */
-    window.addEventListener('load', sizeMarquee);
-    window.addEventListener('resize', sizeMarquee);
-
-    /* The arrows flip travel direction. Reversing mid-run would normally
-       jump, because elapsed time maps to the mirrored position — so the
-       current progress is measured and replayed as a negative delay, which
-       puts the strip back exactly where it already was. */
-    var prev = document.getElementById('testimonialsPrev');
-    var next = document.getElementById('testimonialsNext');
-
-    function setReversed(reversed) {
-      if (marquee.classList.contains('is-reversed') === reversed) return;
-
-      var half = marquee.scrollWidth / 2;
-      var shifted = 0;
-      var transform = window.getComputedStyle(marquee).transform;
-      if (transform && transform !== 'none') {
-        var parts = transform.match(/matrix.*\((.+)\)/);
-        if (parts) {
-          var values = parts[1].split(', ');
-          shifted = Math.abs(parseFloat(values[values.length - 2])) || 0;
-        }
-      }
-
-      /* `shifted` is how far along the half-loop the strip already sits.
-         Forward maps elapsed time straight onto that; reverse mirrors it.
-         So the delay that preserves the current position differs per
-         direction — using one formula for both jumps on the way back. */
-      var duration = half / SPEED_PX_PER_SEC;
-      var progress = half ? shifted / half : 0;
-      var replayed = reversed ? 1 - progress : progress;
-      marquee.classList.toggle('is-reversed', reversed);
-      marquee.style.animationDelay = -replayed * duration + 's';
-    }
-
-    prev.addEventListener('click', function () { setReversed(true); });
-    next.addEventListener('click', function () { setReversed(false); });
+    document.getElementById('testimonialsNext').addEventListener('click', function () {
+      marquee.setReversed(false);
+    });
   }
 
   /* -----------------------------------------------------------
-     My Gallery — a fixed 7-tile collage. Tiles carry no size information:
-     their footprints are pinned by nth-child in styles.css, so the order
-     of `data.gallery.tiles` is what decides where each photo lands.
+     My Gallery — the same looping strip as the testimonials, with
+     uniform photo tiles and no arrows.
   ----------------------------------------------------------- */
   function renderGallery() {
     document.getElementById('galleryEyebrow').textContent = data.gallery.eyebrow;
@@ -397,12 +420,13 @@
 
     document.getElementById('galleryParagraph').textContent = data.gallery.paragraph;
 
-    var grid = document.getElementById('galleryGrid');
+    var marquee = createMarquee(document.getElementById('galleryTrack'));
     data.gallery.tiles.forEach(function (item) {
       var t = el('div', 'gallery-tile');
       applyTileFill(t, item, item.alt);
-      grid.appendChild(t);
+      marquee.strip.appendChild(t);
     });
+    marquee.start();
   }
 
   /* -----------------------------------------------------------
@@ -484,7 +508,9 @@
     renderHero();
     renderWorks();
     renderExperience();
-    renderTestimonials();
+    /* Testimonials are parked: the section is commented out in index.html,
+       so this render has no elements to fill. Uncomment both together. */
+    // renderTestimonials();
     renderGallery();
     renderFooter();
     renderSEO();

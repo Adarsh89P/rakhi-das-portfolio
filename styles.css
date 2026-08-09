@@ -552,6 +552,10 @@ section {
   justify-content: center;
   gap: 22px;
   border-radius: var(--radius-pill);
+  /* The pill keeps the glass tint, blur and bevel but drops the drop
+     shadow — it sits over the hero image and the cast shadow read as a
+     hard edge against it. */
+  box-shadow: none;
 }
 
 /* ==========================================================================
@@ -1495,48 +1499,49 @@ a.work-image:focus-visible .work-image-arrow {
   padding-block: var(--section-pad-half);
 }
 
-/* A continuous marquee. script.js renders the card list twice (the copy is
-   hidden from assistive tech) and the strip slides exactly one set's width
-   before looping, so the seam never shows. Spacing is `margin-right` on the
-   cards rather than flex `gap`: with a gap, one set plus its trailing gap
-   would not equal half the strip and the loop would visibly jump each cycle. */
-.testimonials-track {
+/* A continuous marquee, shared by the testimonials strip and the gallery.
+   script.js renders the item list twice (the copy is hidden from assistive
+   tech) and the strip slides exactly one set's width before looping, so the
+   seam never shows. Spacing is `margin-right` on the items rather than flex
+   `gap`: with a gap, one set plus its trailing gap would not equal half the
+   strip and the loop would visibly jump each cycle. */
+.marquee-track {
   overflow: hidden;
   scroll-snap-type: x mandatory;
   padding-bottom: var(--space-3);
   scrollbar-width: none;
 }
 
-.testimonials-track::-webkit-scrollbar {
+.marquee-track::-webkit-scrollbar {
   display: none;
 }
 
 /* The track is keyboard-scrollable (tabindex="0" in index.html) since the
-   cards themselves have no focusable content of their own. */
-.testimonials-track:focus-visible {
+   items themselves have no focusable content of their own. */
+.marquee-track:focus-visible {
   outline: 2px solid var(--accent-orange);
   outline-offset: 4px;
 }
 
-.testimonials-marquee {
+.marquee-strip {
   display: flex;
   width: max-content;
   /* Duration is set per-strip in script.js from the measured width, so the
-     cards travel at a constant speed no matter how many there are. */
-  animation: testimonials-marquee var(--marquee-duration, 60s) linear infinite;
+     items travel at a constant speed no matter how many there are. */
+  animation: marquee-scroll var(--marquee-duration, 60s) linear infinite;
 }
 
 /* Hovering or tabbing in holds the strip still so a quote can be read. */
-.testimonials-track:hover .testimonials-marquee,
-.testimonials-track:focus-within .testimonials-marquee {
+.marquee-track:hover .marquee-strip,
+.marquee-track:focus-within .marquee-strip {
   animation-play-state: paused;
 }
 
-.testimonials-marquee.is-reversed {
+.marquee-strip.is-reversed {
   animation-direction: reverse;
 }
 
-@keyframes testimonials-marquee {
+@keyframes marquee-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
@@ -1546,12 +1551,12 @@ a.work-image:focus-visible .work-image-arrow {
    Drop the animation outright instead and hand the track back to the user
    as an ordinary horizontal scroller. */
 @media (prefers-reduced-motion: reduce) {
-  .testimonials-marquee {
+  .marquee-strip {
     animation: none !important;
     transform: none !important;
   }
 
-  .testimonials-track {
+  .marquee-track {
     overflow-x: auto;
   }
 }
@@ -1631,40 +1636,33 @@ a.work-image:focus-visible .work-image-arrow {
   max-width: 40rem;
 }
 
-/* The collage is a bespoke 5x3 grid matching Figma's 1314x485 footprint.
-   Tiles are placed by explicit grid-area rather than by a span-based size
-   class: column 1 splits at 213px while columns 3-4 split at 148px, so no
-   single "tall/wide/normal" vocabulary can describe the arrangement.
-   Column and row tracks are `fr` so the whole collage scales as one unit.
+/* Same continuous marquee as the testimonials strip (see .marquee-track),
+   with uniform tiles instead of a collage: every photo gets the same
+   footprint so the row reads as one moving band.
 
-     +-----+-------+-------+-------+-------+
-     |  1  |       |   4   |   5   |       |
-     |     |   3   +-------+-------+   7   |
-     +-----+       |               |       |
-     |  2  |       |       6       |       |
-     +-----+-------+---------------+-------+ */
-.gallery-grid {
-  display: grid;
-  grid-template-columns: 209fr 306fr 216.5fr 216.5fr 306fr;
-  grid-template-rows: 148fr 49fr 256fr;
-  height: min(485px, 30.3125vw);
-  gap: 16px;
-}
-
+   Width is solved from the track rather than fixed, so exactly --tiles-visible
+   sit in view with the last one flush to the right edge: n tiles plus the
+   (n-1) gutters between them fill the track. The strip is `max-content` wide,
+   so a percentage basis here has nothing definite to resolve against —
+   script.js publishes the measured track width as --track-w, and the fallback
+   rebuilds it from the same tokens .container uses (a hair wide, since 100vw
+   counts the scrollbar) for the frame before that measurement lands. */
 .gallery-tile {
+  --tiles-visible: 4;
+  --tile-gap: 16px;
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-sm);
+  flex: 0 0 calc(
+    (var(--track-w, min(var(--content-width), 100vw - var(--gutter) * 2))
+      - (var(--tiles-visible) - 1) * var(--tile-gap)) / var(--tiles-visible)
+  );
+  /* Matches the testimonial photo's footprint: ~306px wide at full width,
+     and the same rounding. */
+  aspect-ratio: 306 / 265;
+  border-radius: var(--radius-md);
+  /* margin, not gap — see the .marquee-strip note on why the seam needs it. */
+  margin-right: var(--tile-gap);
 }
-
-/* grid-area: row-start / column-start / row-end / column-end */
-.gallery-tile:nth-child(1) { grid-area: 1 / 1 / 3 / 2; }
-.gallery-tile:nth-child(2) { grid-area: 3 / 1 / 4 / 2; }
-.gallery-tile:nth-child(3) { grid-area: 1 / 2 / 4 / 3; }
-.gallery-tile:nth-child(4) { grid-area: 1 / 3 / 2 / 4; }
-.gallery-tile:nth-child(5) { grid-area: 1 / 4 / 2 / 5; }
-.gallery-tile:nth-child(6) { grid-area: 2 / 3 / 4 / 5; }
-.gallery-tile:nth-child(7) { grid-area: 1 / 5 / 4 / 6; }
 
 /* ==========================================================================
    Footer
@@ -2002,25 +2000,9 @@ a.work-image:focus-visible .work-image-arrow {
     z-index: auto;
   }
 
-  /* The collage's fixed 5x3 placement can't survive this width — unwind it
-     into a plain 2-column masonry-ish grid and let the tiles flow. Every
-     nth-child placement above is reset, otherwise the explicit grid-areas
-     would keep pointing at tracks that no longer exist. */
-  .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: none;
-    grid-auto-rows: 180px;
-    height: auto;
-  }
-
-  .gallery-tile:nth-child(n) {
-    grid-area: auto;
-  }
-
-  .gallery-tile:nth-child(3),
-  .gallery-tile:nth-child(6),
-  .gallery-tile:nth-child(7) {
-    grid-row: span 2;
+  /* Four across would put the tiles under ~200px here — show fewer, larger. */
+  .gallery-tile {
+    --tiles-visible: 3;
   }
 
   .footer-intro {
@@ -2029,6 +2011,10 @@ a.work-image:focus-visible .work-image-arrow {
 }
 
 @media (max-width: 640px) {
+  .gallery-tile {
+    --tiles-visible: 2;
+  }
+
   .works-head,
   .gallery-head {
     flex-direction: column;
@@ -2037,7 +2023,7 @@ a.work-image:focus-visible .work-image-arrow {
 
   /* `flex-basis` sets the *main* size, so the moment this stacks into a
      column the 380px/480px bases stop being widths and become heights —
-     ~860px of empty space wedged between the heading and the collage.
+     ~860px of empty space wedged between the heading and the strip.
      Hand the sizing back to the content. */
   .gallery-heading,
   .gallery-paragraph {
