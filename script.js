@@ -427,6 +427,10 @@
     if (!data.footer.cvHref) {
       cv.setAttribute('aria-disabled', 'true');
       cv.addEventListener('click', function (e) { e.preventDefault(); });
+    } else {
+      cv.setAttribute('download', data.footer.cvDownloadName || '');
+      cv.setAttribute('target', '_blank');
+      cv.setAttribute('rel', 'noopener');
     }
 
     var socialList = document.getElementById('footerSocialList');

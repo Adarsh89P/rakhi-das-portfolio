@@ -209,7 +209,8 @@ var PORTFOLIO_DATA = {
     tagline: "I'm currently open to full-time opportunities! Let's create something amazing together! ✨",
     avatar: 'public/footer/footer-image.png',
     avatarAlt: 'Rakhi Das',
-    cvHref: '',
+    cvHref: 'public/works/Rakhi_Das_UIUX_Designer_Resume_.pdf',
+    cvDownloadName: 'Rakhi_Das_UIUX_Designer_Resume.pdf',
     copyright: 'Rakhi Das • Built with pixels, prototypes, and plenty of late-night ideas.'
   }
 };
