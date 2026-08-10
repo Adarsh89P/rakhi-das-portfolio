@@ -60,8 +60,9 @@ var PORTFOLIO_DATA = {
   },
 
   works: {
+    /* The eyebrow names the section on its own — there is no heading row
+       under it any more, so the projects start straight after the rule. */
     eyebrow: 'My Works',
-    heading: 'Projects you need to see',
     /* The closing link under the last row — where the projects that did not
        make the cut live. */
     ctaMore: { label: 'View more projects', href: 'https://www.behance.net/rakhidas1' },
@@ -195,25 +196,21 @@ var PORTFOLIO_DATA = {
 
   gallery: {
     eyebrow: 'MY GALLERY',
-    headingPre: 'When I’m Out of Canvas',
+    /* `headingPre` runs straight into the highlighted words, so it has to
+       carry its own trailing space — without it the two render as one word. */
+    headingPre: 'When I’m Out of Canvas, ',
     headingHighlight: 'My Gallery',
-    paragraph: "A few frames from outside the design tools — travel, light and moments worth keeping. Swap these placeholder tiles for real photos any time by adding an `image` url in data.js.",
-    /* Order here IS position in the collage — the grid places tiles by
-       nth-child, so moving an entry moves the photo. Slot shapes below are
-       the Figma sizes at 1314px wide; pick photos whose crop suits them,
-       since every tile is `object-fit: cover` and centred.
+    paragraph: 'A few frames from outside the design tools — travel, light and moments worth keeping.',
+    /* Order here is left-to-right along the scrolling strip. Every tile is
+       the same shape — roughly 306x265 at full width — and `object-fit:
+       cover`, centred, so pick photos whose subject survives a slight crop
+       top and bottom. Add as many as you like; the strip times itself from
+       its own measured width, so more photos means a longer loop, not a
+       faster one.
 
-         1. 209x213  square-ish   top-left
-         2. 209x256  portrait     bottom-left
-         3. 306x485  tall         full-height, left of centre
-         4. 216x148  landscape    top strip
-         5. 216x148  landscape    top strip
-         6. 449x321  landscape    large centre block
-         7. 306x485  tall         full-height, far right
-
-       `color` shows through until `image` is set, so unfilled slots stay
-       visible rather than collapsing. Fill in `alt` with a real
-       description whenever you add an `image`. */
+       `color` shows through until `image` is set, so an unfilled tile stays
+       visible rather than collapsing. Fill in `alt` with a real description
+       whenever you add an `image`. */
     tiles: [
       { color: '#e7d9c9', image: 'public/gallery/img1.png', alt: 'A whitewashed stone house built into a rust-coloured cliff face, prayer flags strung above it' },
       { color: '#d8c9e0', image: 'public/gallery/img2.png', alt: 'Pine branches in the foreground with a valley town half-swallowed by low cloud behind' },

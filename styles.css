@@ -264,7 +264,7 @@ p {
   margin: 0;
 }
 
-/* .hero-badge and .works-heading/.testimonials-heading/.gallery-heading are
+/* .hero-badge and .testimonials-heading/.gallery-heading are
    semantic h1/h2 elements now (for document outline and SEO), but every
    visual property — size, weight, spacing — still comes from those classes.
    This just strips the browser's default heading margin/bold/size so the
@@ -943,9 +943,8 @@ body.intro-active #heroPhotoWrap {
 }
 
 /* ==========================================================================
-   Section heading row shared by Works / Testimonials / Gallery
+   Section heading row shared by Testimonials / Gallery
    ========================================================================== */
-.works-head,
 .testimonials-head {
   display: flex;
   align-items: center;
@@ -954,7 +953,6 @@ body.intro-active #heroPhotoWrap {
   margin-bottom: clamp(40px, 6vw, 68px);
 }
 
-.works-heading,
 .testimonials-heading,
 .gallery-heading {
   font-weight: 300;
@@ -2037,7 +2035,6 @@ a.work-image:focus-visible .work-image-arrow {
     height: 15px;
   }
 
-  .works-head,
   .gallery-head {
     flex-direction: column;
     align-items: flex-start;

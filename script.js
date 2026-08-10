@@ -222,7 +222,6 @@
 
   function renderWorks() {
     document.getElementById('worksEyebrow').textContent = data.works.eyebrow;
-    document.getElementById('worksHeading').textContent = data.works.heading;
 
     var list = document.getElementById('worksList');
 
