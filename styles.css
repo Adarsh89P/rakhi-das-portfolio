@@ -144,13 +144,13 @@
 }
 
 /* ==========================================================================
-   Dark theme
+   Dark theme — currently unreachable, kept for reuse
    ==========================================================================
-   Opt-in only — set by the theme button and replayed from localStorage by
-   the inline script in <head> before first paint, so a returning visitor
-   never sees a white flash. No `prefers-color-scheme` block on purpose:
-   the portfolio should make the same first impression for everyone, and
-   dark is a choice the visitor makes.
+   Nothing sets `data-theme` any more: the theme button and its localStorage
+   replay were removed. The palette is left intact so the feature can come
+   back by restoring that control — no `prefers-color-scheme` block on
+   purpose, since the portfolio should make the same first impression for
+   everyone and dark was a choice the visitor made.
 
    Everything below is a token swap. No layout, no component rules — if a
    component needs a hardcoded colour here, that's the signal it should
@@ -212,20 +212,6 @@
   --text-paragraph: #4b525d;
   --on-ink: #ffffff;
   --hairline-soft: rgba(0, 0, 0, 0.08);
-}
-
-/* Flipping the theme changes a colour on nearly every element, and letting
-   them all snap at once reads as a flash. script.js hangs this class on
-   <html> for the length of the fade and then takes it off, so the blanket
-   `transition` only ever exists during the switch and never competes with a
-   component's own hover transitions. Skipped entirely under reduced-motion. */
-html.theme-switching *,
-html.theme-switching *::before,
-html.theme-switching *::after {
-  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity !important;
-  transition-duration: 300ms !important;
-  transition-timing-function: ease !important;
-  transition-delay: 0s !important;
 }
 
 /* ==========================================================================
@@ -558,75 +544,6 @@ section {
      shadow — it sits over the hero image and the cast shadow read as a
      hard edge against it. */
   box-shadow: none;
-}
-
-/* ==========================================================================
-   Theme button — its own capsule beside the pill
-   ==========================================================================
-   Deliberately not a fifth item inside the bar: the nav centres its logo
-   between two equal link groups, and adding one more child on the right
-   would push the wordmark off-centre. A separate control keeps that layout
-   untouched, and reads as its own affordance rather than as a nav
-   destination. Vertically centred on the pill at every breakpoint. */
-.theme-toggle {
-  pointer-events: auto;
-  position: absolute;
-  right: var(--nav-pill-inset);
-  top: calc(var(--nav-pill-top) + var(--nav-pill-h) / 2);
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink-dim);
-  transition: color var(--transition-fast), transform var(--transition-fast);
-}
-
-.theme-toggle:hover {
-  color: var(--ink);
-  transform: translateY(-50%) scale(1.06);
-}
-
-.theme-toggle svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* One button, two glyphs, crossfaded — swapping `display` would drop the
-   icon in with no transition and make the button feel like it re-rendered.
-   Both are aria-hidden; the button's own aria-label is what gets announced,
-   and script.js keeps that in step with the state. */
-.theme-toggle .icon-sun,
-.theme-toggle .icon-moon {
-  grid-area: 1 / 1;
-  transition: opacity var(--transition-base), transform var(--transition-base);
-}
-
-.theme-toggle {
-  display: inline-grid;
-  place-items: center;
-}
-
-.theme-toggle .icon-sun {
-  opacity: 0;
-  transform: rotate(-70deg) scale(0.6);
-}
-
-.theme-toggle .icon-moon {
-  opacity: 1;
-  transform: rotate(0deg) scale(1);
-}
-
-[data-theme='dark'] .theme-toggle .icon-sun {
-  opacity: 1;
-  transform: rotate(0deg) scale(1);
-}
-
-[data-theme='dark'] .theme-toggle .icon-moon {
-  opacity: 0;
-  transform: rotate(70deg) scale(0.6);
 }
 
 .nav-group {
@@ -999,12 +916,6 @@ body.intro-active #heroPhotoWrap {
 
 .hero-headline .gradient-text {
   font-weight: 500;
-}
-
-.hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .hero-photo-wrap {
@@ -2026,23 +1937,6 @@ a.work-image:focus-visible .work-image-arrow {
     left: 8px;
     top: 50%;
     transform: translateY(-50%);
-  }
-
-  /* The pill spans the row here, so the theme button lands inside it rather
-     than beside it — mirroring the hamburger at the opposite end. It drops
-     its own glass to do so: stacking a second blurred capsule on top of the
-     first only muddies both, and one pane of glass is the point. */
-  .theme-toggle {
-    right: calc(var(--nav-pill-inset) + 8px);
-    background-color: transparent;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-
-  .theme-toggle::before,
-  .theme-toggle::after {
-    content: none;
   }
 
   /* Stacked layout puts the portrait first, so the hero can no longer let it

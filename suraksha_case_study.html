@@ -26,20 +26,6 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="case-study.css">
 
-<!-- Same pre-paint theme replay as index.html — the visitor arrives here
-     from the Works section and the choice has to travel with them. Inline
-     and ahead of first paint, or a dark-mode visitor gets a white flash. -->
-<script>
-  (function () {
-    try {
-      if (window.localStorage.getItem('rakhi:theme') === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-    } catch (err) {
-      /* Storage blocked or private mode — light is the default anyway. */
-    }
-  })();
-</script>
 </head>
 <body>
 

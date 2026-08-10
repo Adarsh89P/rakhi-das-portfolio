@@ -25,7 +25,7 @@ var PORTFOLIO_DATA = {
       { label: 'About', href: '#about' }
     ],
     right: [
-      { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume_.pdf' },
+      { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume.pdf' },
       { label: 'Behance', href: 'https://www.behance.net/rakhidas1' }
     ]
   },
@@ -39,8 +39,6 @@ var PORTFOLIO_DATA = {
     headlinePre: 'I design products that feels ',
     headlineHighlight: 'simple',
     headlinePost: ', even when they are not.',
-    ctaPrimary: { label: 'Book A Call', href: '#footer' },
-    ctaSecondary: { label: 'Get Started', href: '#works' },
     photo: 'public/hero/rakhi-portrait-cutout.png',
     photoAlt: 'Rakhi Das, UI/UX Designer',
     /* The splash uses its own square, closer crop; falls back to `photo`. */

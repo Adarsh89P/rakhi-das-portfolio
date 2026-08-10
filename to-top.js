@@ -23,16 +23,18 @@
   var CONFLICT_PAD = 12;
   var ticking = false;
 
-  /* The floating button is parked in the bottom-right corner, which on a
-     phone is exactly where a full-width CTA row ends up as it scrolls past
-     — "Book A Call" in the hero and the footer's email/CV pair both land
-     under it, two tap targets stacked on the same pixels. Rather than guess
-     at safe offsets, the real rects are compared each frame and the button
-     stands down while it would sit on top of something else clickable.
+  /* The floating button is parked in the bottom-right corner, which is
+     exactly where other CTAs end up as they scroll past — the works
+     section's right-ranged "View more projects" and the footer's email/CV
+     pair both land under it, two tap targets stacked on the same pixels.
+     Rather than guess at safe offsets, the real rects are compared each
+     frame and the button stands down while it would sit on top of something
+     else clickable.
 
-     The case study has no hero CTA, so that half of the selector simply
-     matches nothing there and the footer pair still gets its clearance. */
-  var conflicts = document.querySelectorAll('.hero-cta, .footer-actions, .cs-back');
+     The case study has neither of the home page's CTAs, so those halves of
+     the selector simply match nothing there and `.cs-back` gets the same
+     clearance. */
+  var conflicts = document.querySelectorAll('.works-more, .footer-actions, .cs-back');
 
   function isBlocked() {
     /* `visibility: hidden` still lays the button out, so its box is
