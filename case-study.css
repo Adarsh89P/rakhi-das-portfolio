@@ -244,6 +244,35 @@
   border-radius: var(--radius-lg);
 }
 
+/* Two exports sharing one figure, side by side. Equal columns rather than
+   natural widths: the two shots are near-identical ratios (493x650 and
+   477x618), so equal columns land their heights within a couple of percent
+   of each other, and `stretch` + `cover` closes that last gap so the pair
+   reads as one band rather than as two images that nearly line up. */
+.cs-figure-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: clamp(16px, 2vw, 26px);
+}
+
+.cs-figure-pair img {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Side by side on a phone would put each screenshot at ~150px wide, where
+   the UI inside it is unreadable — stack them and let each have the width. */
+@media (max-width: 640px) {
+  .cs-figure-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-figure-pair img {
+    height: auto;
+  }
+}
+
 /* Empty slot: a labelled placeholder rather than a collapsed gap, so the
    layout reads correctly until the export lands. */
 .cs-placeholder {
