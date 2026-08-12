@@ -98,7 +98,10 @@
   <!-- ===================== ABOUT ===================== -->
   <section id="about" class="about" aria-labelledby="aboutEyebrow">
     <div class="container">
-      <p class="eyebrow-rule" id="aboutEyebrow"></p>
+      <!-- h2, not p: About has no other heading, so as a <p> this section was
+           absent from the document outline entirely. The reset strips heading
+           margin/size/weight, so the tag swap is invisible on screen. -->
+      <h2 class="eyebrow-rule" id="aboutEyebrow"></h2>
       <div class="about-copy" id="aboutCopy"></div>
     </div>
   </section>
@@ -106,7 +109,9 @@
   <!-- ===================== MY WORKS ===================== -->
   <section id="works" class="works" aria-labelledby="worksEyebrow">
     <div class="container">
-      <p class="eyebrow-rule" id="worksEyebrow"></p>
+      <!-- h2 for the same reason as About: the project titles below are h3,
+           so as a <p> this left the outline jumping straight from h1 to h3. -->
+      <h2 class="eyebrow-rule" id="worksEyebrow"></h2>
 
       <!-- Filled from data.works.projects by script.js: a project flagged
            `fullWidth` takes a row of its own, the rest pair up two to a

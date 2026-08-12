@@ -29,8 +29,12 @@
 
 /* The case study rides on styles.css tokens, so it inherits the theme
    automatically — except for these five page-local values, which have to
-   be restated. Same contract as the main page: opt-in, and set before
-   first paint by the inline script in the document head. */
+   be restated.
+
+   Unreachable, like the main palette in styles.css: nothing sets
+   `data-theme` since the theme toggle and its inline head script were
+   removed. Kept in step with that block so the feature can come back by
+   restoring the control alone. */
 [data-theme='dark'] {
   --cs-body-ink: #b0b6c0;
   --cs-rule: #2a303b;

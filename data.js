@@ -112,7 +112,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Jan 2023 - Sept 2023',
         description: 'Designed a centralized platform to simplify influencer–brand collaboration, from discovery and communication to payments and campaign tracking.',
         color: '#f1f2f4',
-        image: 'public/unused/chekky.png',
+        image: 'public/InfluencerMarketing/chekky.png',
         href: 'https://www.figma.com/deck/7Z5C9KMnP7e2YqW3y3xLEM/Cheeky?node-id=2-1411&t=EG6GvTgBjcCRHNGp-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
       },
       {
