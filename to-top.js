@@ -18,10 +18,12 @@
   var toTop = document.getElementById('toTop');
   if (!toTop) return;
 
+  var motion = window.SiteMotion;
+
   /* Far enough down that the button is a genuine shortcut, not clutter. */
   var TO_TOP_AFTER = 600;
   var CONFLICT_PAD = 12;
-  var ticking = false;
+  var visible = null;
 
   /* The floating button is parked in the bottom-right corner, which is
      exactly where other CTAs end up as they scroll past — the works
@@ -53,26 +55,24 @@
     return false;
   }
 
-  function update() {
-    ticking = false;
-    toTop.classList.toggle('is-visible', window.pageYOffset > TO_TOP_AFTER && !isBlocked());
+  /* Runs inside the shared frame from motion.js — this used to be a third
+     scroll listener with a rAF of its own. `&&` short-circuits, so the rect
+     comparisons in isBlocked() are skipped entirely while the button is
+     above its threshold, which is most of the page.
+
+     Resize is covered too: the shared ticker listens for it, and rotating a
+     phone re-flows the CTA rows without scrolling, which can move one into
+     or out of the button's corner. */
+  function update(scrollY) {
+    var next = scrollY > TO_TOP_AFTER && !isBlocked();
+    if (next === visible) return;
+    visible = next;
+    toTop.classList.toggle('is-visible', next);
   }
 
-  function request() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(update);
-  }
-
-  window.addEventListener('scroll', request, { passive: true });
-  /* Rotating a phone re-flows the CTA rows without scrolling, which can move
-     one into or out of the button's corner. */
-  window.addEventListener('resize', request, { passive: true });
+  motion.onFrame(update);
 
   toTop.addEventListener('click', function () {
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    window.scrollTo({ top: 0, behavior: motion.reduced ? 'auto' : 'smooth' });
   });
-
-  update();
 })();

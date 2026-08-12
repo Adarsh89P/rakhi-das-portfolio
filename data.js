@@ -42,7 +42,7 @@ var PORTFOLIO_DATA = {
     photo: 'public/hero/rakhi-portrait-cutout.png',
     photoAlt: 'Rakhi Das, UI/UX Designer',
     /* The splash uses its own square, closer crop; falls back to `photo`. */
-    introPhoto: 'public/hero/rakhi.png'
+    introPhoto: 'public/hero/rakhi-portrait-cutout.png'
   },
 
   /* A short introduction between the hero and the work, and where the nav's
@@ -80,6 +80,11 @@ var PORTFOLIO_DATA = {
       `color` backs the frame while the image loads and shows through any
       transparency, so keep it close to the artwork's own background.
 
+      `fit: 'contain'` is the escape hatch for artwork that is *not* the
+      frame's shape: it shows the whole image, letterboxed against `color`,
+      instead of cropping it to fill. Prefer re-exporting at the frame's
+      shape — this exists for the cases where the source can't be re-cut.
+
       `href` is the case study link, carried by both the title and the
       artwork — point it at a real page any time; '#' leaves the title as
       plain text and the frame as a plain div rather than linking nowhere.
@@ -111,7 +116,14 @@ var PORTFOLIO_DATA = {
         heading: 'Influencer Marketing Platform',
         dateRange: 'Jan 2023 - Sept 2023',
         description: 'Designed a centralized platform to simplify influencer–brand collaboration, from discovery and communication to payments and campaign tracking.',
-        color: '#f1f2f4',
+        /* The one artwork not authored at the frame's 1314x580: it is
+           1032x580, so `cover` had to scale it up 1.27x to fill the width
+           and lost ~21% off the top and bottom. `fit: 'contain'` shows it
+           whole instead, and `color` is the artwork's own background blue
+           so the side margins read as the composition continuing rather
+           than as empty frame. */
+        color: '#006aff',
+        fit: 'contain',
         image: 'public/InfluencerMarketing/chekky.png',
         href: 'https://www.figma.com/deck/7Z5C9KMnP7e2YqW3y3xLEM/Cheeky?node-id=2-1411&t=EG6GvTgBjcCRHNGp-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
       },

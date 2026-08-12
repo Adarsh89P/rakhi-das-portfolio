@@ -7,6 +7,7 @@ Open `index.html` in a browser and it runs.
 index.html                 Home. Structure only — all copy comes from data.js.
 suraksha_case_study.html   Case study. Self-contained content.
 
+motion.js     Motion tokens + the one shared scroll/resize frame. Both pages.
 data.js       Single source of truth for every string, link and asset path.
 script.js     Renders index.html from data.js. Home page only.
 reveal.js     Scroll-reveal. Shared by both pages.
@@ -28,15 +29,40 @@ different person or project without touching markup, styles or logic.
 **Load order in `index.html` matters:**
 
 ```html
+<script src="motion.js"></script>  <!-- defines SiteMotion; all three below use it -->
 <script src="data.js"></script>    <!-- defines PORTFOLIO_DATA -->
 <script src="script.js"></script>  <!-- builds the DOM from it -->
 <script src="reveal.js"></script>  <!-- must run last: most reveal targets -->
 <script src="to-top.js"></script>  <!-- don't exist until script.js runs -->
 ```
 
-The case study loads only `reveal.js` and `to-top.js`. It cannot load
+The case study loads `motion.js`, `reveal.js` and `to-top.js`. It cannot load
 `script.js`, which is a single pass expecting the full home-page DOM and would
 throw on this page's missing elements.
+
+## Motion
+
+`motion.js` owns two things:
+
+- **Timing tokens** (`SiteMotion.DUR`, `SiteMotion.EASE`). Durations are tiered
+  by interaction weight — `micro` 150ms for hover feedback up to `hero` 900ms
+  for the intro flight — and there are exactly two easing curves. New motion
+  should pick an existing tier rather than invent a duration.
+- **One shared frame.** `SiteMotion.onFrame(fn)` subscribes to a single
+  `scroll`/`resize`/`load` listener and a single `requestAnimationFrame`. It
+  hands the callback `(scrollY, viewportHeight)` already read.
+
+Everything scroll-driven goes through it: the about-word fade and the header
+tuck in `script.js`, and the back-to-top button in `to-top.js`. Do not add a
+`scroll` listener — subscribe instead. Callbacks must read layout before
+writing, since they share a frame with each other.
+
+Scroll *reveals* are separate and use `IntersectionObserver` (`reveal.js`),
+which is the right tool for one-shot enter detection and costs nothing per
+frame. Only genuinely scroll-*linked* motion belongs on the ticker.
+
+`SiteMotion.reduced` and `SiteMotion.touch` are live getters, not snapshots —
+re-read them at use rather than caching.
 
 **CSS is token-driven.** Everything in `styles.css` rides on the custom
 properties in `:root`. Change a token, change every component that uses it. The

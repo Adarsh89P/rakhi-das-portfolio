@@ -2,6 +2,7 @@
   'use strict';
 
   var data = window.PORTFOLIO_DATA;
+  var motion = window.SiteMotion;
 
   var SOCIAL_ICONS = {
     twitter: { color: '#0088ff', rotate: '10deg', path: '<path d="M18.9 3H21l-6.53 7.46L22.5 21h-6.9l-4.8-6.27L4.6 21H2.5l7-8L2 3h7.06l4.34 5.73L18.9 3Zm-1.2 16h1.15L7.36 4.9H6.1L17.7 19Z"/>' },
@@ -39,7 +40,9 @@
     }
 
     if (!fill.image) return;
-    var img = el('img', 'tile-img');
+    /* `contain` shows artwork that isn't the frame's shape in full rather
+       than cropping it to fill — the letterbox falls back to `fill.color`. */
+    var img = el('img', fill.fit === 'contain' ? 'tile-img is-contain' : 'tile-img');
     img.src = fill.image;
     img.alt = altText || '';
     img.loading = 'lazy';
@@ -69,7 +72,7 @@
     /* Reduced motion gets the poster frame and a set of controls instead of
        a loop that starts on its own — the preview stays available, it just
        stops being something that moves without being asked. */
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (motion.reduced) {
       video.controls = true;
       video.removeAttribute('aria-hidden');
       video.setAttribute('aria-label', altText || '');
@@ -298,17 +301,22 @@
     var words = Array.prototype.slice.call(copy.querySelectorAll('.about-word'));
     if (!words.length) return;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (motion.reduced) {
       words.forEach(function (word) { word.style.opacity = '1'; });
       return;
     }
 
-    var queued = false;
+    /* Last value written per word. The paint below used to assign
+       `style.opacity` on all ~110 words every single frame, even though a
+       frame of ordinary scrolling only moves the lit edge across two or
+       three of them — the rest were re-assigned their existing value, and
+       each assignment still dirties the element for style recalc. Caching
+       the written string turns a full-list write into a handful. */
+    var painted = new Array(words.length);
+    var lastProgress = -1;
 
-    function paint() {
-      queued = false;
+    function paint(scrollY, viewport) {
       var box = copy.getBoundingClientRect();
-      var viewport = window.innerHeight || document.documentElement.clientHeight;
 
       /* 0 when the block's top is still at 85% of the viewport height, 1 once
          it has risen to 35% — a band tall enough that the last word lands
@@ -318,24 +326,25 @@
       var progress = (start - box.top) / (start - end);
       progress = Math.max(0, Math.min(1, progress));
 
+      /* Fully lit or fully dim and already painted that way: the block is
+         off the band entirely (usually because it's far off screen), so
+         there is nothing to update. */
+      if (progress === lastProgress) return;
+      lastProgress = progress;
+
       /* Spread over the word count with a one-word-wide ramp, so the light
          travels through the text instead of the whole block stepping at once. */
       var head = progress * (words.length + 1);
-      words.forEach(function (word, index) {
-        var lit = Math.max(0, Math.min(1, head - index));
-        word.style.opacity = (0.18 + lit * 0.82).toFixed(3);
-      });
+      for (var i = 0; i < words.length; i++) {
+        var lit = Math.max(0, Math.min(1, head - i));
+        var value = (0.18 + lit * 0.82).toFixed(3);
+        if (painted[i] === value) continue;
+        painted[i] = value;
+        words[i].style.opacity = value;
+      }
     }
 
-    function request() {
-      if (queued) return;
-      queued = true;
-      window.requestAnimationFrame(paint);
-    }
-
-    window.addEventListener('scroll', request, { passive: true });
-    window.addEventListener('resize', request);
-    request();
+    motion.onFrame(paint);
   }
 
   /* -----------------------------------------------------------
@@ -627,6 +636,15 @@
     var introPortrait = document.getElementById('introPortrait');
     var finalLogo = document.getElementById('logo');
     var finalPhotoWrap = document.getElementById('heroPhotoWrap');
+    /* The wrap is the fade target (it's what the intro-active rule holds at
+       opacity 0), but it is NOT the flight target: it's a flex container that
+       fills its grid column, while the visible artwork inside is capped at
+       405px — and at 300px below 900px wide. Measuring the wrap made the
+       portrait fly to the column's width, which happens to equal the photo's
+       on desktop (ratio 1.001, why this went unnoticed) but overshoots by
+       2.4x at 768px and 1.14x at 390px, so the crossfade snapped the portrait
+       down to size. Geometry comes from the photo; opacity stays on the wrap. */
+    var finalPhoto = finalPhotoWrap && finalPhotoWrap.querySelector('.hero-photo');
 
     if (!overlay || !introBrand || !introPortrait || !finalLogo || !finalPhotoWrap) return;
 
@@ -667,7 +685,7 @@
        from a case study, where a full-screen splash would hijack the jump
        they actually asked for; or the splash already played in this tab, so
        it has done its job as a first impression. */
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduceMotion = motion.reduced;
     var deepLinked = window.location.hash.length > 1;
     /* A reload restores the previous scroll offset, so the page can already
        be at "My Works" before a single frame is drawn. A full-screen splash
@@ -686,10 +704,11 @@
     var ENTRANCE_DONE = 1400; /* matches the intro-portrait CSS entrance duration */
     /* Kept deliberately short: the whole point of the splash is the handoff,
        and every extra millisecond is another millisecond the page is frozen
-       under an opaque overlay waiting on it. */
-    var MOVE_MS = 900;
+       under an opaque overlay waiting on it. Values come from the shared
+       motion tokens so the flight stays in step with the rest of the site. */
+    var MOVE_MS = motion.DUR.hero;
     var CROSSFADE_MS = 380;
-    var EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    var EASE = motion.EASE.soft;
     var armed = false;
     var fired = false;
     var finished = false;
@@ -716,7 +735,7 @@
       var brandY = (brandTo.top + brandTo.height / 2) - (brandFrom.top + brandFrom.height / 2);
 
       var photoFrom = introPortrait.getBoundingClientRect();
-      var photoTo = finalPhotoWrap.getBoundingClientRect();
+      var photoTo = (finalPhoto || finalPhotoWrap).getBoundingClientRect();
       var photoScale = photoTo.width / photoFrom.width;
       var photoX = (photoTo.left + photoTo.width / 2) - (photoFrom.left + photoFrom.width / 2);
       var photoY = (photoTo.top + photoTo.height / 2) - (photoFrom.top + photoFrom.height / 2);
@@ -786,14 +805,16 @@
       finalPhotoWrap.style.transition = 'none';
       finalPhotoWrap.style.opacity = '1';
       unlockScroll();
-      window.removeEventListener('scroll', onIntroScroll);
+      if (stopIntroWatch) stopIntroWatch();
     }
 
-    function onIntroScroll() {
-      if (window.pageYOffset > 4) finish();
-    }
-
-    window.addEventListener('scroll', onIntroScroll, { passive: true });
+    /* Escape hatch, on the shared frame: if a scroll slips past the lock
+       (iOS momentum, a focus jump, an extension) the flight is abandoned
+       rather than left stranded over the wrong section. Unsubscribes itself
+       in finish(). */
+    var stopIntroWatch = motion.onFrame(function (scrollY) {
+      if (scrollY > 4) finish();
+    });
 
     function advance() {
       if (armed) morph();
@@ -827,7 +848,7 @@
     navToggle.setAttribute('aria-label', 'Open navigation menu');
     /* Put the bar back under scroll's control. Sits here rather than on the
        toggle's click so Escape and outside-clicks are covered too. */
-    updateScrollChrome();
+    motion.refresh();
   }
 
   function openMenu() {
@@ -836,7 +857,7 @@
     navToggle.setAttribute('aria-label', 'Close navigation menu');
     /* The drawer lives inside the header — if the header is tucked away,
        the menu would open off-screen. */
-    updateScrollChrome();
+    motion.refresh();
   }
 
   navToggle.addEventListener('click', function () {
@@ -868,25 +889,22 @@
   var siteHeader = document.getElementById('siteHeader');
   /* Past the bar's own height, so the very top of the page never flickers. */
   var HIDE_AFTER = 100;
-  var headerTicking = false;
+  var headerHidden = null;
 
-  function updateScrollChrome() {
-    headerTicking = false;
-
+  /* Runs inside the shared frame (motion.js) rather than owning a scroll
+     listener and a rAF of its own. `scrollY` is handed in already read. */
+  function updateScrollChrome(scrollY) {
     /* The drawer is a child of the header, so hiding it would drag an open
        menu off-screen with it. */
-    var scrolledAway = window.pageYOffset > HIDE_AFTER && !navMenu.classList.contains('open');
+    var scrolledAway = scrollY > HIDE_AFTER && !navMenu.classList.contains('open');
+    /* classList.toggle with the same value is cheap but not free, and this
+       runs every frame of every scroll — only touch the DOM on a change. */
+    if (scrolledAway === headerHidden) return;
+    headerHidden = scrolledAway;
     siteHeader.classList.toggle('is-hidden', scrolledAway);
   }
 
-  function requestScrollChrome() {
-    if (headerTicking) return;
-    headerTicking = true;
-    window.requestAnimationFrame(updateScrollChrome);
-  }
-
-  window.addEventListener('scroll', requestScrollChrome, { passive: true });
-  updateScrollChrome();
+  motion.onFrame(updateScrollChrome);
 
   /* Scroll reveal used to live here, and the back-to-top button with it.
      Both moved to files of their own (reveal.js, to-top.js) so the case

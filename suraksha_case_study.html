@@ -330,7 +330,9 @@
 </button>
 
 <!-- The two behaviours both pages share. script.js renders the home page
-     from data.js and has no business here. -->
+     from data.js and has no business here. motion.js comes first: both of
+     the files below read window.SiteMotion. -->
+<script src="motion.js"></script>
 <script src="reveal.js"></script>
 <script src="to-top.js"></script>
 

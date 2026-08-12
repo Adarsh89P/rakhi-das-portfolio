@@ -92,7 +92,7 @@
      reduced-motion request and any browser without IntersectionObserver —
      in either case the content must end up visible, never stuck at 0. */
   if (
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    window.SiteMotion.reduced ||
     !('IntersectionObserver' in window)
   ) {
     targets.forEach(function (target) {

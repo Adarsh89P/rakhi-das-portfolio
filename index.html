@@ -213,6 +213,9 @@
 
 <script type="application/ld+json" id="personSchema"></script>
 
+<!-- Motion tokens + the single shared scroll/resize frame. Must be first:
+     script.js, reveal.js and to-top.js all read window.SiteMotion. -->
+<script src="motion.js"></script>
 <script src="data.js"></script>
 <script src="script.js"></script>
 <!-- After script.js: most reveal targets are built from data.js and don't

@@ -1307,11 +1307,16 @@ a.work-image:hover .work-image-fill {
 }
 
 /* The scale is not decoration: it oversizes the image so the blur samples
-   real pixels at the edges instead of fading into the frame's corners. */
+   real pixels at the edges instead of fading into the frame's corners.
+
+   Both start values are custom properties so the phone breakpoint can dial
+   them back (see "Motion on small screens" in the Responsive section). The
+   end state is fixed at scale(1)/blur(0) either way, so this only changes
+   how the artwork arrives — never where it lands. */
 @keyframes work-media-in {
   from {
-    transform: scale(1.14);
-    filter: blur(18px);
+    transform: scale(var(--media-scale, 1.14));
+    filter: blur(var(--media-blur, 18px));
   }
   to {
     transform: scale(1);
@@ -1339,6 +1344,14 @@ a.work-image:hover .work-image-fill {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Set by `fit: 'contain'` in data.js, for artwork that wasn't authored at
+   the frame's aspect. The whole image is shown and the frame's own `color`
+   fills what's left, so the margins have to be the artwork's background
+   colour to read as one composition. */
+.tile-img.is-contain {
+  object-fit: contain;
 }
 
 /* Hidden until hover, then eases in — the "view project" affordance. */
@@ -2091,5 +2104,33 @@ a.work-image:focus-visible .work-image-arrow {
 
   .footer-actions .btn {
     width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Motion on small screens
+   ==========================================================================
+   Not a smaller copy of the desktop motion — the same moments, given less
+   room to travel. Every rule here changes only how an element *arrives*; the
+   resting state is identical at every width, so nothing about the layout or
+   the design shifts.
+   ========================================================================== */
+@media (max-width: 640px) {
+  /* 24px of lift is read against the viewport, not against the page: on a
+     ~640px-tall phone that is a noticeably longer journey than on a desktop,
+     and the extra distance buys nothing once the element is already most of
+     the way up the screen. */
+  [data-reveal] {
+    --reveal-y: 16px;
+  }
+
+  /* The artwork's blur settle is the single most expensive frame the site
+     draws: an 18px blur across a full-bleed image is a large offscreen
+     buffer, and phone GPUs pay for it in a way desktops don't. Dialled back
+     far enough to cost meaningfully less while still reading as a settle
+     rather than a fade — the end state (scale 1, blur 0) is untouched. */
+  .work-item {
+    --media-blur: 10px;
+    --media-scale: 1.08;
   }
 }
