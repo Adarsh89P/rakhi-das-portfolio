@@ -12,6 +12,7 @@ data.js       Single source of truth for every string, link and asset path.
 script.js     Renders index.html from data.js. Home page only.
 reveal.js     Scroll-reveal. Shared by both pages.
 to-top.js     Back-to-top button. Shared by both pages.
+banner.js     Layered parallax for the case study banner. Case study only.
 
 styles.css      Design tokens + every shared component. Loaded by both pages.
 case-study.css  Only what the case study adds on top.
@@ -63,6 +64,34 @@ frame. Only genuinely scroll-*linked* motion belongs on the ticker.
 
 `SiteMotion.reduced` and `SiteMotion.touch` are live getters, not snapshots —
 re-read them at use rather than caching.
+
+### The case study banner
+
+The Suraksha banner is **four separate layers**, not one image, so each part
+can carry its own entrance and parallax rate:
+
+| `public/Surksha/banner/` | part | depth |
+|---|---|---|
+| `dash.png` | admin dashboard | 0.35 |
+| `table.png` | right-hand table | 0.55 |
+| `card.png` | patient card | 0.70 |
+| `phone.png` | three phones | 1.00 |
+
+`depth` is the multiplier on pointer travel, set via `data-depth` in the
+markup — so the phones move ~3x as far as the dashboard while the navy plate
+behind them only tilts. Layer positions are percentages of the 1540x603
+artboard, taken from the Figma node coordinates; entrance and drift distances
+use `cqw` so they scale with the plate instead of being fixed pixel nudges.
+
+The layers were exported from the Figma source (file `V7feJrAACXgVDCnTonWlQf`,
+node `2189:1444`), keyed off that file's flat background, and cropped to their
+artwork. `table.png` was cut from the original flat banner instead — the Figma
+plan's tool-call limit was reached before it could be exported, and nothing
+overlaps it there, so the cut is lossless.
+
+`public/works/Frame 21.png` is the original flat banner. **Nothing references
+it any more.** It is kept as the provenance of `table.png` and as a fallback;
+delete it if you don't want the 251KB.
 
 **CSS is token-driven.** Everything in `styles.css` rides on the custom
 properties in `:root`. Change a token, change every component that uses it. The

@@ -49,8 +49,50 @@
       <li class="cs-tag">Diagnosis &amp; Treatment</li>
     </ul>
 
-    <figure class="cs-figure">
-      <img src="public/works/Frame%2021.png" alt="The Suraksha product suite — admin dashboard, patient record and three mobile app screens" width="1540" height="603">
+    <!-- The banner is a depth stage rather than one flat image. Its four
+         parts were exported as separate layers from the Figma source, so each
+         can carry its own entrance and its own parallax rate.
+
+         Geometry is in percentages of the 1540x603 artboard, taken from the
+         Figma node positions, so the stack reflows with the page and stays
+         registered at every width.
+
+         Nesting exists so nothing shares a `transform`:
+           .cs-figure       the translateY reveal.js writes
+           .cs-banner-tilt  JS pointer tilt for the whole plate (the
+                            "background barely moves" layer)
+           .cs-lyr          JS per-layer parallax offset
+           .cs-phone-float  the phones' continuous drift
+           .cs-lyr-art      the staggered entrance
+
+         The layers are one picture, so the accessible name lives on the plate
+         and the individual images are decorative. -->
+    <figure class="cs-figure cs-banner" data-stage>
+      <div class="cs-banner-tilt">
+        <div class="cs-banner-plate" role="img"
+             aria-label="The Suraksha product suite — admin dashboard, patient record and three mobile app screens">
+
+          <div class="cs-lyr" data-depth="0.35" style="--l:7.3377%;--t:32.3383%;--w:55.1948%">
+            <img class="cs-lyr-art cs-art-dash" src="public/Surksha/banner/dash.png" alt="" width="1700" height="816" fetchpriority="high" decoding="async">
+          </div>
+
+          <div class="cs-lyr" data-depth="0.55" style="--l:88.3117%;--t:0%;--w:11.6883%">
+            <img class="cs-lyr-art cs-art-table" src="public/Surksha/banner/table.png" alt="" width="180" height="253" decoding="async">
+          </div>
+
+          <div class="cs-lyr" data-depth="0.7" style="--l:8.1169%;--t:26.6998%;--w:26.7532%">
+            <img class="cs-lyr-art cs-art-card" src="public/Surksha/banner/card.png" alt="" width="824" height="883" decoding="async">
+          </div>
+
+          <div class="cs-lyr" data-depth="1" style="--l:56.9481%;--t:45.4395%;--w:27.4351%">
+            <div class="cs-phone-float">
+              <img class="cs-lyr-art cs-art-phone" src="public/Surksha/banner/phone.png" alt="" width="845" height="658" decoding="async">
+            </div>
+          </div>
+
+        </div>
+        <span class="cs-banner-sheen" aria-hidden="true"></span>
+      </div>
     </figure>
   </header>
 
@@ -335,6 +377,9 @@
 <script src="motion.js"></script>
 <script src="reveal.js"></script>
 <script src="to-top.js"></script>
+<!-- After reveal.js: the banner waits on the `.in-view` that file adds
+     before releasing its idle drift. -->
+<script src="banner.js"></script>
 
 </body>
 </html>

@@ -369,3 +369,259 @@
     padding: 28px;
   }
 }
+
+
+/* ==========================================================================
+   Suraksha banner — layered depth stage
+   ==========================================================================
+   The banner is four separate layers exported from the Figma source
+   (2189:1444 "Frame 21"), not one flat image, so each part can carry its own
+   entrance and its own parallax rate:
+
+     dash.png   the admin dashboard   depth 0.35
+     table.png  the right-hand table  depth 0.55
+     card.png   the patient card      depth 0.70
+     phone.png  the three phones      depth 1.00
+
+   Depth is the multiplier on pointer travel, so the phones move roughly three
+   times as far as the dashboard and the navy plate behind them barely moves
+   at all — the ordering asked for in the brief.
+
+   Layer geometry is a percentage of the 1540x603 artboard, straight from the
+   Figma node positions. Percentages rather than pixels because the plate
+   scales with the column: the stack has to stay registered at every width.
+
+   Distances use cqw (1% of the plate's own width) for the same reason. A
+   fixed 80px nudge is a tenth of the plate on desktop and half of it on a
+   phone; in cqw the entrance keeps its proportions everywhere.
+   ========================================================================== */
+.cs-banner {
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+}
+
+/* The banner is the page's opening image and earns more travel and a longer
+   curve than a body figure. Tuned through reveal.js's own custom properties
+   so this element still has exactly one transform and nothing conflicts. */
+.cs-banner[data-reveal] {
+  --reveal-y: 40px;
+  transition:
+    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cs-banner-tilt {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* While the pointer is moving, follow it closely; the long curve above is for
+   the release, which is what carries the weight. */
+.cs-banner[data-tracking] .cs-banner-tilt {
+  transition: transform 120ms linear;
+}
+
+/* The plate: the navy field the layers sit on, holding the artboard ratio so
+   the percentage geometry resolves against a box of the right shape. */
+.cs-banner-plate {
+  position: relative;
+  aspect-ratio: 1540 / 603;
+  background-color: #001164;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  container-type: inline-size;
+  box-shadow:
+    0 18px 50px rgba(0, 8, 40, 0.28),
+    0 4px 14px rgba(0, 8, 40, 0.18);
+}
+
+/* One positioned box per layer. It owns the parallax offset only — the
+   entrance lives on the image inside, so the two never overwrite each other. */
+.cs-lyr {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--w);
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cs-banner[data-tracking] .cs-lyr {
+  transition: transform 140ms linear;
+}
+
+.cs-lyr-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* .cs-figure img rounds every figure image; these are cut-outs sitting on
+     the plate, and the plate already carries the radius. */
+  border-radius: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Entrance. Held at the start state until reveal.js marks the banner in view,
+   then played in the reading order of the composition: the dashboard arrives,
+   the table slides in behind it, the patient card rises last.
+
+   Curves follow the brief's spring parameters. stiffness 70 / damping 18 is
+   just overdamped (zeta about 1.08), so the dashboard and table settle without
+   overshoot and a plain expo-out is the faithful translation. The card's
+   80 / 16 is underdamped (zeta about 0.89), so that one gets a small overshoot
+   keyframe rather than a pure ease.
+   -------------------------------------------------------------------------- */
+.cs-banner .cs-lyr-art {
+  opacity: 0;
+}
+
+.cs-banner.in-view .cs-art-dash {
+  animation: cs-in-dash 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cs-banner.in-view .cs-art-table {
+  animation: cs-in-table 1000ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+}
+
+.cs-banner.in-view .cs-art-card {
+  animation: cs-in-card 850ms cubic-bezier(0.22, 1, 0.36, 1) 350ms both;
+}
+
+.cs-banner.in-view .cs-art-phone {
+  animation: cs-in-phone 900ms cubic-bezier(0.16, 1, 0.3, 1) 450ms both;
+}
+
+@keyframes cs-in-dash {
+  from { opacity: 0; transform: translate3d(5.19cqw, 2.6cqw, 0) scale(0.95); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes cs-in-table {
+  from { opacity: 0; transform: translate3d(7.79cqw, 0, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* The one underdamped spring in the set: a small overshoot before it settles. */
+@keyframes cs-in-card {
+  0%   { opacity: 0; transform: translate3d(0, 3.25cqw, 0) scale(0.9); }
+  72%  { opacity: 1; transform: translate3d(0, -0.28cqw, 0) scale(1.008); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes cs-in-phone {
+  from { opacity: 0; transform: translate3d(0, 2.2cqw, 0) scale(0.97); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   The phones keep drifting after they land — the only continuous motion on
+   the page. Its own box so it never contends with the entrance above it or
+   the parallax offset above that. Starts and ends at zero rotation so the
+   handoff from the entrance is seamless.
+   -------------------------------------------------------------------------- */
+.cs-phone-float {
+  animation: cs-phone-drift 5s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.cs-banner[data-entered] .cs-phone-float {
+  animation-play-state: running;
+}
+
+@keyframes cs-phone-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(0, -0.65cqw, 0) rotate(0.6deg); }
+}
+
+/* A highlight raked across the plate, following the pointer — it reads as a
+   surface catching light rather than a picture. Never eats a click. */
+.cs-banner-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  background: radial-gradient(
+    38% 60% at var(--sheen-x, 50%) var(--sheen-y, 50%),
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 42%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+
+.cs-banner[data-tracking] .cs-banner-sheen {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Small screens. There is no pointer to track, so banner.js skips the tilt
+   and the parallax entirely; the drift stays because it is ambient, at
+   reduced travel. The entrance keeps its stagger — it is the moment that
+   tells the story of the composition — but travels less far.
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .cs-banner-plate {
+    box-shadow:
+      0 10px 28px rgba(0, 8, 40, 0.24),
+      0 3px 10px rgba(0, 8, 40, 0.16);
+  }
+
+  @keyframes cs-in-dash {
+    from { opacity: 0; transform: translate3d(3cqw, 1.5cqw, 0) scale(0.97); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes cs-in-table {
+    from { opacity: 0; transform: translate3d(4.5cqw, 0, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+
+  @keyframes cs-in-card {
+    0%   { opacity: 0; transform: translate3d(0, 2cqw, 0) scale(0.94); }
+    72%  { opacity: 1; transform: translate3d(0, -0.16cqw, 0) scale(1.005); }
+    100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes cs-phone-drift {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%      { transform: translate3d(0, -0.4cqw, 0) rotate(0.35deg); }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: the composition still assembles, it just does not travel.
+   Layers fade in place, in the same order, so the reading sequence survives;
+   nothing slides, drifts or tilts. The plate keeps its shadow, which is depth
+   rather than motion.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .cs-banner-tilt,
+  .cs-lyr {
+    transform: none;
+  }
+
+  .cs-phone-float,
+  .cs-banner[data-entered] .cs-phone-float {
+    animation: none;
+  }
+
+  .cs-banner-sheen {
+    display: none;
+  }
+
+  /* Opacity only — no transform, no scale. The global reduced-motion rule in
+     styles.css collapses the durations, so these land immediately. */
+  .cs-banner.in-view .cs-art-dash,
+  .cs-banner.in-view .cs-art-table,
+  .cs-banner.in-view .cs-art-card,
+  .cs-banner.in-view .cs-art-phone {
+    animation-name: cs-in-fade;
+  }
+
+  @keyframes cs-in-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
