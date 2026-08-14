@@ -1,627 +1,1288 @@
 /* ==========================================================================
-   Suraksha case study — page-specific styles.
+   Suraksha case study — editorial product-design layout
+   ==========================================================================
+   Loaded *after* styles.css, which supplies the font, the ink tokens, the
+   button component and the whole footer. Only what this page adds lives here.
 
-   Loaded *after* styles.css, which supplies the font, the ink/gradient
-   tokens and the whole footer component. Only what this page adds lives
-   here. Geometry comes from the Figma frame (2189:1339, 1920x11139):
-   two centred columns — 1540px for full-bleed imagery, 1016px for reading
-   copy — expressed as max-widths so the page reflows on narrow screens
-   instead of scaling as one fixed canvas.
+   The page is built on one 12-column grid at a 1280px measure. Sections
+   choose a span rather than each inventing its own centred width, so the
+   left edge of a heading, a paragraph and a screenshot all land on the same
+   line down the entire page. That single alignment is what separates an
+   editorial case study from a stack of centred blocks.
+
+   Type is a fixed scale, not per-component clamps: one hero step, one
+   section step, one feature step, one body step, one caption step. Every
+   heading on the page is one of those five.
    ========================================================================== */
 :root {
-  --cs-wide: 1540px;
-  --cs-col: 1016px;
-  --cs-body-ink: #494949;
-  --cs-rule: #d4d4d4;
-  --cs-surface: #f4f4f4;
-  --cs-placeholder-rule: #c9c9c9;
-  --cs-placeholder-ink: #9a9a9a;
+  --cs-max: 1280px;
+  --cs-gutter: clamp(20px, 4vw, 56px);
+  --cs-col-gap: clamp(18px, 2vw, 32px);
 
-  /* Figma sizes at the 1920 canvas, floored so they stay readable on
-     phones. The upper bound is the design value in every case. */
-  --cs-fs-hero: clamp(2rem, 3.5vw, 56px);
-  --cs-fs-hero-sub: clamp(1.05rem, 1.5vw, 24px);
-  --cs-fs-eyebrow: clamp(1.25rem, 1.75vw, 28px);
-  --cs-fs-heading: clamp(1.5rem, 2.25vw, 36px);
-  --cs-fs-body: clamp(1rem, 1.5vw, 24px);
-  --cs-fs-item: clamp(0.95rem, 1vw, 16px);
+  /* Palette. The navy is the product's own — sampled from the banner plate
+     in the Figma source — and the blue is its lighter working tint, used
+     only for emphasis and never as the sole carrier of meaning. */
+  --cs-navy: #001164;
+  --cs-navy-2: #0a1f7a;
+  --cs-blue: #1a45d0;
+  --cs-blue-wash: #eef1fe;
+  --cs-blue-line: #d3dbfa;
+
+  --cs-ink: #0a0c12;
+  --cs-ink-2: #3c4250;
+  --cs-ink-3: #5c6373;
+  --cs-line: #e3e5ea;
+  --cs-line-soft: #eef0f3;
+  --cs-surface: #f7f8fa;
+  --cs-surface-2: #f1f3f7;
+
+  /* Type scale — six steps, phone floor to desktop ceiling. Floors are the
+     brief's mobile targets: hero 40, section 30, feature 25, body 16,
+     caption 13, label 12.
+
+     Anchored in px, not rem, on purpose. styles.css scales the root itself
+     (`font-size: clamp(15px, 14.1px + 0.28vw, 17px)`), so a rem floor is not
+     a floor: 0.75rem lands at 11.4px on a 375px phone, under the 12px legibility
+     minimum, and `1rem` body copy lands at 15.2px rather than the 16px iOS
+     needs to not auto-zoom a form. px floors hold regardless of what the root
+     is doing; the vw term still gives the scale its desktop growth. */
+  --cs-fs-hero: clamp(40px, 4.4vw, 68px);
+  --cs-fs-section: clamp(30px, 3vw, 44px);
+  --cs-fs-feature: clamp(25px, 2.1vw, 32px);
+  --cs-fs-lead: clamp(18px, 16.5px + 0.4vw, 22px);
+  --cs-fs-body: clamp(16px, 15px + 0.22vw, 18px);
+  --cs-fs-caption: clamp(13px, 12.2px + 0.12vw, 14px);
+  --cs-fs-label: clamp(12px, 11.6px + 0.05vw, 13px);
+
+  --cs-nav-h: 68px;
+  --cs-radius: 16px;
+  --cs-radius-sm: 10px;
+
+  --cs-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* The case study rides on styles.css tokens, so it inherits the theme
-   automatically — except for these five page-local values, which have to
-   be restated.
-
-   Unreachable, like the main palette in styles.css: nothing sets
-   `data-theme` since the theme toggle and its inline head script were
-   removed. Kept in step with that block so the feature can come back by
-   restoring the control alone. */
+/* Unreachable while nothing sets `data-theme` — the toggle and its inline
+   head script were removed — but kept in step with the main palette in
+   styles.css so the feature can come back by restoring the control alone. */
 [data-theme='dark'] {
-  --cs-body-ink: #b0b6c0;
-  --cs-rule: #2a303b;
-  --cs-surface: #171b23;
-  --cs-placeholder-rule: #39404c;
-  --cs-placeholder-ink: #79808b;
-}
-
-/* The before/after cards keep their pastel fills in both themes — same
-   situation as .exp-card on the home page, so the same fix: re-point the
-   text tokens on the card itself rather than let dark mode put near-white
-   copy on a pale pink panel. */
-[data-theme='dark'] .cs-ba-card {
-  --ink: #12151c;
-  --ink-dim: #414852;
-  --cs-body-ink: #4b525d;
+  --cs-ink: #f2f4f8;
+  --cs-ink-2: #c2c8d4;
+  --cs-ink-3: #98a0b0;
+  --cs-line: #262b36;
+  --cs-line-soft: #1d222b;
+  --cs-surface: #12151c;
+  --cs-surface-2: #171b23;
+  --cs-blue-wash: #131a3a;
+  --cs-blue-line: #24306b;
 }
 
 /* --------------------------------------------------------------------------
-   Shell
+   Local reset
+   --------------------------------------------------------------------------
+   styles.css zeroes h1-h6 and strips `ul` markers, but the home page uses no
+   description lists and no ordered lists, so the UA defaults for those two
+   were never dealt with. This page leans on both: `dl` for every label/value
+   pair (metadata, overview cards, feature notes, responsive tiers) because
+   the term/definition relationship survives a screen reader, and `ol` where
+   the order is the meaning. Left alone, `dd` inherits a 40px indent that
+   knocks every value out of alignment with its own label, and `ol` renders
+   a native marker on top of the numbers the design already draws.
+   -------------------------------------------------------------------------- */
+.cs-page dd,
+.cs-drawer dd {
+  margin-inline-start: 0;
+}
+
+/* Both halves matter: `list-style` alone leaves the UA's 40px
+   `padding-inline-start`, which knocks the outcome grid and the drawer's
+   section list out of line with the headings above them. */
+.cs-page ol,
+.cs-drawer ol {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Grid primitives
    -------------------------------------------------------------------------- */
 .cs-page {
-  padding-top: 96px;
-  padding-bottom: 120px;
+  padding-top: var(--cs-nav-h);
 }
 
-.cs-wide,
-.cs-col {
+.cs-shell {
   width: 100%;
+  max-width: calc(var(--cs-max) + 2 * var(--cs-gutter));
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 48px);
+  padding-inline: var(--cs-gutter);
 }
 
-.cs-wide {
-  max-width: calc(var(--cs-wide) + 2 * clamp(20px, 4vw, 48px));
+.cs-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--cs-col-gap);
 }
 
-.cs-col {
-  max-width: calc(var(--cs-col) + 2 * clamp(20px, 4vw, 48px));
+/* Column spans. Below 900px everything collapses to one column — a 12-column
+   grid on a phone is a 12-column grid pretending, and the honest single
+   column reads better. */
+.sp-4 { grid-column: span 4; }
+.sp-5 { grid-column: span 5; }
+.sp-6 { grid-column: span 6; }
+.sp-7 { grid-column: span 7; }
+.sp-8 { grid-column: span 8; }
+.sp-12 { grid-column: span 12; }
+
+@media (max-width: 900px) {
+  .sp-4, .sp-5, .sp-6, .sp-7, .sp-8 { grid-column: span 12; }
 }
 
-/* A single back affordance to the portfolio — the case study is reached
-   from the Works section and needs a way home. */
-.cs-back {
+/* Every section pays the same vertical rhythm, and every section is an
+   anchor target, so each reserves the sticky bar's height plus a breath. */
+.cs-sec {
+  position: relative;
+  padding-block: clamp(64px, 7.5vw, 120px);
+  scroll-margin-top: calc(var(--cs-nav-h) + 12px);
+}
+
+/* The divider between sections, inset to the content column rather than run
+   across the section's full padding box. A `border-top` would sit at the
+   shell's outer edge — 56px wider than everything it separates on desktop,
+   which reads as a near-miss against the grid rather than as a rule. */
+.cs-sec + .cs-sec::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--cs-gutter);
+  right: var(--cs-gutter);
+  height: 1px;
+  background-color: var(--cs-line-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   -------------------------------------------------------------------------- */
+.cs-kicker {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 40px;
-  font-size: 1rem;
-  font-weight: 300;
-  color: var(--ink-dim);
-  transition: color var(--transition-fast), transform var(--transition-fast);
-}
-
-.cs-back:hover {
-  color: var(--ink);
-  transform: translateX(-3px);
-}
-
-.cs-back svg {
-  width: 16px;
-  height: 12px;
-}
-
-/* --------------------------------------------------------------------------
-   Hero
-   -------------------------------------------------------------------------- */
-.cs-hero-title {
-  font-weight: 500;
-  font-size: var(--cs-fs-hero);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-bottom: 42px;
-}
-
-.cs-hero-sub {
-  font-weight: 400;
-  font-size: var(--cs-fs-hero-sub);
-  line-height: 1.5;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  max-width: 1149px;
-}
-
-/* Three 263x49 pills, 14px apart in Figma. */
-.cs-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 45px;
-}
-
-.cs-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 263px;
-  height: 49px;
-  padding-inline: 10px;
-  border: 1px solid var(--ink);
-  border-radius: var(--radius-pill);
-  font-weight: 400;
-  font-size: 1rem;
-  color: var(--ink);
-}
-
-/* --------------------------------------------------------------------------
-   Sections
-   -------------------------------------------------------------------------- */
-.cs-section {
-  margin-top: clamp(48px, 6vw, 100px);
-}
-
-/* Eyebrow + the 51px rule that sits under every section label. */
-.cs-eyebrow {
-  font-weight: 400;
-  font-size: var(--cs-fs-eyebrow);
-  line-height: 1.2;
-  color: var(--ink);
-  margin-bottom: 17px;
-}
-
-.cs-eyebrow::after {
-  content: '';
-  display: block;
-  width: 51px;
-  height: 1px;
-  margin-top: 17px;
-  background-color: var(--ink);
-}
-
-.cs-heading {
-  font-weight: 400;
-  font-size: var(--cs-fs-heading);
-  line-height: 1.3;
-  color: var(--ink);
-  max-width: 936px;
-  margin-top: 32px;
-}
-
-.cs-body {
-  font-weight: 400;
-  font-size: var(--cs-fs-body);
-  line-height: 1.5;
-  color: var(--cs-body-ink);
-  max-width: 857px;
-  margin-top: 32px;
-}
-
-.cs-body strong {
+  font-size: var(--cs-fs-label);
   font-weight: 600;
-  color: var(--cs-body-ink);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cs-blue);
+}
+
+.cs-kicker::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background-color: currentColor;
+}
+
+/* The section label doubles as the scrollspy target's name, so it carries
+   the number the sticky nav counts by. */
+.cs-sec-label {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cs-blue);
+  margin-bottom: 20px;
+}
+
+.cs-h2 {
+  font-size: var(--cs-fs-section);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--cs-ink);
+  text-wrap: balance;
+}
+
+.cs-h3 {
+  font-size: var(--cs-fs-feature);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--cs-ink);
 }
 
 .cs-lead {
+  font-size: var(--cs-fs-lead);
+  line-height: 1.5;
+  color: var(--cs-ink-2);
+  margin-top: 24px;
+  max-width: 62ch;
+}
+
+.cs-p {
+  font-size: var(--cs-fs-body);
+  line-height: 1.65;
+  color: var(--cs-ink-2);
+  max-width: 68ch;
+}
+
+.cs-p + .cs-p {
+  margin-top: 18px;
+}
+
+.cs-p strong {
+  font-weight: 600;
+  color: var(--cs-ink);
+}
+
+.cs-cap {
+  font-size: var(--cs-fs-caption);
+  line-height: 1.5;
+  color: var(--cs-ink-3);
+  margin-top: 14px;
+}
+
+/* Emphasis inside the hero headline. Blue *and* a heavier weight — colour
+   alone would be the only signal otherwise, which fails for anyone who
+   can't separate the two hues. */
+.cs-em {
+  color: var(--cs-blue);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Sticky navigation
+   --------------------------------------------------------------------------
+   One bar carries both jobs the brief asks for: the portfolio identity on
+   the left (a route back out of the case study) and the case-study section
+   nav in the middle. Two stacked bars would eat 130px of a phone screen.
+   -------------------------------------------------------------------------- */
+.cs-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: var(--cs-nav-h);
+  background-color: var(--cs-navy);
+  color: #fff;
+}
+
+.cs-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+}
+
+.cs-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.cs-nav-brand:hover {
+  opacity: 0.75;
+  transform: translateX(-2px);
+}
+
+.cs-nav-brand svg {
+  width: 15px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+.cs-nav-sep {
+  width: 1px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.24);
+  flex-shrink: 0;
+}
+
+.cs-nav-title {
+  font-size: 1rem;
   font-weight: 400;
-  font-size: var(--cs-fs-item);
-  color: var(--ink);
+  color: rgba(255, 255, 255, 0.72);
+  flex-shrink: 0;
+}
+
+.cs-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline: auto;
+}
+
+.cs-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding-inline: 11px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.68);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.cs-nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Active state is weight + a rule, not colour alone. */
+.cs-nav-link.is-active {
+  color: #fff;
+  font-weight: 500;
+}
+
+.cs-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: #7fa0ff;
+}
+
+.cs-nav-cta {
+  flex-shrink: 0;
+  height: 38px;
+  padding-inline: 18px;
+  border-radius: var(--radius-pill);
+  background-color: #fff;
+  color: var(--cs-navy);
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.cs-nav-cta svg {
+  width: 13px;
+  height: 9px;
+}
+
+.cs-nav-cta:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+/* Reading progress. transform: scaleX only — a width animation here would
+   relayout the bar on every frame. */
+.cs-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  transform: scaleX(var(--p, 0));
+  transform-origin: 0 50%;
+  background-color: #7fa0ff;
+  will-change: transform;
+}
+
+/* ---- mobile bar + drawer ---- */
+.cs-nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  margin-left: auto;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cs-nav-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cs-nav-toggle .cs-ico-close { display: none; }
+.cs-nav[data-open] .cs-nav-toggle .cs-ico-open { display: none; }
+.cs-nav[data-open] .cs-nav-toggle .cs-ico-close { display: block; }
+
+.cs-drawer {
+  position: fixed;
+  inset: var(--cs-nav-h) 0 auto 0;
+  z-index: 59;
+  background-color: var(--cs-navy);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px var(--cs-gutter) 22px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 240ms var(--cs-ease), transform 240ms var(--cs-ease), visibility 240ms;
+}
+
+.cs-nav[data-open] + .cs-drawer,
+.cs-drawer[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.cs-drawer ol {
+  display: grid;
+  gap: 2px;
+  counter-reset: dr;
+}
+
+.cs-drawer a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding-inline: 4px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cs-drawer a::before {
+  counter-increment: dr;
+  content: '0' counter(dr);
+  font-size: var(--cs-fs-label);
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.cs-drawer a.is-active {
+  color: #fff;
+  font-weight: 500;
+}
+
+@media (max-width: 1080px) {
+  .cs-nav-links,
+  .cs-nav-cta { display: none; }
+  .cs-nav-toggle { display: inline-flex; }
+}
+
+@media (max-width: 480px) {
+  .cs-nav-title,
+  .cs-nav-sep { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   01 — Hero
+   --------------------------------------------------------------------------
+   The headline block takes 8 of 12 columns and the product banner takes all
+   12 beneath it, rather than the two sitting side by side. The banner is a
+   2.55:1 artboard: at half the measure it would render ~250px tall, which is
+   the opposite of the brief's "make the product UI visually dominant".
+   Stacked, it runs the full 1280 and the UI inside it is legible.
+   -------------------------------------------------------------------------- */
+.cs-hero {
+  padding-top: clamp(48px, 6vw, 88px);
+  padding-bottom: clamp(48px, 6vw, 88px);
+}
+
+.cs-hero-title {
+  font-size: var(--cs-fs-hero);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--cs-ink);
+  margin-top: 22px;
+  text-wrap: balance;
+}
+
+.cs-hero-sub {
+  font-size: var(--cs-fs-lead);
+  line-height: 1.55;
+  color: var(--cs-ink-2);
+  margin-top: 26px;
+  max-width: 52ch;
+}
+
+/* Metadata: four facts a recruiter reads in one pass. dl rather than a grid
+   of divs so the term/definition relationship survives a screen reader. */
+.cs-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px var(--cs-col-gap);
+  margin-top: clamp(36px, 4vw, 56px);
+  padding-top: 28px;
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-meta dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cs-ink-3);
+}
+
+.cs-meta dt svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--cs-blue);
+}
+
+.cs-meta dd {
+  margin-top: 10px;
+  font-size: var(--cs-fs-body);
+  line-height: 1.5;
+  color: var(--cs-ink);
+}
+
+@media (max-width: 760px) {
+  .cs-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.cs-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-top: 32px;
 }
 
 /* --------------------------------------------------------------------------
-   Plus-marked lists (Figma uses a lucide/plus glyph at 18px)
+   02 — Project overview
    -------------------------------------------------------------------------- */
-.cs-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin-top: 36px;
+.cs-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cs-col-gap);
+  margin-top: 40px;
 }
 
-.cs-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+.cs-card {
+  padding: 28px 26px;
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-radius);
+  background-color: var(--surface);
+  transition: border-color var(--transition-base), transform var(--transition-base);
 }
 
-.cs-list svg {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  color: var(--ink);
+.cs-card:hover {
+  border-color: var(--cs-blue-line);
+  transform: translateY(-2px);
 }
 
-.cs-list-text {
-  font-weight: 400;
-  font-size: var(--cs-fs-item);
-  line-height: 1.35;
-  color: var(--ink);
+.cs-card-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background-color: var(--cs-blue-wash);
+  color: var(--cs-blue);
+  margin-bottom: 20px;
 }
 
-/* The MVP list carries a second, quieter line under each label. */
-.cs-list-sub {
-  display: block;
-  margin-top: 12px;
-  color: var(--cs-body-ink);
+.cs-card-ico svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cs-card dt,
+.cs-card-title {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cs-ink-3);
+  margin-bottom: 10px;
+}
+
+.cs-card dd,
+.cs-card-body {
+  font-size: var(--cs-fs-body);
+  line-height: 1.5;
+  color: var(--cs-ink);
+}
+
+@media (max-width: 1000px) {
+  .cs-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .cs-cards { grid-template-columns: minmax(0, 1fr); }
+  .cs-card { padding: 22px 20px; }
 }
 
 /* --------------------------------------------------------------------------
-   Image slots. Every one keeps its Figma aspect ratio so the page's rhythm
-   holds whether or not a real export has been dropped in yet.
+   03 — The challenge: pain points
+   -------------------------------------------------------------------------- */
+.cs-pain {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cs-col-gap);
+  margin-top: clamp(48px, 5vw, 72px);
+  padding-top: 40px;
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-pain-num {
+  font-size: 1.5rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--cs-blue);
+  letter-spacing: -0.02em;
+}
+
+.cs-pain h3 {
+  font-size: clamp(1.0625rem, 1.2vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--cs-ink);
+  margin-top: 12px;
+}
+
+.cs-pain p {
+  font-size: var(--cs-fs-body);
+  line-height: 1.6;
+  color: var(--cs-ink-2);
+  margin-top: 10px;
+}
+
+@media (max-width: 860px) {
+  .cs-pain { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+}
+
+/* --------------------------------------------------------------------------
+   04 — Insights
+   --------------------------------------------------------------------------
+   Method → observation → insight → implication, as one row per insight.
+   The implication is the payload, so it gets the tinted panel and the rest
+   of the row stays plain.
+   -------------------------------------------------------------------------- */
+.cs-insights {
+  display: grid;
+  gap: 0;
+  margin-top: 40px;
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-insight {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr) minmax(0, 0.85fr);
+  gap: var(--cs-col-gap);
+  padding-block: clamp(32px, 3.4vw, 48px);
+  border-bottom: 1px solid var(--cs-line);
+}
+
+/* The rail: which insight this is, and which method produced it. Only the
+   number is tracked-out uppercase — the method is a phrase up to three words
+   long, and uppercase at 0.12em turns it into four wrapped lines in a column
+   this narrow. */
+.cs-insight-rail {
+  padding-top: 6px;
+}
+
+.cs-insight-num {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cs-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-insight-method {
+  font-size: var(--cs-fs-caption);
+  line-height: 1.4;
+  color: var(--cs-ink-3);
+  margin-top: 6px;
+}
+
+.cs-insight-claim {
+  font-size: clamp(1.1875rem, 1.6vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+  color: var(--cs-ink);
+}
+
+.cs-insight-evidence {
+  font-size: var(--cs-fs-body);
+  line-height: 1.6;
+  color: var(--cs-ink-2);
+  margin-top: 14px;
+}
+
+.cs-implication {
+  padding: 22px 24px;
+  border-radius: var(--cs-radius-sm);
+  background-color: var(--cs-blue-wash);
+  border: 1px solid var(--cs-blue-line);
+}
+
+.cs-implication-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cs-blue);
+  margin-bottom: 12px;
+}
+
+.cs-implication-label svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cs-implication p {
+  font-size: var(--cs-fs-body);
+  line-height: 1.6;
+  color: var(--cs-ink);
+}
+
+@media (max-width: 980px) {
+  .cs-insight {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  /* Stacked, the rail becomes a one-line strapline above the claim. */
+  .cs-insight-rail {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-top: 0;
+  }
+
+  .cs-insight-method { margin-top: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   05 — Strategy steps
+   -------------------------------------------------------------------------- */
+.cs-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 44px;
+  border-top: 1px solid var(--cs-line);
+  border-left: 1px solid var(--cs-line);
+}
+
+.cs-step {
+  padding: 28px 26px 32px;
+  border-right: 1px solid var(--cs-line);
+  border-bottom: 1px solid var(--cs-line);
+}
+
+.cs-step-num {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--cs-blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-step h3 {
+  font-size: clamp(1rem, 1.15vw, 1.125rem);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--cs-ink);
+  margin-top: 14px;
+}
+
+.cs-step p {
+  font-size: var(--cs-fs-caption);
+  line-height: 1.55;
+  color: var(--cs-ink-3);
+  margin-top: 8px;
+}
+
+@media (max-width: 860px) {
+  .cs-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .cs-steps { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Figures
+   --------------------------------------------------------------------------
+   Every figure keeps its own aspect ratio through width/height attributes on
+   the img, so nothing shifts while a lazy image arrives.
    -------------------------------------------------------------------------- */
 .cs-figure {
-  margin-top: clamp(32px, 4vw, 64px);
+  margin-top: clamp(32px, 4vw, 56px);
+}
+
+/* Every content image is a <picture> with a WebP source and the original PNG
+   as the fallback — the eight of them together drop from 1288KB to 241KB,
+   which on a phone is the difference between the screenshots arriving and
+   the reader having scrolled past them. `picture` is inline by default and
+   would otherwise contribute a text baseline gap under each figure, and in
+   `.cs-figure-pair` it is the grid item, so it has to be a block. */
+.cs-figure picture {
+  display: block;
+  min-width: 0;
 }
 
 .cs-figure img {
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-lg);
-}
-
-/* Two exports sharing one figure, side by side. Equal columns rather than
-   natural widths: the two shots are near-identical ratios (493x650 and
-   477x618), so equal columns land their heights within a couple of percent
-   of each other, and `stretch` + `cover` closes that last gap so the pair
-   reads as one band rather than as two images that nearly line up. */
-.cs-figure-pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: stretch;
-  gap: clamp(16px, 2vw, 26px);
-}
-
-.cs-figure-pair img {
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Side by side on a phone would put each screenshot at ~150px wide, where
-   the UI inside it is unreadable — stack them and let each have the width. */
-@media (max-width: 640px) {
-  .cs-figure-pair {
-    grid-template-columns: 1fr;
-  }
-
-  .cs-figure-pair img {
-    height: auto;
-  }
-}
-
-/* Empty slot: a labelled placeholder rather than a collapsed gap, so the
-   layout reads correctly until the export lands. */
-.cs-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  border: 1px dashed var(--cs-placeholder-rule);
-  border-radius: var(--radius-lg);
-  background-color: var(--cs-surface);
-  color: var(--cs-placeholder-ink);
-  font-size: 0.875rem;
-  text-align: center;
-  padding: 24px;
-}
-
-/* --------------------------------------------------------------------------
-   Before / After pairs
-   -------------------------------------------------------------------------- */
-.cs-role {
-  font-weight: 500;
-  font-size: clamp(1.05rem, 1.5vw, 24px);
-  color: var(--ink);
-  margin-top: clamp(48px, 5vw, 80px);
-}
-
-.cs-ba {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
-  margin-top: 43px;
-}
-
-.cs-ba-card {
-  padding: 48px;
-  border-radius: var(--radius-lg);
-}
-
-/* Tinted with the site's own pastel tokens so the two states read apart at
-   a glance without introducing colours the design system doesn't already
-   use elsewhere. */
-.cs-ba-card.is-before {
-  background-color: var(--exp-pink);
-}
-
-.cs-ba-card.is-after {
-  background-color: var(--exp-blue);
-}
-
-.cs-ba-label {
-  font-weight: 600;
-  font-size: var(--cs-fs-item);
-  color: var(--ink);
-  margin-bottom: 36px;
-}
-
-/* --------------------------------------------------------------------------
-   Key highlights + sign-off
-   -------------------------------------------------------------------------- */
-/* Frame 20 is 1278 wide — narrower than the 1540 wide column it sits in, so
-   it is capped at its own size rather than being stretched past it. */
-.cs-figure-highlights {
-  max-width: 1278px;
-  margin-inline: auto;
-}
-
-.cs-thanks {
-  margin-top: clamp(80px, 9vw, 139px);
-  text-align: center;
-  font-weight: 500;
-  font-size: clamp(2rem, 3.2vw, 52px);
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-
-/* --------------------------------------------------------------------------
-   Responsive
-   -------------------------------------------------------------------------- */
-@media (max-width: 720px) {
-  .cs-page {
-    padding-top: 64px;
-  }
-
-  .cs-tag {
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-
-  .cs-ba-card {
-    padding: 28px;
-  }
-}
-
-
-/* ==========================================================================
-   Suraksha banner — layered depth stage
-   ==========================================================================
-   The banner is four separate layers exported from the Figma source
-   (2189:1444 "Frame 21"), not one flat image, so each part can carry its own
-   entrance and its own parallax rate:
-
-     dash.png   the admin dashboard   depth 0.35
-     table.png  the right-hand table  depth 0.55
-     card.png   the patient card      depth 0.70
-     phone.png  the three phones      depth 1.00
-
-   Depth is the multiplier on pointer travel, so the phones move roughly three
-   times as far as the dashboard and the navy plate behind them barely moves
-   at all — the ordering asked for in the brief.
-
-   Layer geometry is a percentage of the 1540x603 artboard, straight from the
-   Figma node positions. Percentages rather than pixels because the plate
-   scales with the column: the stack has to stay registered at every width.
-
-   Distances use cqw (1% of the plate's own width) for the same reason. A
-   fixed 80px nudge is a tenth of the plate on desktop and half of it on a
-   phone; in cqw the entrance keeps its proportions everywhere.
-   ========================================================================== */
-.cs-banner {
-  perspective: 1400px;
-  perspective-origin: 50% 50%;
-}
-
-/* The banner is the page's opening image and earns more travel and a longer
-   curve than a body figure. Tuned through reveal.js's own custom properties
-   so this element still has exactly one transform and nothing conflicts. */
-.cs-banner[data-reveal] {
-  --reveal-y: 40px;
-  transition:
-    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.cs-banner-tilt {
-  position: relative;
-  transform-style: preserve-3d;
-  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* While the pointer is moving, follow it closely; the long curve above is for
-   the release, which is what carries the weight. */
-.cs-banner[data-tracking] .cs-banner-tilt {
-  transition: transform 120ms linear;
-}
-
-/* The plate: the navy field the layers sit on, holding the artboard ratio so
-   the percentage geometry resolves against a box of the right shape. */
-.cs-banner-plate {
-  position: relative;
-  aspect-ratio: 1540 / 603;
-  background-color: #001164;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  container-type: inline-size;
-  box-shadow:
-    0 18px 50px rgba(0, 8, 40, 0.28),
-    0 4px 14px rgba(0, 8, 40, 0.18);
-}
-
-/* One positioned box per layer. It owns the parallax offset only — the
-   entrance lives on the image inside, so the two never overwrite each other. */
-.cs-lyr {
-  position: absolute;
-  left: var(--l);
-  top: var(--t);
-  width: var(--w);
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
-  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cs-banner[data-tracking] .cs-lyr {
-  transition: transform 140ms linear;
-}
-
-.cs-lyr-art {
   display: block;
   width: 100%;
   height: auto;
-  /* .cs-figure img rounds every figure image; these are cut-outs sitting on
-     the plate, and the plate already carries the radius. */
-  border-radius: 0;
+  border-radius: var(--cs-radius);
 }
 
-/* --------------------------------------------------------------------------
-   Entrance. Held at the start state until reveal.js marks the banner in view,
-   then played in the reading order of the composition: the dashboard arrives,
-   the table slides in behind it, the patient card rises last.
-
-   Curves follow the brief's spring parameters. stiffness 70 / damping 18 is
-   just overdamped (zeta about 1.08), so the dashboard and table settle without
-   overshoot and a plain expo-out is the faithful translation. The card's
-   80 / 16 is underdamped (zeta about 0.89), so that one gets a small overshoot
-   keyframe rather than a pure ease.
-   -------------------------------------------------------------------------- */
-.cs-banner .cs-lyr-art {
-  opacity: 0;
+/* Diagrams are line art on white: a border gives them an edge, a shadow
+   would just fuzz them. Screenshots get the shadow instead. */
+.cs-figure-diagram img {
+  border: 1px solid var(--cs-line);
+  background-color: var(--surface);
+  padding: clamp(12px, 1.6vw, 24px);
 }
 
-.cs-banner.in-view .cs-art-dash {
-  animation: cs-in-dash 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+.cs-figure-shot img {
+  box-shadow:
+    0 1px 2px rgba(10, 12, 18, 0.06),
+    0 12px 32px rgba(10, 12, 18, 0.08);
 }
 
-.cs-banner.in-view .cs-art-table {
-  animation: cs-in-table 1000ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+.cs-figure-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--cs-col-gap);
+  align-items: start;
 }
 
-.cs-banner.in-view .cs-art-card {
-  animation: cs-in-card 850ms cubic-bezier(0.22, 1, 0.36, 1) 350ms both;
-}
-
-.cs-banner.in-view .cs-art-phone {
-  animation: cs-in-phone 900ms cubic-bezier(0.16, 1, 0.3, 1) 450ms both;
-}
-
-@keyframes cs-in-dash {
-  from { opacity: 0; transform: translate3d(5.19cqw, 2.6cqw, 0) scale(0.95); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-@keyframes cs-in-table {
-  from { opacity: 0; transform: translate3d(7.79cqw, 0, 0); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-/* The one underdamped spring in the set: a small overshoot before it settles. */
-@keyframes cs-in-card {
-  0%   { opacity: 0; transform: translate3d(0, 3.25cqw, 0) scale(0.9); }
-  72%  { opacity: 1; transform: translate3d(0, -0.28cqw, 0) scale(1.008); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-@keyframes cs-in-phone {
-  from { opacity: 0; transform: translate3d(0, 2.2cqw, 0) scale(0.97); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-}
-
-/* --------------------------------------------------------------------------
-   The phones keep drifting after they land — the only continuous motion on
-   the page. Its own box so it never contends with the entrance above it or
-   the parallax offset above that. Starts and ends at zero rotation so the
-   handoff from the entrance is seamless.
-   -------------------------------------------------------------------------- */
-.cs-phone-float {
-  animation: cs-phone-drift 5s ease-in-out infinite;
-  animation-play-state: paused;
-}
-
-.cs-banner[data-entered] .cs-phone-float {
-  animation-play-state: running;
-}
-
-@keyframes cs-phone-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%      { transform: translate3d(0, -0.65cqw, 0) rotate(0.6deg); }
-}
-
-/* A highlight raked across the plate, following the pointer — it reads as a
-   surface catching light rather than a picture. Never eats a click. */
-.cs-banner-sheen {
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius-lg);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 400ms ease;
-  background: radial-gradient(
-    38% 60% at var(--sheen-x, 50%) var(--sheen-y, 50%),
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.04) 42%,
-    rgba(255, 255, 255, 0) 72%
-  );
-}
-
-.cs-banner[data-tracking] .cs-banner-sheen {
-  opacity: 1;
-}
-
-/* --------------------------------------------------------------------------
-   Small screens. There is no pointer to track, so banner.js skips the tilt
-   and the parallax entirely; the drift stays because it is ambient, at
-   reduced travel. The entrance keeps its stagger — it is the moment that
-   tells the story of the composition — but travels less far.
-   -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  .cs-banner-plate {
-    box-shadow:
-      0 10px 28px rgba(0, 8, 40, 0.24),
-      0 3px 10px rgba(0, 8, 40, 0.16);
-  }
-
-  @keyframes cs-in-dash {
-    from { opacity: 0; transform: translate3d(3cqw, 1.5cqw, 0) scale(0.97); }
-    to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  }
-
-  @keyframes cs-in-table {
-    from { opacity: 0; transform: translate3d(4.5cqw, 0, 0); }
-    to   { opacity: 1; transform: translate3d(0, 0, 0); }
-  }
-
-  @keyframes cs-in-card {
-    0%   { opacity: 0; transform: translate3d(0, 2cqw, 0) scale(0.94); }
-    72%  { opacity: 1; transform: translate3d(0, -0.16cqw, 0) scale(1.005); }
-    100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  }
-
-  @keyframes cs-phone-drift {
-    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50%      { transform: translate3d(0, -0.4cqw, 0) rotate(0.35deg); }
-  }
+  .cs-figure-pair { grid-template-columns: 1fr; }
 }
 
 /* --------------------------------------------------------------------------
-   Reduced motion: the composition still assembles, it just does not travel.
-   Layers fade in place, in the same order, so the reading sequence survives;
-   nothing slides, drifts or tilts. The plate keeps its shadow, which is depth
-   rather than motion.
+   Pan viewport
+   --------------------------------------------------------------------------
+   A 1016px operational dashboard scaled onto a 350px phone is a picture of an
+   interface rather than an interface — the row labels stop being legible at
+   about a third of their authored size, and every one of these images is a
+   screenshot whose whole point is the interface inside it.
+
+   On phones the image keeps a readable minimum width and pans inside its own
+   viewport instead. Contained on purpose: the scroll lives on this box, so
+   the page itself never scrolls sideways.
+
+   `tabindex="0"` is not decoration — a scroll container that only responds to
+   touch or a mouse wheel is unreachable by keyboard, so it has to be
+   focusable for the arrow keys to reach it. Above the breakpoint the whole
+   thing is inert: `overflow: visible`, no focus stop.
    -------------------------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  .cs-banner-tilt,
-  .cs-lyr {
-    transform: none;
+.cs-pan { display: block; }
+
+@media (max-width: 720px) {
+  .cs-figure-shot,
+  .cs-figure-diagram {
+    position: relative;
   }
 
-  .cs-phone-float,
-  .cs-banner[data-entered] .cs-phone-float {
-    animation: none;
+  .cs-pan {
+    overflow-x: auto;
+    /* Explicit: with one axis set to `auto`, `visible` on the other computes
+       to `auto` too, which would hand these boxes a vertical scrollbar for
+       the sake of a few pixels of drop shadow. */
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--cs-radius);
   }
 
-  .cs-banner-sheen {
-    display: none;
+  /* Both boxes: the <picture> is the block that sizes inside the scroller,
+     so widening only the img would leave the picture at container width. */
+  .cs-pan picture,
+  .cs-pan img {
+    min-width: 620px;
+    /* The shadow would be clipped by the scroller anyway; the pan box's own
+       radius and the edge fade carry the framing here. */
+    box-shadow: none;
   }
 
-  /* Opacity only — no transform, no scale. The global reduced-motion rule in
-     styles.css collapses the durations, so these land immediately. */
-  .cs-banner.in-view .cs-art-dash,
-  .cs-banner.in-view .cs-art-table,
-  .cs-banner.in-view .cs-art-card,
-  .cs-banner.in-view .cs-art-phone {
-    animation-name: cs-in-fade;
+  /* The right edge fades so it is visible that the image continues, rather
+     than reading as an image that happens to be cropped. Outside the scroller
+     so it stays pinned while the content moves under it. */
+  .cs-figure-shot::after,
+  .cs-figure-diagram::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 44px;
+    pointer-events: none;
+    border-radius: 0 var(--cs-radius) var(--cs-radius) 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--surface));
   }
 
-  @keyframes cs-in-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+  /* The paired phone screenshots stack at full width already; nothing to pan. */
+  .cs-figure-pair .cs-pan { overflow-x: visible; }
+  .cs-figure-pair .cs-pan img { min-width: 0; }
+  .cs-figure-pair::after { content: none; }
+}
+
+/* Numbered decision notes under a screenshot. Deliberately not pinned onto
+   the image: pin coordinates would have to be authored per screenshot and
+   would drift the moment a screen is re-exported. */
+.cs-annos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px var(--cs-col-gap);
+  margin-top: 22px;
+}
+
+.cs-anno {
+  display: flex;
+  gap: 10px;
+  font-size: var(--cs-fs-caption);
+  line-height: 1.5;
+  color: var(--cs-ink-2);
+}
+
+.cs-anno b {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background-color: var(--cs-blue-wash);
+  color: var(--cs-blue);
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   07 — Final solution: feature blocks
+   --------------------------------------------------------------------------
+   Each feature is a 4/8 split: reasoning sticks on the left while the visual
+   scrolls past on the right, so the "why" stays on screen for the whole time
+   the reader is looking at the "what". The sticky column is disabled below
+   980px, where there is no second column to be sticky beside.
+   -------------------------------------------------------------------------- */
+.cs-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(28px, 3.4vw, 56px);
+  padding-block: clamp(48px, 5.5vw, 88px);
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-feature-aside {
+  position: sticky;
+  top: calc(var(--cs-nav-h) + 32px);
+  align-self: start;
+}
+
+.cs-feature-num {
+  font-size: clamp(2.25rem, 3.4vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--cs-blue-line);
+}
+
+.cs-feature-aside h3 {
+  font-size: var(--cs-fs-feature);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--cs-ink);
+  margin-top: 10px;
+}
+
+.cs-feature-purpose {
+  font-size: var(--cs-fs-body);
+  line-height: 1.6;
+  color: var(--cs-ink-2);
+  margin-top: 14px;
+}
+
+.cs-notes {
+  margin-top: 28px;
+  display: grid;
+  gap: 20px;
+}
+
+.cs-note dt {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cs-ink-3);
+  margin-bottom: 7px;
+}
+
+.cs-note dd {
+  font-size: var(--cs-fs-body);
+  line-height: 1.55;
+  color: var(--cs-ink);
+}
+
+/* The decision is the sentence a hiring manager is looking for. */
+.cs-note.is-decision dt { color: var(--cs-blue); }
+
+.cs-note.is-decision dd {
+  padding-left: 14px;
+  border-left: 2px solid var(--cs-blue-line);
+}
+
+.cs-feature .cs-figure { margin-top: 0; }
+
+/* The last feature's own bottom padding and the section's stack into roughly
+   230px of nothing before the next section starts. The section owns the
+   rhythm between sections; the feature only owns the rhythm between features. */
+.cs-feature:last-child { padding-bottom: 0; }
+
+@media (max-width: 980px) {
+  .cs-feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cs-feature-aside { position: static; }
+  .cs-feature .cs-figure { margin-top: 8px; }
+}
+
+/* --------------------------------------------------------------------------
+   08 — Responsive experience
+   -------------------------------------------------------------------------- */
+.cs-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cs-col-gap);
+  margin-top: 44px;
+}
+
+.cs-tier {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 26px;
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-radius);
+  background-color: var(--cs-surface);
+}
+
+.cs-tier-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--cs-line);
+}
+
+.cs-tier-head svg {
+  width: 20px;
+  height: 20px;
+  color: var(--cs-blue);
+  flex-shrink: 0;
+}
+
+.cs-tier-head h3 {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--cs-ink);
+}
+
+.cs-tier-head span {
+  margin-left: auto;
+  font-size: var(--cs-fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--cs-ink-3);
+}
+
+.cs-tier dl {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.cs-tier dt {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cs-ink-3);
+  margin-bottom: 5px;
+}
+
+.cs-tier dd {
+  font-size: var(--cs-fs-caption);
+  line-height: 1.6;
+  color: var(--cs-ink-2);
+}
+
+@media (max-width: 900px) {
+  .cs-tiers { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   Design system + accessibility notes
+   -------------------------------------------------------------------------- */
+.cs-notelist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 32px;
+  background-color: var(--cs-line);
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-radius);
+  overflow: hidden;
+}
+
+.cs-notelist > div {
+  background-color: var(--surface);
+  padding: 24px 26px;
+}
+
+.cs-notelist h3 {
+  font-size: var(--cs-fs-body);
+  font-weight: 500;
+  color: var(--cs-ink);
+  margin-bottom: 8px;
+}
+
+.cs-notelist p {
+  font-size: var(--cs-fs-caption);
+  line-height: 1.6;
+  color: var(--cs-ink-2);
+}
+
+@media (max-width: 720px) {
+  .cs-notelist { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --------------------------------------------------------------------------
+   09 — Outcome
+   -------------------------------------------------------------------------- */
+.cs-outcome {
+  background-color: var(--cs-navy);
+  color: #fff;
+  border-radius: clamp(16px, 2vw, 28px);
+  padding: clamp(36px, 4.5vw, 72px);
+  margin-top: 44px;
+}
+
+.cs-outcome .cs-sec-label { color: #8fabff; }
+
+.cs-outcome h2 {
+  font-size: var(--cs-fs-section);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #fff;
+  max-width: 20ch;
+}
+
+.cs-outcome-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px var(--cs-col-gap);
+  margin-top: clamp(36px, 4vw, 56px);
+}
+
+.cs-outcome-list > li > span {
+  font-size: var(--cs-fs-label);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: #8fabff;
+}
+
+.cs-outcome-list > li > p {
+  font-size: var(--cs-fs-body);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@media (max-width: 900px) {
+  .cs-outcome-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .cs-outcome-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+.cs-learned {
+  margin-top: clamp(48px, 5vw, 72px);
+  padding-top: clamp(32px, 3.5vw, 48px);
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-learned-quote {
+  font-size: clamp(1.25rem, 2.1vw, 1.875rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  color: var(--cs-ink);
+  max-width: 34ch;
+}
+
+/* --------------------------------------------------------------------------
+   Closing CTA
+   -------------------------------------------------------------------------- */
+.cs-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding-block: clamp(64px, 7vw, 110px);
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-end h2 {
+  font-size: var(--cs-fs-section);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--cs-ink);
+}
+
+.cs-end p {
+  font-size: var(--cs-fs-body);
+  color: var(--cs-ink-3);
+  margin-top: 12px;
+}
+
+.cs-end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Hero figure
+   --------------------------------------------------------------------------
+   The product hero itself is the shared component in hero.css; this only
+   decides how much of the column it gets. 82% of the 1280 measure on desktop,
+   centred — wide enough to lead the page, inset enough that the composition
+   reads as a held object rather than a full-bleed band. Below 900px it takes
+   the whole column: at that size every percent counts toward legibility.
+   -------------------------------------------------------------------------- */
+.cs-hero-figure {
+  width: 82%;
+  margin-inline: auto;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+
+@media (max-width: 900px) {
+  .cs-hero-figure {
+    width: 100%;
   }
 }

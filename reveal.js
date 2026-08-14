@@ -41,20 +41,20 @@
     '.gallery-head',
     '.gallery-tile',
 
-    /* --- case study --- */
-    '.cs-back',
-    '.cs-hero-title',
-    '.cs-hero-sub',
-    '.cs-tags',
-    '.cs-eyebrow',
-    '.cs-heading',
-    '.cs-body',
-    '.cs-lead',
-    '.cs-list li',
+    /* --- case study ---
+       One opt-in class rather than a list of component selectors. Every
+       block that should arrive carries `.cs-reveal`, which means a new
+       section in the markup animates without also editing this file, and
+       — because reveal.js staggers same-parent targets in document order —
+       the cards inside a grid fall into sequence on their own.
+
+       `.cs-figure` is separate: a figure is a reveal target by definition.
+       The layered product hero is deliberately NOT in this list — it runs its
+       own IntersectionObserver in hero.js, because on the home page it sits
+       inside a `.work-item` that already has an entrance, and two nested
+       fades would spend the layer stagger before either box is on screen. */
+    '.cs-reveal',
     '.cs-figure',
-    '.cs-role',
-    '.cs-ba-card',
-    '.cs-thanks',
 
     /* --- footer, on both pages --- */
     '.footer-intro',

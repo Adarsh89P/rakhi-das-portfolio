@@ -39,6 +39,16 @@
       return;
     }
 
+    /* A layered hero rather than one flattened export: each product surface
+       is its own element, so each can be positioned and animated on its own
+       and the composition can be rebuilt differently for small screens
+       instead of being scaled down. See buildHeroStage. */
+    if (fill.layers) {
+      container.classList.add('has-hero');
+      container.appendChild(buildHeroStage(fill, altText));
+      return;
+    }
+
     if (!fill.image) return;
     /* `contain` shows artwork that isn't the frame's shape in full rather
        than cropping it to fill — the letterbox falls back to `fill.color`. */
@@ -48,6 +58,81 @@
     img.loading = 'lazy';
     img.decoding = 'async';
     container.appendChild(img);
+  }
+
+  /* The layered product hero, shared by the home page tile and the case study
+     banner. Markup only — every position, size and entrance lives in CSS,
+     keyed off `data-lyr`, so the desktop and mobile compositions are two
+     independent sets of rules rather than one scaled by a factor.
+
+     The layers are one picture, so the accessible name goes on the stage and
+     the individual images are decorative. */
+  function buildHeroStage(fill, altText) {
+    var stage = el('div', 'hero-stage');
+    stage.setAttribute('data-hero', '');
+
+    /* One box per effect, so no two ever write the same `transform`:
+       stage (reveal) > tilt (pointer) > lyr (parallax) > float > art. */
+    var tilt = el('div', 'hero-tilt');
+    var plate = el('div', 'hero-plate');
+    plate.setAttribute('role', 'img');
+    plate.setAttribute('aria-label', altText || '');
+    if (fill.color) plate.style.backgroundColor = fill.color;
+
+    fill.layers.forEach(function (layer) {
+      var box = el('div', 'hero-lyr');
+      box.setAttribute('data-lyr', layer.name);
+      /* Depth is the multiplier on pointer travel — read by hero.js, which
+         is also why it lives in the data rather than in CSS. */
+      if (layer.depth != null) box.setAttribute('data-depth', layer.depth);
+
+      var img = el('img', 'hero-art');
+      img.src = layer.src;
+      img.alt = '';
+      /* Intrinsic ratio known before the bytes arrive, so a layer never
+         reflows the stack as it decodes. */
+      img.width = layer.w;
+      img.height = layer.h;
+      img.decoding = 'async';
+      /* The hero is the first thing in the viewport on the case study and
+         well below the fold on the home page; the caller decides. */
+      if (fill.eager) img.setAttribute('fetchpriority', 'high');
+      else img.loading = 'lazy';
+
+      /* A WebP source only where the layer carries one — see data.js for why
+         it is not on all five. The <img> stays the fallback either way. */
+      var media = img;
+      if (layer.webp) {
+        var picture = el('picture');
+        var source = el('source');
+        source.srcset = layer.webp;
+        source.type = 'image/webp';
+        picture.appendChild(source);
+        picture.appendChild(img);
+        media = picture;
+      }
+
+      /* The idle drift needs a box of its own — three transforms deep, it
+         would otherwise overwrite either the entrance or the parallax. */
+      if (layer.float) {
+        var floater = el('div', 'hero-float');
+        floater.appendChild(media);
+        box.appendChild(floater);
+      } else {
+        box.appendChild(media);
+      }
+      plate.appendChild(box);
+    });
+
+    /* Decorative highlight, inside the plate so it is clipped to the same
+       rounded rectangle the layers are. */
+    var sheen = el('span', 'hero-sheen');
+    sheen.setAttribute('aria-hidden', 'true');
+    plate.appendChild(sheen);
+
+    tilt.appendChild(plate);
+    stage.appendChild(tilt);
+    return stage;
   }
 
   /* A silent, looping preview — decorative in the a11y sense, since the

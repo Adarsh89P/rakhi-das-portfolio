@@ -38,6 +38,10 @@
   --footer-bg: #000000;
   --footer-ink: #ffffff;
   --footer-pill: #505050;
+  /* Quiet text on the black footer. --grey-text (#666) is tuned for white and
+     only reaches 3.66:1 here, under the 4.5:1 AA floor for body copy; this
+     lands at 5.69:1 while staying a muted grey rather than going white. */
+  --footer-muted: #858585;
 
   --radius-pill: 39px;
   --radius-lg: 17px;
@@ -1434,6 +1438,13 @@ a.work-image:focus-visible .work-image-arrow {
   box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
   /* Background color comes from data.js per item (applied inline in
      script.js) — one of --exp-blue/-peach/-pink. */
+
+  /* --text-paragraph is tuned against white, where it clears AA at 4.54:1.
+     On these pastel fills it does not: 3.53:1 on --exp-blue, the darkest of
+     the three and so the worst case. Re-pointing the token on the card
+     covers every descendant at once — the same trick the dark-theme block
+     above uses — and lands at 5.20:1 while staying a muted grey. */
+  --text-paragraph: #5c5c5c;
 }
 
 /* Rotation, resting stagger and stacking order — cycled per position so
@@ -1834,7 +1845,7 @@ a.work-image:focus-visible .work-image-arrow {
   font-weight: 400;
   font-size: 14px;
   line-height: 1.5714;
-  color: var(--grey-text);
+  color: var(--footer-muted);
 }
 
 /* ==========================================================================

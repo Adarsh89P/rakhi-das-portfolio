@@ -98,8 +98,34 @@ var PORTFOLIO_DATA = {
         heading: 'SaaS Dashboard Redesign',
         dateRange: 'Mar 2025 – Jul 2025',
         description: 'Simplifying complex healthcare journeys into intuitive digital experiences for patients, doctors, and administrators.',
-        color: '#49acea',
-        image: 'public/Surksha/Frame21.png',
+        /* The plate colour behind the layers — the original export's own
+           background, sampled from it rather than picked. */
+        color: '#0044c5',
+        /* The layered hero, in paint order. Replaces the flattened
+           Frame21.png export: each product surface is its own element, so it
+           can be positioned and animated independently and the composition
+           can be rebuilt for small screens instead of shrunk.
+
+           `depth` is that layer's share of the pointer's travel (hero.js);
+           `float` gives a layer the idle drift. Positions and the two
+           compositions live in hero.css — this is just what is in the picture.
+
+           `webp` is set only on the three layers where WebP actually beats
+           PNG. It is not a blanket win here: the dashboard and the patient
+           card are flat-fill UI with sharp text, which PNG's filtering
+           compresses better — re-encoding them cost 24% and 29% respectively.
+           The device shots have photographic content and gain 42-51%.
+
+           Shared by the case study banner, which renders the same list. */
+        layers: [
+          { name: 'dash',   src: 'public/Surksha/banner/dash.png',      w: 1700, h: 816, depth: 0.35 },
+          { name: 'table',  src: 'public/Surksha/banner/table.png',     w: 448,  h: 436, depth: 0.55, webp: 'public/Surksha/banner/table.webp' },
+          { name: 'card',   src: 'public/Surksha/banner/card.png',      w: 824,  h: 883, depth: 0.7 },
+          { name: 'phones', src: 'public/Surksha/banner/phone.png',     w: 845,  h: 658, depth: 1, float: true, webp: 'public/Surksha/banner/phone.webp' },
+          /* Small screens only: the middle device cut out of the strip above,
+             the one phone in it with an unoccluded silhouette. */
+          { name: 'app',    src: 'public/Surksha/banner/phone-app.png', w: 319,  h: 658, depth: 1, float: true, webp: 'public/Surksha/banner/phone-app.webp' }
+        ],
         href: 'suraksha_case_study.html'
       },
       {

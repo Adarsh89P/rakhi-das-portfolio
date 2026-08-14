@@ -1,0 +1,403 @@
+/* ==========================================================================
+   Layered product hero — shared by the home page tile and the case study
+   ==========================================================================
+   Replaces the flattened export (public/Surksha/Frame21.png) with the
+   individual product surfaces as separate elements, so each can be positioned
+   and animated on its own and the composition can be *rebuilt* for small
+   screens rather than shrunk.
+
+   ---- Where the numbers come from -----------------------------------------
+   The desktop geometry is not eyeballed. Each cut-out layer was template
+   matched against the original flattened 1314x580 export and the winning
+   scale and offset read off, scoring by the fraction of the layer's opaque
+   pixels agreeing within tolerance. Three of the four layers share one export
+   scale (0.4275) because they came from a single 2x Figma export; the table
+   sits at 1.045 because it was cut from a shipped composite at 1:1.
+
+     layer    matched at        agreement
+     dash     98,250   727x349   76.8%
+     card     106,221  352x377   86.6%
+     phones   748,317  361x281   86.9%
+
+   The table is the exception. The shipped table.png turned out to be an
+   incomplete crop — 188 of the 291px the bookings panel actually occupies,
+   which showed up in the diff as a solid missing block in the top-right
+   corner. Its true extent was measured directly off the export (x 1023-1313,
+   y 0-282, running off the right edge) and the asset re-cut from the same
+   component inside dash.png at 448x436 (88.4% agreement), which is 1.54x the
+   resolution a 1:1 re-cut would have given.
+
+   Positions are percentages of that artboard, so the composition reflows with
+   the page instead of scaling as one fixed canvas, and every layer stays
+   registered against every other at any width.
+
+   ---- Two compositions, not one -------------------------------------------
+   The desktop arrangement leads with the admin dashboard and reads left to
+   right. It cannot simply shrink: at a 375px viewport the dashboard renders at
+   0.18x its authored size, where its table rows are a grey texture rather than
+   an interface.
+
+   So the small-screen composition is a different picture built from the same
+   assets. It leads with a *single* phone — the patient app home screen, cut
+   out of the three-device strip, the only one of the three with an unoccluded
+   silhouette — supported by the patient card and the bookings-table sliver,
+   both of which survive the size. The desktop dashboard and the three-up strip
+   are dropped rather than made illegible. Which layers appear is part of the
+   composition, not a detail.
+
+   The switch is a container query on the stage, not a viewport media query:
+   the same component is used inside a full-bleed case study banner and inside
+   a works tile that is half-width on some layouts, and what matters is how
+   much room the hero itself got.
+
+   ---- Why the nesting ------------------------------------------------------
+   So that no two effects ever write the same `transform`:
+     .hero-stage    the reveal translate (owned by reveal.js)
+     .hero-tilt     pointer tilt of the whole plate
+     .hero-lyr      per-layer parallax offset
+     .hero-float    the phones' idle drift
+     .hero-art      the staggered entrance
+   ========================================================================== */
+
+.hero-stage {
+  /* The query container. `inline-size` only: the plate's own aspect-ratio is
+     switched inside the query, and since height cannot feed back into inline
+     size there is no cycle. */
+  container-type: inline-size;
+  container-name: hero;
+  width: 100%;
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+}
+
+.hero-tilt {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* While the pointer is moving, follow it closely; the long curve above is for
+   the release, which is what carries the weight. */
+.hero-stage[data-tracking] .hero-tilt {
+  transition: transform 120ms linear;
+}
+
+/* The plate: the blue field the layers sit on. #0044c5 is the original
+   export's own background, sampled from it rather than picked. */
+.hero-plate {
+  position: relative;
+  aspect-ratio: 1314 / 580;
+  background-color: #0044c5;
+  border-radius: var(--radius-lg, 17px);
+  overflow: hidden;
+}
+
+/* One positioned box per layer. It owns the parallax offset only — the
+   entrance lives on the image inside, so the two never overwrite each other. */
+.hero-lyr {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--w);
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-stage[data-tracking] .hero-lyr {
+  transition: transform 140ms linear;
+}
+
+/* Three of the five layers are wrapped in <picture> for a WebP source, which
+   would otherwise contribute an inline box between the layer and its art. */
+.hero-lyr picture {
+  display: block;
+}
+
+/* `contain` is the guarantee against distortion: the box is sized from the
+   artboard percentages and the art keeps its own ratio inside it whatever
+   rounding does to the box. Each image also carries width/height attributes,
+   so the intrinsic ratio is known before it loads. */
+.hero-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Desktop composition — measured from the 1314x580 export
+   -------------------------------------------------------------------------- */
+.hero-lyr[data-lyr='dash']   { --l: 7.458%;  --t: 43.103%; --w: 55.327%; }
+/* Runs off the right edge of the plate, as it does in the original. */
+.hero-lyr[data-lyr='table']  { --l: 77.854%; --t: 0%;      --w: 22.146%; }
+.hero-lyr[data-lyr='card']   { --l: 8.067%;  --t: 38.103%; --w: 26.788%; }
+.hero-lyr[data-lyr='phones'] { --l: 56.925%; --t: 54.655%; --w: 27.473%; }
+
+/* The single-device cut-out is the small-screen lead and has no place in the
+   desktop picture, where the full three-up strip is shown instead. */
+.hero-lyr[data-lyr='app'] { display: none; }
+
+/* --------------------------------------------------------------------------
+   Restored shadows
+   --------------------------------------------------------------------------
+   The cut-outs lost their drop shadows when they were keyed: a soft shadow
+   falling on a flat coloured field keeps that field's hue and only darkens it,
+   which is exactly what a chromaticity key is built to remove. Sampling the
+   flattened original across the card's right edge shows grey running 196 to
+   255 over about 80px of the 1314px artboard — a real shadow, not a seam.
+
+   Put back in CSS rather than baked back into the pixels, so they stay crisp
+   at any size and cost nothing in file weight. Distances are in cqw so the
+   shadow scales with the hero instead of becoming a black smear on a phone.
+
+   On `.hero-art` — the innermost box — deliberately: the devices' idle drift
+   transforms `.hero-float`, its parent, so the filtered image is rasterised
+   once and the animation merely composites it. Filtering the moving box
+   instead would re-run the blur on every frame.
+   -------------------------------------------------------------------------- */
+/* Tuned against that measured profile rather than picked: at 0.3 opacity and
+   2.2cqw the falloff read about 14 levels too light and died ~20px short. */
+.hero-lyr[data-lyr='card'] .hero-art {
+  filter: drop-shadow(0.6cqw 0.4cqw 2.9cqw rgba(0, 10, 40, 0.4));
+}
+
+.hero-lyr[data-lyr='phones'] .hero-art,
+.hero-lyr[data-lyr='table'] .hero-art {
+  filter: drop-shadow(0.4cqw 0.5cqw 1.8cqw rgba(0, 10, 40, 0.26));
+}
+
+/* --------------------------------------------------------------------------
+   Entrance
+   --------------------------------------------------------------------------
+   Held at the start state until reveal.js marks the stage in view, then played
+   in the reading order of the composition: the dashboard arrives, the table
+   slides in behind it, the card rises, the devices land last.
+
+   Travel is in `cqw` — 1% of the stage's own width — not px. A fixed 80px
+   nudge is a tenth of the plate on a desktop and half of it on a phone; in
+   cqw the entrance keeps its proportions at every size.
+
+   Curves follow the source spring parameters. stiffness 70 / damping 18 is
+   just overdamped (zeta about 1.08), so the dashboard and table settle without
+   overshoot and a plain expo-out is the faithful translation. The card's
+   80 / 16 is underdamped (zeta about 0.89) and gets a small overshoot keyframe.
+   -------------------------------------------------------------------------- */
+.hero-stage .hero-art { opacity: 0; }
+
+.hero-stage.in-view [data-lyr='dash'] .hero-art {
+  animation: hero-in-dash 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-stage.in-view [data-lyr='table'] .hero-art {
+  animation: hero-in-table 1000ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+}
+
+.hero-stage.in-view [data-lyr='card'] .hero-art {
+  animation: hero-in-card 850ms cubic-bezier(0.22, 1, 0.36, 1) 350ms both;
+}
+
+.hero-stage.in-view [data-lyr='phones'] .hero-art,
+.hero-stage.in-view [data-lyr='app'] .hero-art {
+  animation: hero-in-device 900ms cubic-bezier(0.16, 1, 0.3, 1) 450ms both;
+}
+
+@keyframes hero-in-dash {
+  from { opacity: 0; transform: translate3d(5.19cqw, 2.6cqw, 0) scale(0.95); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes hero-in-table {
+  from { opacity: 0; transform: translate3d(7.79cqw, 0, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* The one underdamped spring in the set: a small overshoot before it settles. */
+@keyframes hero-in-card {
+  0%   { opacity: 0; transform: translate3d(0, 3.25cqw, 0) scale(0.9); }
+  72%  { opacity: 1; transform: translate3d(0, -0.28cqw, 0) scale(1.008); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes hero-in-device {
+  from { opacity: 0; transform: translate3d(0, 2.2cqw, 0) scale(0.97); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   Idle drift on the devices — the only continuous motion. Its own box so it
+   never contends with the entrance above it or the parallax offset above that.
+   Starts and ends at zero rotation so the handoff from the entrance is seamless.
+   -------------------------------------------------------------------------- */
+.hero-float {
+  animation: hero-drift 5s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.hero-stage[data-entered] .hero-float {
+  animation-play-state: running;
+}
+
+@keyframes hero-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(0, -0.65cqw, 0) rotate(0.6deg); }
+}
+
+/* A highlight raked across the plate, following the pointer — it reads as a
+   surface catching light rather than a picture. Never eats a click. */
+.hero-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg, 17px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  background: radial-gradient(
+    38% 60% at var(--sheen-x, 50%) var(--sheen-y, 50%),
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 42%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+
+.hero-stage[data-tracking] .hero-sheen { opacity: 1; }
+
+/* ==========================================================================
+   Small-screen composition
+   ==========================================================================
+   A different picture from the same assets — not the desktop one reflowed.
+
+   Leads with the patient app home screen at ~64% of the stage, which puts it
+   at about two thirds of its authored pixel width: legible. The patient card
+   enters from the left edge and the bookings-table sliver anchors the top
+   right. The dashboard and the three-up strip are dropped: at this size the
+   dashboard is 0.18x and the outer two phones are 0.2x, and a screenshot
+   nobody can read is worse than a screenshot that isn't there.
+
+   The plate turns portrait (1/1.32) because a 2.27:1 letterbox at 327px is
+   107px tall — not enough room for a device to be the subject of anything.
+
+   The 560px threshold is set by the *mobile* composition, not the desktop one.
+   The obvious reading is to switch as soon as the dashboard stops being
+   readable, around 720px — but that is wrong in practice. Between 560 and 720
+   the desktop arrangement still reads as a product shot even though its finest
+   text has gone; the phone leading the mobile arrangement, by contrast, is a
+   319px asset shown at 61% of the stage, so past a 560px stage it is being
+   upscaled. A slightly-too-small dashboard reads as a photograph of a screen.
+   An upscaled phone reads as a mistake. So the switch happens where the mobile
+   composition stops being honest: 319 / 0.61 = 523, rounded to 560 for about
+   7% of headroom.
+
+   Measured against the stage, not the viewport, because this component is used
+   both as a full-bleed case study banner and as a works tile: what matters is
+   the room the hero got, not the size of the window.
+   ========================================================================== */
+@container hero (max-width: 560px) {
+  .hero-plate {
+    aspect-ratio: 1 / 1.32;
+  }
+
+  .hero-lyr[data-lyr='dash'],
+  .hero-lyr[data-lyr='phones'] {
+    display: none;
+  }
+
+  /* The lead. Sits right so the two supporting pieces can stack down the left
+     without either being reduced to an unreadable sliver. */
+  .hero-lyr[data-lyr='app'] {
+    display: block;
+    --l: 37%;
+    --t: 11%;
+    --w: 61%;
+  }
+
+  /* The patient app's own header band is rgb(0,68,197) — the same colour as
+     the plate it sits on, so without a shadow the top third of the device has
+     no edge and the phone appears to start halfway down. This is the only
+     place a layer needs separating from the background, so it is the only
+     place that pays for a filter. */
+  .hero-lyr[data-lyr='app'] .hero-art {
+    filter: drop-shadow(0 10px 22px rgba(0, 8, 40, 0.42));
+  }
+
+  /* Entering from the left edge, positioned so the crop lands past the card's
+     own margin: the avatar, the patient name and the primary action are all
+     inside the visible portion. Cropping a few pixels further left leaves a
+     column of orphaned digits, which reads as broken rather than as depth. */
+  .hero-lyr[data-lyr='card'] {
+    --l: -5%;
+    --t: 45%;
+    --w: 68%;
+  }
+
+  /* Top left, clear of both — the one piece of the desktop tool that survives
+     this size, at about 0.7x its authored width. */
+  .hero-lyr[data-lyr='table'] {
+    --l: 3%;
+    --t: 3%;
+    --w: 37%;
+  }
+
+  /* Travel is read against the stage, and the stage is now a third of the
+     width it was — the desktop distances would throw a layer clean off it. */
+  @keyframes hero-in-dash {
+    from { opacity: 0; transform: translate3d(3cqw, 1.5cqw, 0) scale(0.97); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes hero-in-table {
+    from { opacity: 0; transform: translate3d(4.5cqw, 0, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+
+  @keyframes hero-in-card {
+    0%   { opacity: 0; transform: translate3d(0, 2cqw, 0) scale(0.94); }
+    72%  { opacity: 1; transform: translate3d(0, -0.16cqw, 0) scale(1.005); }
+    100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes hero-drift {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%      { transform: translate3d(0, -0.4cqw, 0) rotate(0.35deg); }
+  }
+}
+
+/* Browsers without container queries keep the desktop composition, which is
+   correct at every width they will encounter — the feature shipped in every
+   engine in 2023, so this is a floor, not a plan. */
+@supports not (container-type: inline-size) {
+  .hero-lyr[data-lyr='app'] { display: none; }
+}
+
+/* ==========================================================================
+   Reduced motion: the composition still assembles, it just does not travel.
+   Layers fade in place, in the same order, so the reading sequence survives;
+   nothing slides, drifts or tilts.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hero-tilt,
+  .hero-lyr {
+    transform: none;
+  }
+
+  .hero-float,
+  .hero-stage[data-entered] .hero-float {
+    animation: none;
+  }
+
+  .hero-sheen { display: none; }
+
+  .hero-stage.in-view [data-lyr='dash'] .hero-art,
+  .hero-stage.in-view [data-lyr='table'] .hero-art,
+  .hero-stage.in-view [data-lyr='card'] .hero-art,
+  .hero-stage.in-view [data-lyr='phones'] .hero-art,
+  .hero-stage.in-view [data-lyr='app'] .hero-art {
+    animation-name: hero-in-fade;
+  }
+
+  @keyframes hero-in-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}

@@ -12,9 +12,11 @@ data.js       Single source of truth for every string, link and asset path.
 script.js     Renders index.html from data.js. Home page only.
 reveal.js     Scroll-reveal. Shared by both pages.
 to-top.js     Back-to-top button. Shared by both pages.
-banner.js     Layered parallax for the case study banner. Case study only.
+hero.js       Layered product hero: parallax, tilt, entrance. Both pages.
+cs-nav.js     Case study scrollspy, progress bar, drawer. Case study only.
 
 styles.css      Design tokens + every shared component. Loaded by both pages.
+hero.css        The layered product hero. Loaded by both pages.
 case-study.css  Only what the case study adds on top.
 
 public/       Images, video, resume PDF.
@@ -37,9 +39,92 @@ different person or project without touching markup, styles or logic.
 <script src="to-top.js"></script>  <!-- don't exist until script.js runs -->
 ```
 
-The case study loads `motion.js`, `reveal.js` and `to-top.js`. It cannot load
-`script.js`, which is a single pass expecting the full home-page DOM and would
-throw on this page's missing elements.
+The case study loads `motion.js`, `reveal.js`, `to-top.js`, `cs-nav.js` and
+`hero.js`. It cannot load `script.js`, which is a single pass expecting the
+full home-page DOM and would throw on this page's missing elements — which is
+why its hero is written out in the markup rather than built from `data.js`.
+
+### The layered product hero
+
+`hero.css` + `hero.js` + `buildHeroStage` in `script.js`. One component, used by
+the home page works tile (built from `data.js`) and the case study banner
+(written out inline, because `script.js` cannot run there). It replaces the
+flattened `Frame21.png` export with the five product surfaces as separate
+elements.
+
+**Two compositions, not one scaled.** A container query on the stage — not a
+viewport media query, because the component is used at two different widths on
+the same site — switches at a 560px stage:
+
+| | desktop | small screen |
+|---|---|---|
+| plate | 1314 / 580 | 1 / 1.32 |
+| layers | dash, table, card, phones | table, card, **app** |
+| leads with | the admin dashboard | the patient app screen |
+
+`app` is the middle device cut out of the three-up strip — the only one of the
+three with an unoccluded silhouette. The dashboard and the strip are *dropped*
+on small screens rather than shrunk: at a 335px stage the dashboard renders at
+0.18x and its table rows stop being rows.
+
+The 560px threshold is set by where the mobile composition stops being honest
+(a 319px asset at 0.61 of the stage upscales past 523px), not by where the
+dashboard stops being readable. Between 560 and 720 the desktop arrangement
+still reads as a product shot; an upscaled phone reads as a mistake.
+
+**Desktop geometry is measured, not eyeballed** — each layer was template
+matched against the original flattened export (77–91% pixel agreement) and the
+winning scale and offset written as percentages of the artboard. The rebuild
+diffs against that export at a mean 4.67/255 per pixel, the residue being text
+anti-aliasing from the 0.4275x downscale.
+
+**Two asset defects surfaced doing this** (full note in `hero.css`): the
+phones' app header is the same blue as the background they were cut from, so
+the chroma key had removed it — invisible on a blue plate, but the hole showed
+whatever sat behind it; and `table.png` was an incomplete crop covering 188 of
+the 291px the bookings panel occupies.
+
+**Shadows are CSS, not baked.** The key stripped them (a soft shadow on a flat
+field keeps that field's hue), so they are restored as `drop-shadow` in `cqw`,
+tuned against the grey falloff sampled from the original. They sit on
+`.hero-art`, inside the box that animates, so the drift composites a rasterised
+result instead of re-blurring every frame.
+
+**WebP only where it wins.** Three of five layers; the dashboard and card are
+flat-fill UI with sharp text and got 24–29% *bigger* as WebP.
+
+**Every layer is `loading="lazy"`.** A `display: none` image with that attribute
+is never fetched, which is what keeps the unused composition off the wire —
+70KB on a phone against 190KB on a desktop. In-viewport lazy images still load
+immediately, so the visible layers pay nothing.
+
+### The case study
+
+`suraksha_case_study.html` + `case-study.css` + `cs-nav.js` are a self-contained
+editorial layout that borrows only the font, ink tokens, `.btn` and the footer
+from `styles.css`.
+
+**One 12-column grid at a 1280px measure.** `.cs-shell` centres it, `.cs-grid`
+declares it, `.sp-4` … `.sp-12` choose a span, and everything collapses to one
+column at 900px. The point is that a heading, a paragraph and a screenshot all
+start on the same vertical line down the whole page.
+
+**Nine sections**, each an anchor target with `scroll-margin-top` reserving the
+sticky bar: hero → overview → challenge → research → strategy → design →
+solution → responsive → outcome.
+
+**Type is a fixed six-step scale**, and the steps are anchored in **px, not
+rem**. `styles.css` scales the root itself (`clamp(15px, 14.1px + 0.28vw,
+17px)`), so a rem floor is not a floor — `0.75rem` lands at 11.4px on a 375px
+phone. The `vw` term still supplies the desktop growth.
+
+`cs-nav.js` runs the scrollspy, the reading-progress bar and the mobile drawer
+off `SiteMotion`'s single ticker, and manages `tabindex` on the pannable image
+boxes (see Conventions).
+
+Content images are `<picture>` with a WebP source and the original PNG as the
+fallback: 1288KB → 241KB across the eight of them. Regenerate with
+`sharp(src).webp({ quality: 82, effort: 6 })`.
 
 ## Motion
 
@@ -109,8 +194,22 @@ heading levels can be chosen for document outline without affecting appearance.
   `animation-delay` that keeps the marquee from jumping when reversed, and the
   `transition-delay` cleanup in `reveal.js` that stops stagger delays leaking
   into hover transitions. Preserve these when editing.
-- **`prefers-reduced-motion` is honoured in five places.** Any new motion must
+- **`prefers-reduced-motion` is honoured throughout.** Any new motion must
   handle it too.
+- **Reveals on the case study are opt-in via `.cs-reveal`.** `reveal.js` matches
+  that one class plus `.cs-figure`, so a new section animates without editing
+  `reveal.js` — and because same-parent targets stagger in document order, the
+  cards in a grid sequence themselves.
+- **`.cs-pan` is a contained horizontal scroller**, used below 720px so a
+  1016px dashboard screenshot can be read at a usable size instead of being
+  scaled to a third of it. `cs-nav.js` adds `tabindex="0"` and an `aria-label`
+  **only while the box actually overflows** — a scroll region that answers only
+  to touch and the wheel is unreachable by keyboard, but hard-coding the
+  attribute would leave six dead tab stops on every desktop viewport.
+- **`.cs-page` re-zeroes `dd` margin and `ol` padding.** `styles.css` strips
+  `ul` markers and `h1`–`h6` margins, but the home page uses neither
+  description lists nor ordered lists, so those UA defaults were never dealt
+  with. The case study uses both heavily.
 
 ## Deployment
 
