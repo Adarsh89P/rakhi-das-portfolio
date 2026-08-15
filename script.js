@@ -358,20 +358,56 @@
       copy.appendChild(fadeParagraph('about-line', text));
     });
 
+    /* Run the fade before the pills go in: it only collects `.about-word`,
+       and the pills are not part of the sentence being read. */
     initAboutFade(copy);
+
+    if (data.about.skills && data.about.skills.length) {
+      var list = el('ul', 'about-skills');
+      data.about.skills.forEach(function (skill) {
+        list.appendChild(el('li', 'about-skill', skill));
+      });
+      copy.appendChild(list);
+    }
   }
 
-  /* One <span> per word so each can be faded on its own. The spaces stay as
-     plain text nodes between them, which is what keeps the paragraph
-     selectable and copyable as ordinary prose. */
+  /* One <span> per word so each can be faded on its own. The whitespace runs
+     stay as plain text nodes between them, which is what keeps the paragraph
+     selectable and copyable as ordinary prose.
+
+     `{...}` in the source marks an accented run, which may span several words
+     ("{design systems}"). Rather than splitting on the braces — which loses
+     the exact spacing around them and strands trailing punctuation in its own
+     token — the string is split on whitespace and an `accent` flag is carried
+     across words until the closing brace. A word like "{intention}." keeps
+     its full stop inside the accent, which is what reads correctly. */
   function fadeParagraph(className, text) {
     var p = el('p', className);
-    text.split(' ').forEach(function (word, index) {
-      if (index) p.appendChild(document.createTextNode(' '));
-      var span = el('span', 'about-word');
+    var accent = false;
+
+    text.split(/(\s+)/).forEach(function (chunk) {
+      if (!chunk) return;
+
+      if (/^\s+$/.test(chunk)) {
+        p.appendChild(document.createTextNode(chunk));
+        return;
+      }
+
+      var word = chunk;
+      if (word.indexOf('{') !== -1) {
+        accent = true;
+        word = word.replace('{', '');
+      }
+      var closes = word.indexOf('}') !== -1;
+      if (closes) word = word.replace('}', '');
+
+      var span = el('span', accent ? 'about-word is-accent' : 'about-word');
       span.textContent = word;
       p.appendChild(span);
+
+      if (closes) accent = false;
     });
+
     return p;
   }
 

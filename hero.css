@@ -294,8 +294,16 @@
    the room the hero got, not the size of the window.
    ========================================================================== */
 @container hero (max-width: 560px) {
+  /* Matches the project frame's own small-screen ratio (629/580 in
+     styles.css). The hero is placed inside a fixed-ratio frame on the home
+     page, so a plate that sets a different ratio is simply clipped by it —
+     a portrait 1/1.32 plate lost 300px of its height to a landscape frame,
+     which is most of the phone. Sharing one ratio means the plate fills the
+     frame exactly and the composition is laid out against the box it will
+     actually be seen in. On the case study, where the figure has no ratio of
+     its own, the plate is what defines the shape. */
   .hero-plate {
-    aspect-ratio: 1 / 1.32;
+    aspect-ratio: 629 / 580;
   }
 
   .hero-lyr[data-lyr='dash'],
@@ -304,12 +312,19 @@
   }
 
   /* The lead. Sits right so the two supporting pieces can stack down the left
-     without either being reduced to an unreadable sliver. */
+     without either being reduced to an unreadable sliver.
+
+     Deliberately taller than the plate: at 55% of a 342px frame the device is
+     195px wide and 402px tall in a 315px box, so roughly a quarter of it runs
+     off the bottom. That is the right trade — showing the whole phone would
+     mean 150px of width, where the app's own labels stop resolving. The part
+     kept is the part that carries the product: header, search, the four
+     primary actions and the promoted card. */
   .hero-lyr[data-lyr='app'] {
     display: block;
-    --l: 37%;
-    --t: 11%;
-    --w: 61%;
+    --l: 41%;
+    --t: 6%;
+    --w: 55%;
   }
 
   /* The patient app's own header band is rgb(0,68,197) — the same colour as
@@ -326,17 +341,17 @@
      inside the visible portion. Cropping a few pixels further left leaves a
      column of orphaned digits, which reads as broken rather than as depth. */
   .hero-lyr[data-lyr='card'] {
-    --l: -5%;
-    --t: 45%;
-    --w: 68%;
+    --l: -6%;
+    --t: 38%;
+    --w: 62%;
   }
 
   /* Top left, clear of both — the one piece of the desktop tool that survives
      this size, at about 0.7x its authored width. */
   .hero-lyr[data-lyr='table'] {
-    --l: 3%;
-    --t: 3%;
-    --w: 37%;
+    --l: 2%;
+    --t: 4%;
+    --w: 34%;
   }
 
   /* Travel is read against the stage, and the stage is now a third of the

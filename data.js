@@ -51,11 +51,27 @@ var PORTFOLIO_DATA = {
      with. Every word fades in as the section scrolls up. */
   about: {
     eyebrow: 'About Me',
-    lead: "I'm a product designer who loves crafting calm, clear experiences that users love and teams trust. I design with a systems mindset — simplifying complex workflows, elevating visual clarity, and shaping products that scale with intention.",
+    /* `{...}` marks an accented run. Plain text rather than HTML so the copy
+       stays editable here without markup in it — fadeParagraph in script.js
+       turns each word into its own span either way, which is what the
+       scroll-driven word fade needs. */
+    lead: 'I turn complex workflows into calm, clear products that scale with {intention}.',
     /* Renders under the lead in smaller, lighter type. */
     paragraphs: [
-      'Most projects start with a conversation and end with something a teammate can reuse: a flow, a pattern, a component with the edge cases already answered.',
-      'I care about the quiet decisions — the empty state, the error message, the spacing that makes a dense screen readable — because those are the parts people actually feel.'
+      '4 years designing research-led experiences — sweating the quiet details, from empty states to {design systems}, that make a product feel effortless.'
+    ],
+    /* Capability pills under the copy. Order is deliberate: tools first, then
+       research, then the craft — it reads as a working sequence rather than
+       an alphabetised dump. */
+    skills: [
+      'Figma',
+      'User Research',
+      'Design Systems',
+      'Prototyping',
+      'Wireframing',
+      'Usability Testing',
+      'Interaction Design',
+      'Design Tokens'
     ]
   },
 
@@ -133,7 +149,13 @@ var PORTFOLIO_DATA = {
         heading: 'Yoga All-in-One Elevate Health & Serenity.',
         dateRange: 'Jan 2024 – Nov 2024',
         description: 'A unified app offering guided yoga sessions, personalized routines, progress tracking, and a calming, intuitive experience to support a consistent wellness journey',
-        color: '#fedfe7',
+        /* Sampled from the artwork's own top and bottom edge rows (#f6c9c9 and
+           #f4c3b6), not picked from the pastel set: below 608px this artwork
+           is letterboxed rather than cropped, so `color` becomes a visible mat
+           either side of it. The previous #fedfe7 was 60-87 off those edges
+           and drew a seam across the tile; this is within 14. On desktop the
+           image covers the whole frame, so the mat is never seen there. */
+        color: '#f5c6c0',
         image: 'public/MobileBanking/yogaapp.jpg',
         href: 'https://www.behance.net/gallery/227695287/Yoga-Lifestyle'
       },
@@ -177,7 +199,7 @@ var PORTFOLIO_DATA = {
     heading: "Where I've worked",
     /* `logoLetter` renders as a lettermark badge; swap in a real `logo`
        image url per item any time (falls back to the letter until then).
-       `color` is one of the site's 3 pastel tokens (see --exp-blue/-peach/
+       `color` is one of the site's 4 card tints (see --exp-lilac/-blush/
        -pink below) — cards cascade in a fanned stack, so keep them varied. */
     items: [
       {
@@ -186,7 +208,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Dec 2024 – Present',
         logoLetter: 'S',
         logo: 'public/logos/sundew.png',
-        color: 'var(--exp-blue)',
+        color: 'var(--exp-lilac)',
         description: 'Designing research-led product experiences for a fast-moving startup, from first interview to shipped interface.'
       },
       {
@@ -195,7 +217,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Jun 2023 – Feb 2025',
         logoLetter: 'F',
         logo: 'public/logos/Fortmindz.png',
-        color: 'var(--exp-peach)',
+        color: 'var(--exp-cream)',
         description: 'Owned interface design for web and mobile products, backed by a reusable component library.'
       },
       {
@@ -204,7 +226,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Nov 2022 – Jun 2023',
         logoLetter: 'P',
         logo: '',
-        color: 'var(--exp-pink)',
+        color: 'var(--exp-blush)',
         description: 'Translated client briefs into interactive prototypes that made design decisions easy to review.'
       },
       {
@@ -213,7 +235,7 @@ var PORTFOLIO_DATA = {
         dateRange: 'Oct 2020 – Feb 2023',
         logoLetter: 'G',
         logo: 'public/logos/Granicus.png',
-        color: 'var(--exp-blue)',
+        color: 'var(--exp-stone)',
         description: 'Client-facing implementation work that became the foundation for a move into UX design.'
       }
     ]

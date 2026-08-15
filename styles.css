@@ -29,11 +29,24 @@
   --hairline: #e5e5e5;
   --hairline-soft: rgba(0, 0, 0, 0.06);
 
-  /* The same 3 pastels already used for the Works image placeholders,
-     named for reuse on the Experience cascade. */
-  --exp-blue: #c4e8ff;
-  --exp-peach: #ffe9d1;
-  --exp-pink: #fedfe7;
+  /* Experience card fills.
+
+     These were three saturated pastels (#c4e8ff baby blue, #ffe9d1 peach,
+     #fedfe7 candy pink) borrowed from the Works placeholders. Nothing else on
+     the page is coloured that way — the site is white, ink and one gradient —
+     so the cascade read as a strip of children's stationery dropped into an
+     editorial layout, and with only three fills across four cards the blue
+     repeated at either end of the fan.
+
+     Replaced with four tints mixed from the site's OWN accent gradient
+     (--gradient-accent: #b16cea -> #fa5f72 -> #ffa44c) at roughly 15% over
+     white, plus one warm neutral to close the set. Same family as every other
+     accent on the page, a quarter of the saturation, and four distinct cards
+     instead of three-and-a-repeat. */
+  --exp-lilac: #f3e8fb;
+  --exp-blush: #fde7ea;
+  --exp-cream: #fff1e2;
+  --exp-stone: #f1f0ed;
 
   --footer-bg: #000000;
   --footer-ink: #ffffff;
@@ -83,7 +96,11 @@
   --nav-pill-top: 14px;
   --nav-pill-inset: clamp(16px, 4vw, 32px);
 
-  --section-pad: clamp(56px, 4rem + 3vw, 96px);
+  /* Half of this sits on each side of every section, so the value IS the gap
+     between any two sections. The previous clamp(56px, 4rem + 3vw, 96px) put
+     96px between sections on a desktop and 72px on a phone, which on a page
+     of six stacked sections is most of a viewport spent on nothing. */
+  --section-pad: clamp(40px, 2rem + 2.6vw, 76px);
   /* Half-gap: every top-level section pads itself with this on both edges,
      so any two adjacent sections always sum to a full --section-pad —
      one consistent rhythm down the whole page instead of each section
@@ -329,8 +346,13 @@ section {
   }
 }
 
-/* Shared gradient-text utility — the one accent used across every section. */
-.gradient-text {
+/* Shared gradient-text utility — the one accent used across every section.
+   `.about-lead .is-accent` joins the selector rather than restating the
+   recipe: the About copy marks its accent with `{...}` in data.js instead of
+   a class name (see fadeParagraph), so it cannot carry `.gradient-text`
+   itself, and a second copy of the declarations would drift from this one. */
+.gradient-text,
+.about-lead .is-accent {
   background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1003,9 +1025,11 @@ body.intro-active #heroPhotoWrap {
 }
 
 /* The eyebrow keeps its rule across the full container, as in every other
-   section; the copy under it is centered. */
+   section. The copy under it is ranged left: the block ends in a wrapping row
+   of capability pills, and pills centre-justified under centred prose leave a
+   ragged last row that reads as a mistake rather than as a list. */
 .about-copy {
-  text-align: center;
+  text-align: left;
 }
 
 /* The measures below live on the paragraphs rather than here so each `ch`
@@ -1020,7 +1044,6 @@ body.intro-active #heroPhotoWrap {
   letter-spacing: -0.02em;
   color: var(--ink);
   max-width: 54ch;
-  margin-inline: auto;
   text-wrap: balance;
 }
 
@@ -1032,7 +1055,6 @@ body.intro-active #heroPhotoWrap {
   color: var(--text-paragraph);
   max-width: 66ch;
   margin-top: var(--space-4);
-  margin-inline: auto;
   text-wrap: balance;
 }
 
@@ -1043,6 +1065,52 @@ body.intro-active #heroPhotoWrap {
    to 1 immediately. */
 .about-word {
   opacity: 0.18;
+}
+
+/* The accented run inside the copy, marked with `{...}` in data.js.
+
+   The lede's accent is the site's shared gradient, applied up at the
+   `.gradient-text` utility so there is only one copy of the recipe.
+
+   The supporting line does NOT take it. That line is 16-20px body copy, where
+   the AA floor is 4.5:1, and the gradient's stops measure 3.39, 3.02 and
+   1.97:1 on white — the orange tail fails even the 3:1 large-text floor. So
+   here the emphasis is carried by weight and full-strength ink instead. */
+.about-line .is-accent {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* Capability pills. A list, because that is what it is — the row reads as
+   eight separate claims, not one sentence. */
+.about-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--space-5);
+}
+
+.about-skill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 7px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background-color: var(--surface);
+  font-weight: 400;
+  /* Held at 14px rather than a rem step: the root scales 15-17px, and a pill
+     label is the one place the type wants to stay put while the prose around
+     it grows. */
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--ink-dim);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.about-skill:hover {
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 /* ==========================================================================
@@ -1394,7 +1462,7 @@ a.work-image:focus-visible .work-image-arrow {
    Experience — a fanned, overlapping cascade of cards (like a spread hand
    of cards), styled after the reference "My Journey" layout but in the
    site's own pastel palette instead of a dark theme. Colors come from
-   data.js per item (--exp-blue/-peach/-pink, defined in :root above).
+   data.js per item (--exp-lilac/-blush/-cream/-stone, defined in :root above).
 
    Layout notes:
    - Overlap is plain negative margin-left — no absolute positioning.
@@ -1437,13 +1505,13 @@ a.work-image:focus-visible .work-image-arrow {
   border: 1px solid var(--hairline-soft);
   box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
   /* Background color comes from data.js per item (applied inline in
-     script.js) — one of --exp-blue/-peach/-pink. */
+     script.js) — one of --exp-lilac/-blush/-cream/-stone. */
 
   /* --text-paragraph is tuned against white, where it clears AA at 4.54:1.
-     On these pastel fills it does not: 3.53:1 on --exp-blue, the darkest of
-     the three and so the worst case. Re-pointing the token on the card
-     covers every descendant at once — the same trick the dark-theme block
-     above uses — and lands at 5.20:1 while staying a muted grey. */
+     On a tinted fill it does not — even against the lightest of these four it
+     only reaches 3.75:1. Re-pointing the token on the card covers every
+     descendant at once, the same trick the dark-theme block above uses, and
+     lands at 5.65-6.03:1 across the set while staying a muted grey. */
   --text-paragraph: #5c5c5c;
 }
 
@@ -1723,7 +1791,7 @@ a.work-image:focus-visible .work-image-arrow {
 .footer-watermark {
   position: absolute;
   left: 50%;
-  bottom: min(275px, 17.1875vw);
+  bottom: min(178px, 11.1vw);
   transform: translate(-51.23%, 100%);
   z-index: 0;
   font-weight: 700;
@@ -1749,7 +1817,7 @@ a.work-image:focus-visible .work-image-arrow {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: min(42px, 2.625vw);
+  margin-bottom: min(26px, 1.8vw);
 }
 
 /* The circular crop lives on the img, not here — a clipping container would
@@ -1807,16 +1875,22 @@ a.work-image:focus-visible .work-image-arrow {
 .footer-actions {
   display: flex;
   gap: 10px;
-  margin-bottom: min(42px, 2.625vw);
+  margin-bottom: min(26px, 1.8vw);
 }
 
 /* 16px gap puts the unrotated 56px tiles at x = 0 / 72 / 144 / 216, matching
    Figma — the per-tile rotation is applied in script.js and, being a
    transform, does not disturb this layout. */
+/* The gap under the icons is the window the watermark shows through, so it
+   cannot go to zero — but at min(145px, 9.0625vw) it was 130px of empty black
+   on a desktop, which made the footer the tallest section on the page after
+   Works. Halved: the watermark is a 6%-opacity backdrop and reads just as
+   well with less of it visible, and its own bottom anchor came down to match
+   so it keeps the same relationship to the copyright rule. */
 .footer-social {
   display: flex;
   gap: 16px;
-  margin-bottom: min(145px, 9.0625vw);
+  margin-bottom: min(72px, 4.6vw);
 }
 
 .footer-social-link {
@@ -1991,9 +2065,33 @@ a.work-image:focus-visible .work-image-arrow {
     white-space: normal;
   }
 
+  /* No `.about` padding override any more: --section-pad-half is now 20px a
+     side on a phone, which is already tighter than the 24px this carried, so
+     keeping it would make About the *loosest* section rather than the
+     tightest. One rhythm governs. */
+
+  /* This margin does double duty: it separates the lede from the first
+     supporting line, and it is also the gap *between* the supporting lines.
+     Tightening it once closes both, which is what keeps the block reading as
+     one paragraph group rather than three stranded sentences. */
+  .about-line {
+    margin-top: var(--space-3);
+  }
+
+  /* Stacked, every project is full width and the reader is scrolling a single
+     column — the desktop gap was sized to separate rows that also had 30px of
+     horizontal space doing part of that work. */
+  .works-list {
+    gap: clamp(32px, 5vw, 48px);
+  }
+
   .work-row {
     flex-direction: column;
-    gap: clamp(56px, 7vw, var(--space-10));
+    /* Once a pair stacks it is two projects in the same column as every other
+       project, so it wants the row gap, not more than it: the previous
+       clamp(56px, 7vw, --space-10) opened a pair wider than the gap between
+       two full-width projects, which read as a section break that wasn't. */
+    gap: clamp(24px, 4vw, 40px);
   }
 
   /* A stacked pair is full width again, so it takes the full display size
@@ -2036,6 +2134,89 @@ a.work-image:focus-visible .work-image-arrow {
 
   .footer-intro {
     align-items: flex-start;
+  }
+
+  /* The footer's own components, not just its padding. On a phone the intro
+     block alone ran 232px — an 82px avatar above a two-line heading above a
+     three-line tagline — before either button. These are the Figma desktop
+     measurements; at this width they are simply oversized. */
+  .footer-avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  /* Kept proportional to the smaller avatar: the dot is drawn as a ratio of
+     the circle in Figma, so a fixed 20px reads as a bulge at 64px. */
+  .footer-avatar::after {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+  }
+
+  .footer-tagline {
+    font-size: 16px;
+  }
+
+  .footer-social-link {
+    width: 48px;
+    height: 48px;
+  }
+
+  .footer-social-link svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* The back-to-top button is fixed to the bottom-right, so at the very end
+     of the page it lands on top of this line — it was covering the last two
+     characters of "prototypes,". Reserving its width plus its 16px offset
+     keeps the sentence out from under it. Only needed here: on a desktop the
+     line ends around x=580 of 1440 and never reaches the button. */
+  .footer-bottom {
+    padding-right: 64px;
+  }
+}
+
+/* One frame shape for every project, matching the shape a paired project
+   already uses once it has stacked.
+
+   1314/580 is a desktop measurement: the frame is 1314px wide there and the
+   artwork was authored to fill it. At 342px the same ratio is a 151px-tall
+   letterbox — too short to read a screenshot in, and it was clipping 300px
+   off the layered hero's small-screen composition, leaving only its top
+   third visible.
+
+   The breakpoint is 608px rather than the 900px used above because this rule
+   has to change in lockstep with hero.css, which switches composition on a
+   *container* query at a 560px stage. Below 800px the gutter is a flat 24px a
+   side, so a 560px stage is a 608px viewport. Splitting them would leave a
+   band where the plate and the frame disagree about their shape: the hero
+   would draw a 2.27:1 plate inside a 1.08:1 frame and leave a blue gap under
+   itself. If either number moves, move the other.
+
+   `.work-row .work-image` outside any media query carries the same value at
+   higher specificity, so the pairs are unaffected; `.work-image.has-video`
+   also outranks this and keeps 16/9, the shape its footage was recorded at. */
+@media (max-width: 608px) {
+  .work-image {
+    aspect-ratio: 629 / 580;
+  }
+
+  /* ...and show the whole artwork inside it.
+     A paired project's image is authored at 629x580 — exactly this box — so
+     `cover` neither crops nor stretches it, which is why those tiles look
+     right. A full-width project's is authored at 2.27:1 for the frame it has
+     on a desktop, and `cover` fits that to the box by height, throwing away
+     52% of its width: the Yoga tile lost both edges of the composition.
+
+     `contain` shows all of it and lets the tile's own `color` fill what is
+     left, which is the same trick the Influencer project already uses at
+     every width (`fit: 'contain'` in data.js) — its margins disappear because
+     that colour is the artwork's own background. The rule is scoped to
+     `.works-list > .work-item` so it reaches only the full-width projects;
+     the pairs, which live inside `.work-row`, keep `cover`. */
+  .works-list > .work-item .tile-img {
+    object-fit: contain;
   }
 }
 
