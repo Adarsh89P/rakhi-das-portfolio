@@ -681,6 +681,13 @@
       if (!meta) return;
       var url = data.social[key];
 
+      /* A placeholder is not a profile. '#' and '' both used to render a
+         full-colour icon that went nowhere — worse than an absent icon,
+         because it looks clickable and costs the visitor a tap to find out
+         it isn't. Skipping here rather than only pruning data.js means a
+         half-filled entry can never ship as a dead link again. */
+      if (!url || url === '#') return;
+
       var li = el('li');
       var a = el('a', 'footer-social-link', '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + meta.path + '</svg>');
       a.href = url;

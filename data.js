@@ -18,15 +18,25 @@ var PORTFOLIO_DATA = {
     email: 'dasrakhi303@gmail.com'
   },
 
-  /* Nav links either side of the centered logo, left-to-right. */
+  /* Nav links either side of the centered logo, left-to-right. Kept to three
+     a side so the two groups balance around the wordmark.
+
+     The page has six destinations and the nav used to name two of them, so
+     Work, Experience and Contact were the sections a visitor had to find by
+     scrolling. Behance came out to make room: it is still reachable from the
+     footer icons and from 'View more projects' at the end of the work list,
+     and an outbound link is the one thing a site nav should not spend a slot
+     on. Contact points at the footer, which is where the email and CV live. */
   nav: {
     left: [
       { label: 'Home', href: '#home' },
-      { label: 'About', href: '#about' }
+      { label: 'About', href: '#about' },
+      { label: 'Work', href: '#works' }
     ],
     right: [
-      { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume.pdf' },
-      { label: 'Behance', href: 'https://www.behance.net/rakhidas1' }
+      { label: 'Experience', href: '#experience' },
+      { label: 'Contact', href: '#footer' },
+      { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume.pdf' }
     ]
   },
 
@@ -111,9 +121,13 @@ var PORTFOLIO_DATA = {
     projects: [
       {
         fullWidth: true,
-        heading: 'SaaS Dashboard Redesign',
+        /* Was 'SaaS Dashboard Redesign', which named the wrong category —
+           the case study behind this card is a healthcare diagnostic
+           ecosystem — and hid the one fact that makes it worth opening: it is
+           five products, not a dashboard. */
+        heading: 'Suraksha — Diagnostic Ecosystem',
         dateRange: 'Mar 2025 – Jul 2025',
-        description: 'Simplifying complex healthcare journeys into intuitive digital experiences for patients, doctors, and administrators.',
+        description: 'Five connected products — patient app, front desk and admin dashboards, home collector app and website — redesigned into one diagnostic system for patients, technicians and administrators.',
         /* The plate colour behind the layers — the original export's own
            background, sampled from it rather than picked. */
         color: '#0044c5',
@@ -284,10 +298,17 @@ var PORTFOLIO_DATA = {
 
   /* Key order is render order in the footer fan. Each key must have a
      matching entry in SOCIAL_ICONS (script.js) or it is skipped. */
+  /* Only real profiles belong here. An entry whose URL is missing or '#' is
+     skipped by the renderer rather than shipped as an icon that goes nowhere,
+     so adding a profile is: uncomment the line, paste the URL, done.
+
+     twitter and instagram were both '#' — two dead links in the footer of
+     every page. Commented rather than deleted so the handles can come back
+     without having to re-derive the key names the icon set expects. */
   social: {
-    twitter: '#',
+    // twitter: '',
     behance: 'https://www.behance.net/rakhidas1',
-    instagram: '#',
+    // instagram: '',
     linkedin: 'https://www.linkedin.com/in/rakhi-das-183381158/'
   },
 
