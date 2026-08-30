@@ -1,0 +1,1076 @@
+/* =========================================================================
+   YOGAEASE CASE STUDY
+   =========================================================================
+   A second case-study skin, deliberately unlike case-study.css (Suraksha).
+   That page is a centred single column with a horizontal section bar; this
+   one is a two-track editorial layout — a persistent left index rail beside
+   a reading column — because this project's material is broader (research,
+   IA, a design system, five product areas) and readers need to jump.
+
+   Everything is prefixed `y-` and scoped under `.y-doc` so the two case
+   studies can never leak into each other, and so styles.css keeps ownership
+   of the shared shell (buttons, footer, skip link, back-to-top).
+
+   TYPE IS ANCHORED IN PX, NOT REM. styles.css scales the root
+   (`font-size: clamp(15px, 14.1px + 0.28vw, 17px)`), so a rem-based scale
+   silently shrinks ~12% on a phone and the small steps fall under the
+   legibility floor. Every step below is a px clamp for that reason.
+   ========================================================================= */
+
+.y-doc {
+  /* ---- Palette -------------------------------------------------------
+     Lifted from the project's own design system slide rather than invented:
+     Salmon Pink #FF9D9D, Spanish Pink #F5C3B5, Rich Black #0B0829, White.
+
+     `--y-rose` is the brand salmon and is used DECORATIVELY ONLY — it is
+     1.6:1 on this background and can never carry text or a meaningful icon.
+     `--y-rose-deep` is that hue taken down to 6.3:1 so the accent can
+     actually be read; it is what every accented word, number, rule and
+     button fill uses. */
+  --y-ink: #0b0829;
+  --y-ink-2: #3d3947;
+  --y-ink-3: #6b6775;
+  --y-rose: #ff9d9d;
+  --y-rose-deep: #a3352f;
+  --y-sand: #f5c3b5;
+  --y-blush: #fff1ee;
+  --y-blush-2: #fde9e4;
+  --y-bg: #faf8f7;
+  --y-card: #ffffff;
+  --y-line: #e8e2de;
+  --y-line-soft: rgba(11, 8, 41, 0.07);
+
+  /* ---- Measure -------------------------------------------------------
+     1200 of content inside a 1280 shell. The rail is 236 + a 56 gutter,
+     leaving ~740 for the reading column at full width — about 78
+     characters at 18px, the top of the comfortable range. */
+  --y-shell: 1280px;
+  --y-gut: clamp(20px, 4vw, 56px);
+  --y-rail: 236px;
+  --y-rail-gap: clamp(32px, 4.4vw, 64px);
+  --y-topbar-h: 58px;
+
+  /* Half on each side of every section, so the value IS the gap between
+     any two — the same trick styles.css uses, kept so the two pages feel
+     like one site. */
+  --y-sec-pad: clamp(44px, 4.6vw, 88px);
+
+  /* ---- Type ---------------------------------------------------------- */
+  --y-fs-h1: clamp(40px, 6vw, 84px);
+  --y-fs-h2: clamp(30px, 3.3vw, 48px);
+  --y-fs-h3: clamp(22px, 1.5vw, 27px);
+  --y-fs-h4: clamp(17px, 1vw, 19px);
+  --y-fs-lead: clamp(18px, 16px + 0.5vw, 23px);
+  --y-fs-body: clamp(16px, 15.2px + 0.2vw, 18px);
+  --y-fs-sm: clamp(14px, 13.5px + 0.15vw, 15px);
+  --y-fs-cap: clamp(13px, 12.4px + 0.12vw, 14px);
+  --y-fs-eyebrow: clamp(11px, 10.6px + 0.1vw, 12.5px);
+  --y-fs-stat: clamp(36px, 3.8vw, 56px);
+
+  --y-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+
+  --y-r-lg: 18px;
+  --y-r-md: 12px;
+  --y-r-sm: 8px;
+
+  background: var(--y-bg);
+  color: var(--y-ink-2);
+}
+
+/* styles.css never styled these — the UA defaults (a 40px dd indent, a
+   doubled marker on a list that already numbers itself) would show through
+   on the process and goal lists. */
+.y-doc dd { margin-inline-start: 0; }
+
+/* styles.css has no visually-hidden helper. Needed for the hour chart,
+   where the visible label is "40hr" but a screen reader should hear
+   "40 hours" rather than spell out the abbreviation. */
+.y-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.y-doc ol,
+.y-doc ul.y-plain { list-style: none; padding-inline-start: 0; margin: 0; }
+
+.y-shell {
+  width: 100%;
+  max-width: calc(var(--y-shell) + var(--y-gut) * 2);
+  margin-inline: auto;
+  padding-inline: var(--y-gut);
+}
+
+/* =========================================================================
+   TOP BAR
+   =========================================================================
+   Deliberately slim. The section index lives in the rail, so this bar only
+   has to answer "where am I and how do I get out" — a title and two exits.
+   ========================================================================= */
+.y-top {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  height: var(--y-topbar-h);
+  display: flex;
+  align-items: center;
+  background: rgba(250, 248, 247, 0.82);
+  border-bottom: 1px solid var(--y-line);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+
+/* Without a backdrop-filter the bar would be 82% translucent over live
+   content and the links would be unreadable, so it goes near-opaque. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .y-top { background: rgba(250, 248, 247, 0.98); }
+}
+
+.y-top-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+/* The bar is 58px tall, so a 40px target fits with room either side. Left
+   to its text box this link was 21px — a miss on a phone. */
+.y-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  gap: 8px;
+  font-size: var(--y-fs-sm);
+  font-weight: 600;
+  color: var(--y-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.y-back svg { width: 15px; height: 11px; flex: none; }
+.y-back:hover { color: var(--y-rose-deep); }
+
+.y-top-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--y-line);
+  flex: none;
+}
+
+.y-top-title {
+  font-size: var(--y-fs-sm);
+  color: var(--y-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.y-top-cta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: var(--y-ink);
+  color: #fff;
+  font-size: var(--y-fs-cap);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.y-top-cta svg { width: 12px; height: 12px; flex: none; }
+.y-top-cta:hover { background: var(--y-rose-deep); }
+
+/* A reading-progress hairline. Cheap orientation on a page this tall. */
+.y-progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--y-rose-deep);
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+.y-hero {
+  padding-top: clamp(34px, 4vw, 64px);
+  padding-bottom: var(--y-sec-pad);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Orbix-style blueprint hairlines. Purely atmospheric, so they sit behind
+   everything and are hidden from assistive tech by being a pseudo-element. */
+.y-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, var(--y-line-soft) 1px, transparent 1px) 0 0 / 25% 100%;
+  opacity: 0.9;
+}
+.y-hero > * { position: relative; }
+
+.y-hero-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.y-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--y-fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--y-rose-deep);
+  margin: 0 0 14px;
+}
+.y-eyebrow::before {
+  content: '';
+  width: 20px;
+  height: 1.5px;
+  background: currentColor;
+  flex: none;
+}
+
+.y-h1 {
+  font-size: var(--y-fs-h1);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  color: var(--y-ink);
+  margin: 0;
+}
+.y-h1 em {
+  font-family: var(--y-serif);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.y-featured {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+  text-decoration: none;
+  padding-bottom: 6px;
+}
+.y-featured b {
+  color: var(--y-ink);
+  font-weight: 600;
+}
+.y-featured:hover b { color: var(--y-rose-deep); }
+.y-featured span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: #0057ff;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  flex: none;
+}
+
+.y-hero-sub {
+  font-size: var(--y-fs-lead);
+  line-height: 1.5;
+  color: var(--y-ink-2);
+  max-width: 60ch;
+  margin: 22px 0 0;
+}
+
+.y-hero-fig {
+  margin: clamp(26px, 3vw, 44px) 0 0;
+  border-radius: var(--y-r-lg);
+  overflow: hidden;
+  background: var(--y-blush);
+}
+.y-hero-fig img { display: block; width: 100%; height: auto; }
+
+/* ---- Meta strip --------------------------------------------------------
+   Rebuilt as real text rather than cropped from the source artwork: it has
+   to reflow to one column on a phone, and a flattened image cannot. */
+.y-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  margin-top: clamp(26px, 3vw, 44px);
+  background: var(--y-line);
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-md);
+  overflow: hidden;
+}
+.y-meta > div {
+  background: var(--y-card);
+  padding: 18px 20px;
+}
+.y-meta dt {
+  font-size: var(--y-fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--y-rose-deep);
+  margin-bottom: 6px;
+}
+.y-meta dd {
+  font-size: var(--y-fs-body);
+  font-weight: 500;
+  color: var(--y-ink);
+}
+
+/* =========================================================================
+   TWO-TRACK BODY  (rail + reading column)
+   ========================================================================= */
+.y-body {
+  display: grid;
+  grid-template-columns: var(--y-rail) minmax(0, 1fr);
+  gap: var(--y-rail-gap);
+  align-items: start;
+  padding-bottom: var(--y-sec-pad);
+}
+
+/* ---- The index rail ----------------------------------------------------
+   Sticks below the top bar for the whole scroll. `align-self: start` on the
+   grid item is what lets `position: sticky` work here — a stretched grid
+   item is already full height and has nothing to stick within. */
+.y-rail {
+  position: sticky;
+  top: calc(var(--y-topbar-h) + 24px);
+  align-self: start;
+}
+
+.y-rail-card {
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-md);
+  background: var(--y-card);
+  padding: 18px 16px 16px;
+}
+
+.y-rail-label {
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+  margin: 0 0 12px;
+  padding-inline: 8px;
+}
+
+.y-rail-list { display: block; }
+.y-rail-list li { display: block; }
+
+.y-rail-link {
+  position: relative;
+  display: block;
+  padding: 8px 8px 8px 14px;
+  font-size: var(--y-fs-sm);
+  line-height: 1.35;
+  color: var(--y-ink-3);
+  text-decoration: none;
+  border-radius: var(--y-r-sm);
+}
+.y-rail-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  /* Full height always, scaled to nothing when inactive. Animating `height`
+     here made the browser lay the bar out again on every frame of the
+     transition; scaleY is composited and does the same job. */
+  height: 20px;
+  border-radius: 2px;
+  background: var(--y-rose-deep);
+  transform: translateY(-50%) scaleY(0);
+  transition: transform var(--transition-fast);
+}
+.y-rail-link:hover { color: var(--y-ink); background: var(--y-blush); }
+
+.y-rail-link.is-active {
+  color: var(--y-ink);
+  font-weight: 600;
+}
+.y-rail-link.is-active::before { transform: translateY(-50%) scaleY(1); }
+
+.y-rail-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 11px 16px;
+  border-radius: 999px;
+  background: var(--y-rose-deep);
+  color: #fff;
+  font-size: var(--y-fs-cap);
+  font-weight: 600;
+  text-decoration: none;
+}
+.y-rail-cta svg { width: 13px; height: 10px; flex: none; }
+.y-rail-cta:hover { background: var(--y-ink); }
+
+/* ---- Mobile index ------------------------------------------------------
+   Below 1024 the rail is replaced (not reflowed) by a horizontal chip
+   scroller pinned under the top bar. A 9-item vertical list stacked above
+   the article would cost most of a phone viewport before a word is read.
+   Hidden above 1024 so only one of the two is ever in the DOM flow. */
+.y-chips {
+  display: none;
+  position: sticky;
+  top: var(--y-topbar-h);
+  z-index: 55;
+  background: rgba(250, 248, 247, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--y-line);
+}
+.y-chips-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 10px var(--y-gut);
+  /* No scroll-snap here. `x proximity` re-snapped to the nearest chip edge
+     after the scrollspy had scrolled the active chip into view, landing it
+     back under the right edge. A nav strip gains nothing from snapping. */
+}
+.y-chips-scroll::-webkit-scrollbar { display: none; }
+.y-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--y-line);
+  background: var(--y-card);
+  font-size: var(--y-fs-cap);
+  font-weight: 500;
+  color: var(--y-ink-3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.y-chip.is-active {
+  background: var(--y-ink);
+  border-color: var(--y-ink);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* =========================================================================
+   SECTIONS
+   ========================================================================= */
+.y-sec {
+  padding-block: var(--y-sec-pad);
+  /* Clears the sticky top bar (and, on mobile, the chip bar too) when an
+     anchor link jumps here. */
+  scroll-margin-top: calc(var(--y-topbar-h) + 18px);
+}
+.y-sec:first-child { padding-top: clamp(28px, 3vw, 48px); }
+
+/* One hairline between sections, inset so it reads as a rule inside the
+   column rather than a full-bleed divider. */
+.y-sec + .y-sec { border-top: 1px solid var(--y-line); }
+
+.y-h2 {
+  font-size: var(--y-fs-h2);
+  line-height: 1.06;
+  letter-spacing: -0.028em;
+  font-weight: 600;
+  color: var(--y-ink);
+  margin: 0 0 18px;
+  max-width: 20ch;
+}
+
+.y-h3 {
+  font-size: var(--y-fs-h3);
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  font-weight: 600;
+  color: var(--y-ink);
+  margin: 0 0 12px;
+}
+
+.y-h4 {
+  font-size: var(--y-fs-h4);
+  font-weight: 600;
+  color: var(--y-ink);
+  margin: 0 0 8px;
+}
+
+/* ---- Vertical rhythm ---------------------------------------------------
+   Three deliberate tiers, so the page groups rather than drones:
+
+     within a group        10–16px   (margins on .y-p, .y-list, .y-h3)
+     between subsections   34–56px   (.y-sub, below)
+     between sections      44–88px   (--y-sec-pad, doubled at the seam)
+
+   `.y-sub` marks a heading that opens a new sub-topic inside a section —
+   the "Key insights" or "Typography" kind. It scales with the viewport
+   instead of sitting at a flat value so the middle tier keeps its distance
+   from the outer one at every width. */
+.y-sub { margin-top: clamp(34px, 3.4vw, 56px); }
+
+.y-lead {
+  font-size: var(--y-fs-lead);
+  line-height: 1.5;
+  color: var(--y-ink-2);
+  margin: 0 0 20px;
+  max-width: 62ch;
+}
+
+.y-p {
+  font-size: var(--y-fs-body);
+  line-height: 1.65;
+  color: var(--y-ink-2);
+  margin: 0 0 16px;
+  max-width: 68ch;
+}
+.y-p:last-child { margin-bottom: 0; }
+.y-p strong { color: var(--y-ink); font-weight: 600; }
+
+/* ---- Bullet list with a bold lead-in (the Orbix pattern) --------------- */
+.y-list {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  display: grid;
+  gap: 14px;
+  max-width: 68ch;
+}
+.y-list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: var(--y-fs-body);
+  line-height: 1.6;
+  color: var(--y-ink-2);
+}
+.y-list li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--y-rose);
+  outline: 1px solid var(--y-rose-deep);
+  outline-offset: 1px;
+}
+.y-list b { color: var(--y-ink); font-weight: 600; }
+
+/* ---- Figures ----------------------------------------------------------- */
+.y-fig {
+  margin: clamp(22px, 2.6vw, 38px) 0 0;
+}
+.y-fig picture,
+.y-fig > img {
+  display: block;
+  border-radius: var(--y-r-md);
+  overflow: hidden;
+}
+.y-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--y-r-md);
+  background: var(--y-blush);
+}
+/* The source artwork is on white; on a warm-white page an untinted image
+   would float. A hairline gives every figure a defined edge. */
+.y-fig--framed img {
+  border: 1px solid var(--y-line);
+  background: #fff;
+}
+.y-fig figcaption {
+  margin-top: 10px;
+  font-size: var(--y-fs-cap);
+  line-height: 1.5;
+  color: var(--y-ink-3);
+}
+
+.y-figs {
+  display: grid;
+  gap: 16px;
+  margin-top: clamp(22px, 2.6vw, 38px);
+}
+.y-figs-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.y-figs .y-fig { margin: 0; }
+
+/* ---- Cards ------------------------------------------------------------- */
+.y-cards {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
+}
+.y-cards-2 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.y-cards-3 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+
+.y-card {
+  background: var(--y-card);
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-md);
+  padding: 20px;
+}
+.y-card p {
+  margin: 0;
+  font-size: var(--y-fs-sm);
+  line-height: 1.6;
+  color: var(--y-ink-2);
+}
+.y-card--blush { background: var(--y-blush); border-color: var(--y-blush-2); }
+
+/* A small lotus-ish marker so the goal cards echo the source deck's
+   bullet motif without shipping 40 copies of a raster icon. */
+.y-card-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--y-rose);
+  color: var(--y-ink);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* ---- Numbered process steps -------------------------------------------- */
+.y-steps {
+  display: grid;
+  gap: 0;
+  margin-top: 26px;
+  border-top: 1px solid var(--y-line);
+}
+.y-step {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--y-line);
+}
+.y-step-n {
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--y-rose-deep);
+  font-variant-numeric: tabular-nums;
+}
+.y-step p {
+  margin: 0;
+  font-size: var(--y-fs-body);
+  line-height: 1.6;
+  color: var(--y-ink-2);
+}
+
+/* ---- Timeline chart ----------------------------------------------------
+   Rebuilt from the source numbers (10 / 16 / 14 / 40 hours) as real
+   elements rather than used as a flat image: the bars stay crisp at any
+   zoom, the values are selectable text, and a screen reader gets the
+   figures instead of alt prose approximating them. Heights are set inline
+   as a --h custom property, percent of the tallest bar. */
+.y-chart {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+  margin-top: 26px;
+  /* 320 so the shortest bar (10hr = 25% of the 40hr peak) still clears the
+     78px floor at its true proportion — at 240 the floor would have
+     inflated it to 32% and flattened the comparison. */
+  min-height: 320px;
+}
+.y-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: calc(var(--h) * 1%);
+  min-height: 78px;
+  padding: 14px;
+  border-radius: var(--y-r-md);
+  background: var(--y-blush-2);
+  border: 1px solid var(--y-sand);
+}
+.y-bar:last-child { background: var(--y-rose); border-color: var(--y-rose); }
+.y-bar dt {
+  font-size: var(--y-fs-cap);
+  font-weight: 600;
+  color: var(--y-ink);
+}
+.y-bar dd {
+  font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--y-rose-deep);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+.y-bar:last-child dd { color: #7d1f1b; }
+.y-phases {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+}
+
+/* ---- Palette swatches --------------------------------------------------
+   Real colour chips, not a screenshot of them: the hex values become
+   copyable text and each chip is exactly the colour it claims to be. */
+.y-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+.y-swatch {
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-md);
+  overflow: hidden;
+  background: var(--y-card);
+}
+.y-swatch-chip { height: 92px; }
+.y-swatch-meta { padding: 12px 14px; }
+.y-swatch-meta b {
+  display: block;
+  font-size: var(--y-fs-sm);
+  font-weight: 600;
+  color: var(--y-ink);
+}
+.y-swatch-meta span {
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+}
+
+/* ---- Type specimen -----------------------------------------------------
+   The two families the project actually shipped, set in themselves. */
+.y-specimen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+.y-spec {
+  padding: 22px;
+  border-radius: var(--y-r-md);
+  background: var(--y-blush);
+  border: 1px solid var(--y-blush-2);
+}
+.y-spec-name {
+  font-size: clamp(26px, 2.6vw, 36px);
+  color: var(--y-ink);
+  margin: 0 0 4px;
+  line-height: 1.1;
+}
+.y-spec-role {
+  font-size: var(--y-fs-cap);
+  color: var(--y-rose-deep);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.y-spec-glyphs {
+  font-size: clamp(19px, 1.8vw, 24px);
+  color: var(--y-ink-2);
+  line-height: 1.45;
+  margin: 0;
+}
+.y-spec--serif .y-spec-name,
+.y-spec--serif .y-spec-glyphs { font-family: var(--y-serif); }
+.y-spec--serif .y-spec-name { font-style: italic; font-weight: 500; }
+.y-spec--sans .y-spec-name,
+.y-spec--sans .y-spec-glyphs { font-family: 'Montserrat', system-ui, sans-serif; }
+.y-spec-scale {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--y-sand);
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+  font-family: var(--font-base);
+}
+
+/* ---- Pull quote --------------------------------------------------------- */
+.y-quote {
+  margin: clamp(26px, 3vw, 44px) 0 0;
+  padding: 0 0 0 clamp(18px, 2vw, 28px);
+  border-left: 3px solid var(--y-rose);
+}
+.y-quote p {
+  font-family: var(--y-serif);
+  font-size: clamp(20px, 2.1vw, 30px);
+  line-height: 1.32;
+  color: var(--y-ink);
+  margin: 0;
+}
+.y-quote p em { font-style: italic; }
+.y-quote footer {
+  margin-top: 12px;
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+  font-family: var(--font-base);
+}
+
+/* ---- Interview questions ------------------------------------------------ */
+.y-qs {
+  counter-reset: q;
+  display: grid;
+  gap: 10px;
+  margin: 22px 0 0;
+  max-width: 68ch;
+}
+.y-qs li {
+  counter-increment: q;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  font-size: var(--y-fs-sm);
+  line-height: 1.55;
+  color: var(--y-ink-2);
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--y-line);
+}
+.y-qs li::before {
+  content: 'Q' counter(q);
+  font-size: var(--y-fs-cap);
+  font-weight: 600;
+  color: var(--y-rose-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Persona sheet ------------------------------------------------------ */
+.y-persona {
+  margin-top: 26px;
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-md);
+  background: var(--y-card);
+  overflow: hidden;
+}
+.y-persona-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  padding: 18px 20px;
+  background: var(--y-blush);
+  border-bottom: 1px solid var(--y-blush-2);
+}
+.y-persona-top div {
+  font-size: var(--y-fs-cap);
+  color: var(--y-ink-3);
+}
+.y-persona-top b {
+  display: block;
+  font-size: var(--y-fs-sm);
+  color: var(--y-ink);
+  font-weight: 600;
+}
+.y-persona-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.y-persona-grid > div {
+  padding: 18px 20px;
+  border-top: 1px solid var(--y-line);
+  border-right: 1px solid var(--y-line);
+}
+/* Four columns of prose in a narrow cell — a step down from body size so
+   the quadrants stay scannable side by side. */
+.y-persona-grid .y-p { font-size: var(--y-fs-sm); }
+.y-persona-grid > div:nth-child(-n+2) { border-top: 0; }
+
+/* ---- Stats -------------------------------------------------------------- */
+.y-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  margin-top: 26px;
+  background: var(--y-line);
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-md);
+  overflow: hidden;
+}
+.y-stat {
+  background: var(--y-card);
+  padding: 22px 20px;
+}
+.y-stat b {
+  display: block;
+  font-size: var(--y-fs-stat);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--y-ink);
+  font-variant-numeric: tabular-nums;
+}
+.y-stat span {
+  display: block;
+  margin-top: 8px;
+  font-size: var(--y-fs-cap);
+  line-height: 1.45;
+  color: var(--y-ink-3);
+}
+
+/* ---- Credit note -------------------------------------------------------- */
+.y-credit {
+  margin-top: 26px;
+  padding: 20px 22px;
+  border-radius: var(--y-r-md);
+  background: var(--y-blush);
+  border: 1px solid var(--y-blush-2);
+}
+/* The credit block sits at h4 weight, not h3: it closes the section rather
+   than opening a new one. */
+.y-credit .y-h3 {
+  font-size: var(--y-fs-h4);
+  margin-bottom: 8px;
+}
+.y-credit p {
+  margin: 0;
+  font-size: var(--y-fs-sm);
+  line-height: 1.6;
+  color: var(--y-ink-2);
+}
+.y-credit p + p { margin-top: 10px; }
+
+/* ---- End CTA ------------------------------------------------------------ */
+.y-end {
+  padding-block: var(--y-sec-pad);
+  border-top: 1px solid var(--y-line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.y-end h2 {
+  font-size: var(--y-fs-h2);
+  letter-spacing: -0.028em;
+  font-weight: 600;
+  color: var(--y-ink);
+  margin: 0 0 10px;
+}
+.y-end p {
+  margin: 0;
+  font-size: var(--y-fs-body);
+  color: var(--y-ink-2);
+  max-width: 46ch;
+}
+.y-end-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* =========================================================================
+   MOTION
+   =========================================================================
+   One transform + opacity per element. Nothing animates layout.
+
+   The hidden state is keyed to `[data-reveal]`, which reveal.js stamps on
+   at runtime — so with JS off or still loading, every block is simply
+   visible rather than permanently at opacity 0. */
+.y-reveal[data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.y-reveal.in-view {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .y-reveal[data-reveal] { opacity: 1; transform: none; transition: none; }
+  .y-progress { transition: none; }
+  .y-rail-link::before { transition: none; }
+}
+
+/* =========================================================================
+   BREAKPOINTS
+   ========================================================================= */
+
+/* Rail gives out here: below this the two tracks leave the reading column
+   under ~460px, which is narrower than the phone layout it would become. */
+@media (max-width: 1023px) {
+  .y-body {
+    display: block;
+    padding-bottom: 0;
+  }
+  .y-rail { display: none; }
+  .y-chips { display: block; }
+  .y-sec {
+    /* Now two sticky bars stack above the content. */
+    scroll-margin-top: calc(var(--y-topbar-h) + 52px);
+  }
+}
+
+@media (max-width: 760px) {
+  .y-doc { --y-sec-pad: clamp(36px, 8vw, 56px); }
+
+  .y-hero-head { align-items: flex-start; }
+  .y-featured { order: -1; padding-bottom: 0; }
+
+  /* Four hour-bars side by side put each under 80px on a 375 screen and
+     the value clipped. Two rows of two keeps the comparison readable. */
+  .y-chart,
+  .y-phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .y-chart { min-height: 0; }
+  .y-bar { min-height: 108px; }
+  /* Percent heights are meaningless once the bars wrap, so they go
+     content-sized and the number alone carries the comparison. */
+  .y-bar { height: auto; }
+  .y-phases { display: none; }
+
+  .y-figs-2 { grid-template-columns: minmax(0, 1fr); }
+
+  .y-step {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .y-persona-grid > div { border-right: 0; }
+  .y-persona-grid > div:nth-child(2) { border-top: 1px solid var(--y-line); }
+
+  .y-end { display: block; }
+  .y-end-actions { margin-top: 20px; }
+
+  .y-top-title { display: none; }
+  .y-top-sep { display: none; }
+}
+
+@media (max-width: 430px) {
+  /* Five meta cells in a two-column grid leave a sixth slot showing the
+     grid's own background — an empty box that reads as a missing value.
+     The last one spans the row instead. */
+  .y-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .y-meta > div:last-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 400px) {
+  /* The label stays: hiding it left an unlabelled arrow with no accessible
+     name. At 375 the bar holds "Rakhi.UX" + this pill with room to spare
+     once the title and separator have dropped out at 760. */
+  .y-top-cta { padding: 8px 12px; letter-spacing: -0.01em; }
+}

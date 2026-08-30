@@ -56,6 +56,11 @@
     '.cs-reveal',
     '.cs-figure',
 
+    /* --- yoga case study ---
+       Same opt-in idea as `.cs-reveal`, under its own name so the two case
+       studies' stylesheets never have to agree on a shared class. */
+    '.y-reveal',
+
     /* --- footer, on both pages --- */
     '.footer-intro',
     '.footer-actions',

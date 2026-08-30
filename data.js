@@ -171,7 +171,7 @@ var PORTFOLIO_DATA = {
            image covers the whole frame, so the mat is never seen there. */
         color: '#f5c6c0',
         image: 'public/MobileBanking/yogaapp.jpg',
-        href: 'https://www.behance.net/gallery/227695287/Yoga-Lifestyle'
+        href: 'yoga_case_study.html'
       },
       {
         fullWidth: true,
