@@ -19,12 +19,10 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Bricolage is the site voice and carries the page. Playfair Display and
-     Montserrat are the two families THIS PROJECT shipped: they are loaded so
-     the design-system specimen and the pull quotes can be set in the real
-     thing rather than in a screenshot of it. Only the weights actually used
-     are requested. -->
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Bricolage is the site voice and carries the page. Playfair Display is the
+     project's own display face, loaded so the product name in the hero is set
+     in the real thing. Only the weights actually used are requested. -->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 
 <!-- styles.css supplies the font stack, the button component, the skip link
      and the footer; yoga-case.css adds this page's own grid, scale and
@@ -66,13 +64,13 @@
 <nav class="y-chips" id="yChips" aria-label="Sections">
   <div class="y-chips-scroll">
     <a class="y-chip" href="#overview">Overview</a>
-    <a class="y-chip" href="#problem">Problem &amp; Goals</a>
-    <a class="y-chip" href="#research">Research</a>
+    <a class="y-chip" href="#problem">Problem</a>
+    <a class="y-chip" href="#solution">Solution</a>
     <a class="y-chip" href="#process">Process</a>
-    <a class="y-chip" href="#architecture">Architecture</a>
-    <a class="y-chip" href="#design-system">Design System</a>
-    <a class="y-chip" href="#showcase">The App</a>
-    <a class="y-chip" href="#impact">Outcome</a>
+    <a class="y-chip" href="#research">Research</a>
+    <a class="y-chip" href="#services">Services</a>
+    <a class="y-chip" href="#onboarding">Onboarding</a>
+    <a class="y-chip" href="#outcome">Outcome</a>
   </div>
 </nav>
 
@@ -125,13 +123,13 @@
         <p class="y-rail-label">In this Project:</p>
         <ul class="y-rail-list y-plain">
           <li><a class="y-rail-link" href="#overview">Overview</a></li>
-          <li><a class="y-rail-link" href="#problem">Problem &amp; Goals</a></li>
-          <li><a class="y-rail-link" href="#research">Research</a></li>
+          <li><a class="y-rail-link" href="#problem">Problem</a></li>
+          <li><a class="y-rail-link" href="#solution">Solution</a></li>
           <li><a class="y-rail-link" href="#process">Process</a></li>
-          <li><a class="y-rail-link" href="#architecture">Architecture</a></li>
-          <li><a class="y-rail-link" href="#design-system">Design System</a></li>
-          <li><a class="y-rail-link" href="#showcase">The App</a></li>
-          <li><a class="y-rail-link" href="#impact">Outcome</a></li>
+          <li><a class="y-rail-link" href="#research">Research</a></li>
+          <li><a class="y-rail-link" href="#services">Services</a></li>
+          <li><a class="y-rail-link" href="#onboarding">Onboarding</a></li>
+          <li><a class="y-rail-link" href="#outcome">Outcome</a></li>
         </ul>
         <a class="y-rail-cta" href="https://www.behance.net/gallery/227695287/Yoga-Lifestyle" target="_blank" rel="noopener">
           View full deck
@@ -146,11 +144,9 @@
       <!-- ========== OVERVIEW ========== -->
       <section class="y-sec" id="overview" aria-labelledby="overviewHead">
         <p class="y-eyebrow y-reveal">Project Overview</p>
-        <h2 class="y-h2 y-reveal" id="overviewHead">Blending tradition with technology in one wellness app</h2>
+        <h2 class="y-h2 y-reveal" id="overviewHead">YogaEase brings practice, mindfulness and nutrition into one app</h2>
 
-        <p class="y-lead y-reveal">Our project revolves around developing an all-in-one yoga and wellness app, aligning with our client's goal of making yoga's benefits easily accessible.</p>
-
-        <p class="y-p y-reveal">We seamlessly blend tradition with technology, offering session bookings, nutrition guidance, preloaded videos, and an integrated e-commerce platform. This app serves as a holistic solution for yoga enthusiasts, catering to users of all levels — from someone rolling out a mat for the first time to a practitioner deepening an established routine.</p>
+        <p class="y-lead y-reveal">An all-in-one yoga and wellness app that combines guided sessions, mindfulness, diet-based recipes and an integrated store — so the whole routine lives in one place instead of five.</p>
 
         <figure class="y-fig y-reveal">
           <picture>
@@ -158,87 +154,88 @@
             <img src="public/Yoga/overview-phones.jpg" width="1487" height="805" alt="Two YogaEase phone screens: an upcoming workshops list and the personalised home feed with a subscription banner and mood check-in." loading="lazy" decoding="async">
           </picture>
         </figure>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/photo-strip.webp" type="image/webp">
-            <img src="public/Yoga/photo-strip.jpg" width="1487" height="485" alt="Four photographs of a practitioner moving through downward dog, wild thing, upward dog and a seated twist in a sunlit studio." loading="lazy" decoding="async">
-          </picture>
-        </figure>
       </section>
 
-      <!-- ========== PROBLEM & GOALS ========== -->
+      <!-- ========== PROBLEM ========== -->
       <section class="y-sec" id="problem" aria-labelledby="problemHead">
         <p class="y-eyebrow y-reveal">Problem</p>
         <h2 class="y-h2 y-reveal" id="problemHead">Wellness was scattered across too many places</h2>
 
-        <p class="y-lead y-reveal">Addressing the need for a comprehensive and user-centric yoga app, we aim to create a digital platform that seamlessly combines yoga sessions, diet-based recipes, preloaded videos, and e-commerce — providing a holistic wellness solution for yoga enthusiasts.</p>
-
-        <h3 class="y-h3 y-reveal">What users were up against</h3>
-        <p class="y-p y-reveal">These came out of the interviews rather than assumption — they are the pain points our participants described in their own words.</p>
+        <p class="y-lead y-reveal">From eight user interviews, four pain points came up again and again.</p>
 
         <ul class="y-list y-reveal">
-          <li><b>Not enough time</b> — limited time for lengthy sessions, and difficulty balancing work and wellness.</li>
-          <li><b>No sense of progress</b> — difficulty tracking progress, and a lack of meditation-focused content.</li>
-          <li><b>Practice and nutrition lived apart</b> — limited resources for combining yoga and nutrition, alongside data privacy concerns.</li>
-          <li><b>Hard to start</b> — overwhelmed by complex poses, and a lack of beginner-friendly guidance.</li>
+          <li><b>Not enough time</b> — little room for long sessions, and no easy way to fit practice around work.</li>
+          <li><b>No sense of progress</b> — hard to track a routine, and almost no meditation-focused content.</li>
+          <li><b>Practice and nutrition lived apart</b> — yoga in one app, recipes in another, nothing tying them together.</li>
+          <li><b>Hard to start</b> — beginners felt overwhelmed by complex poses and thin guidance.</li>
+        </ul>
+
+        <div class="y-ps y-reveal">
+          <div class="y-ps-panel">
+            <div class="y-ps-orb y-ps-orb--problem">
+              <h3>Problem</h3>
+              <p>Wellness scattered across five apps — a timetable, a video library, a meditation app, a recipe folder and a shop — with no thread between them.</p>
+            </div>
+          </div>
+          <div class="y-ps-panel">
+            <div class="y-ps-orb y-ps-orb--solution">
+              <h3>Solution</h3>
+              <p>One holistic app: short on-demand sessions, a wellness dashboard, recipes in the tab bar and a beginner path — all behind a single account.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SOLUTION ========== -->
+      <section class="y-sec" id="solution" aria-labelledby="solutionHead">
+        <p class="y-eyebrow y-reveal">Solution</p>
+        <h2 class="y-h2 y-reveal" id="solutionHead">One holistic wellness experience</h2>
+
+        <p class="y-lead y-reveal">Five connected areas behind a single account — each answering one of the pain points directly.</p>
+
+        <ul class="y-list y-reveal">
+          <li><b>Short, on-demand sessions</b> — five-minute meditations and preloaded videos alongside the live timetable.</li>
+          <li><b>A wellness dashboard</b> — yoga, sleep, mood, water and steps tracked in one place, with a learning list.</li>
+          <li><b>Recipes in the tab bar</b> — diet-based recipes sit next to the practice, not buried in a submenu.</li>
+          <li><b>A beginner path</b> — graded series and a curated library so a first session is easy to find.</li>
         </ul>
 
         <figure class="y-fig y-reveal">
           <picture>
-            <source srcset="public/Yoga/quote-toes.webp" type="image/webp">
-            <img src="public/Yoga/quote-toes.jpg" width="1487" height="710" alt="A person stretching towards their toes in a warmly lit living room, overlaid with the quote: Yoga is not about touching your toes, it's about what you learn on the way down." loading="lazy" decoding="async">
+            <source srcset="public/Yoga/final-trio.webp" type="image/webp">
+            <img src="public/Yoga/final-trio.jpg" width="1487" height="580" alt="Three YogaEase screens fanned in perspective: the welcome screen, a recipe feed and a session library." loading="lazy" decoding="async">
           </picture>
         </figure>
+      </section>
 
-        <h3 class="y-h3 y-sub y-reveal">Five goals we set for the product</h3>
+      <!-- ========== PROCESS ========== -->
+      <section class="y-sec" id="process" aria-labelledby="processHead">
+        <p class="y-eyebrow y-reveal">Process</p>
+        <h2 class="y-h2 y-reveal" id="processHead">Discovery through delivery</h2>
 
-        <div class="y-cards y-cards-2">
-          <div class="y-card y-reveal">
-            <div class="y-card-mark" aria-hidden="true">1</div>
-            <h4 class="y-h4">Holistic Wellness Integration</h4>
-            <p>We are committed to seamlessly integrating diet-based recipes and nutrition advice into the app's core offerings, driven by the belief that physical well-being is an essential component of holistic health.</p>
-          </div>
-          <div class="y-card y-reveal">
-            <div class="y-card-mark" aria-hidden="true">2</div>
-            <h4 class="y-h4">Diverse Content Library</h4>
-            <p>A library of preloaded video sessions, curated and led by expert instructors — providing a rich and varied yoga experience across different skill levels and interests.</p>
-          </div>
-          <div class="y-card y-reveal">
-            <div class="y-card-mark" aria-hidden="true">3</div>
-            <h4 class="y-h4">Efficient E-commerce Platform</h4>
-            <p>A user-centric store inside the app offering a thoughtfully selected range of yoga-related products, so users have a convenient and reliable source for their wellness needs.</p>
-          </div>
-          <div class="y-card y-reveal">
-            <div class="y-card-mark" aria-hidden="true">4</div>
-            <h4 class="y-h4">Flexible Subscription Model</h4>
-            <p>Various subscription options giving exclusive access to premium content, personalised features, and benefits that encourage long-term engagement.</p>
-          </div>
-          <div class="y-card y-reveal">
-            <div class="y-card-mark" aria-hidden="true">5</div>
-            <h4 class="y-h4">Streamlined Wellness Access</h4>
-            <p>A unified platform that simplifies the wellness journey, empowering people to embrace wellness practices and yoga easily and improving their overall quality of life.</p>
-          </div>
-        </div>
+        <p class="y-lead y-reveal">Four stages, roughly 80 hours from first interview to handoff.</p>
+
+        <ol class="y-steps y-reveal">
+          <li class="y-step"><span class="y-step-n">01</span><div><h4 class="y-h4">Discovery &amp; research</h4><p>Client goals, idea validation and eight user interviews.</p></div></li>
+          <li class="y-step"><span class="y-step-n">02</span><div><h4 class="y-h4">Structure &amp; flow</h4><p>Affinity mapping, a persona, and one site map across five areas.</p></div></li>
+          <li class="y-step"><span class="y-step-n">03</span><div><h4 class="y-h4">UX &amp; UI design</h4><p>Wireframes into 40+ final screens on a calm, consistent design system.</p></div></li>
+          <li class="y-step"><span class="y-step-n">04</span><div><h4 class="y-h4">Refinement &amp; delivery</h4><p>Prototyping, review and handoff.</p></div></li>
+        </ol>
       </section>
 
       <!-- ========== RESEARCH ========== -->
       <section class="y-sec" id="research" aria-labelledby="researchHead">
         <p class="y-eyebrow y-reveal">Research</p>
-        <h2 class="y-h2 y-reveal" id="researchHead">Eight conversations that shaped the product</h2>
+        <h2 class="y-h2 y-reveal" id="researchHead">Understanding how people practise</h2>
 
-        <p class="y-lead y-reveal">Our journey starts by getting to know our users — real people with their own motivations, goals, and hurdles in yoga. Through candid interviews and organizing their feedback, we've gathered essential insights.</p>
+        <p class="y-lead y-reveal">Eight interviews, grouped by affinity mapping into a clear set of themes.</p>
 
-        <p class="y-p y-reveal">For qualitative analysis, we engaged in user interviews with <strong>eight potential users</strong> to understand their motivations and challenges. These are the questions we put to each of them.</p>
-
-        <ol class="y-qs y-reveal">
-          <li><span>What motivated you to seek out a yoga app like this one?</span></li>
-          <li><span>Can you describe your typical experience when practicing yoga, including any challenges you face?</span></li>
-          <li><span>How do you envision an ideal yoga app assisting you in your practice and overall wellness?</span></li>
-          <li><span>What role does diet and nutrition play in your wellness journey, and how do you incorporate it into your routine?</span></li>
-          <li><span>How do you prefer to discover and select yoga sessions?</span></li>
-          <li><span>What features or functionalities would you consider essential in an ideal yoga app, and why?</span></li>
-        </ol>
+        <ul class="y-list y-reveal">
+          <li><b>Diverse motivations</b> — from physical fitness to mental well-being, so the app has to flex.</li>
+          <li><b>Discovery is hard</b> — users want personalization and a curated selection, not a bigger catalogue.</li>
+          <li><b>Nutrition belongs with practice</b> — combining the two is a genuine selling point.</li>
+          <li><b>Community and mindfulness</b> — features that keep people coming back.</li>
+        </ul>
 
         <figure class="y-fig y-fig--framed y-reveal">
           <picture>
@@ -247,265 +244,29 @@
           </picture>
           <figcaption>What participants said they were practising for, mapped across the group.</figcaption>
         </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Key insights</h3>
-        <ul class="y-list y-reveal">
-          <li>Users have <b>diverse motivations and goals</b>, from physical fitness to mental well-being, which highlights the need for a flexible and adaptable app.</li>
-          <li>Pain points include challenges in <b>session discovery</b>, a desire for <b>personalization</b>, and concerns about <b>data privacy</b>.</li>
-          <li>Users value <b>quality over quantity</b> when it comes to content, and are looking for a curated selection of sessions.</li>
-          <li>Integrating <b>nutrition guidance with yoga</b> is a unique selling point that appeals to certain users.</li>
-          <li>A sense of <b>community and mindfulness</b> features could enhance user engagement and satisfaction.</li>
-        </ul>
-
-        <h3 class="y-h3 y-sub y-reveal">Affinity &amp; empathy mapping</h3>
-        <p class="y-p y-reveal">Our affinity mapping process is a visual journey through user interview data. By grouping similar insights and experiences, we've unveiled key patterns and themes that inform our design decisions.</p>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/empathy-cards.webp" type="image/webp">
-            <img src="public/Yoga/empathy-cards.jpg" width="1487" height="750" alt="Affinity map grouped into four panels — user statements, motivation, goals and pain points — with the interview quotes sorted under each." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/key-insights.webp" type="image/webp">
-            <img src="public/Yoga/key-insights.jpg" width="1487" height="850" alt="Key insights presented over a photograph of a practitioner kneeling in prayer position on an orange mat." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">The persona we designed for</h3>
-
-        <blockquote class="y-quote y-reveal">
-          <p>“In the whirlwind of city life, yoga is my anchor. It's not just about stretching; it's about finding moments of calm amidst chaos, and I'm on a journey to make it a <em>consistent part of my daily life</em>.”</p>
-          <footer>Emily Anderson — the primary persona</footer>
-        </blockquote>
-
-        <div class="y-persona y-reveal">
-          <div class="y-persona-top">
-            <div>Name<b>Emily Anderson</b></div>
-            <div>Occupation<b>Marketing Manager</b></div>
-            <div>Location<b>Urban City</b></div>
-            <div>Age<b>28</b></div>
-          </div>
-          <div class="y-persona-grid">
-            <div>
-              <h4 class="y-h4">Personality</h4>
-              <p class="y-p">A driven marketing manager from San Francisco. Emily's fast-paced career constantly keeps her on her toes, leaving her yearning for moments of serenity and rejuvenation. Her journey into yoga reflects her pursuit of inner balance amidst the hustle and bustle of city life.</p>
-            </div>
-            <div>
-              <h4 class="y-h4">Frustration</h4>
-              <p class="y-p">Emily's primary frustration stems from the difficulty of finding quality yoga sessions that align with her busy lifestyle. Her packed work schedule leaves little room for in-person classes, and she has struggled to locate a yoga app that offers customized sessions tailored to her specific needs.</p>
-            </div>
-            <div>
-              <h4 class="y-h4">Goals</h4>
-              <p class="y-p">Integrate yoga into her daily routine for effective stress management. Achieve a harmonious work-life balance and rediscover inner tranquility. Enhance her flexibility and posture, both of which often suffer due to extended hours at her desk.</p>
-            </div>
-            <div>
-              <h4 class="y-h4">Motivation</h4>
-              <p class="y-p">Emily is motivated by her strong desire to attain mental clarity and a sense of inner peace. Her demanding job requires her to think on her feet and be creative, which often leaves her feeling mentally drained. She believes yoga can be the refuge she seeks.</p>
-            </div>
-          </div>
-        </div>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/empathy-quad.webp" type="image/webp">
-            <img src="public/Yoga/empathy-quad.jpg" width="1487" height="950" alt="Empathy map in four quadrants — does, feels, frustration and thinks — laid over a photograph of a practitioner in upward-facing dog." loading="lazy" decoding="async">
-          </picture>
-        </figure>
       </section>
 
-      <!-- ========== PROCESS ========== -->
-      <section class="y-sec" id="process" aria-labelledby="processHead">
-        <p class="y-eyebrow y-reveal">Process</p>
-        <h2 class="y-h2 y-reveal" id="processHead">Six stages, discovery through delivery</h2>
+      <!-- ========== SERVICES ========== -->
+      <section class="y-sec" id="services" aria-labelledby="servicesHead">
+        <p class="y-eyebrow y-reveal">Services</p>
+        <h2 class="y-h2 y-reveal" id="servicesHead">What the project covered</h2>
 
-        <p class="y-lead y-reveal">Explore our meticulous design process, from wireframing to prototyping, as we shape the app's user interface to ensure a seamless and intuitive experience for all users, fostering engagement and satisfaction.</p>
-
-        <ol class="y-steps y-reveal">
-          <li class="y-step"><span class="y-step-n">01</span><div><h4 class="y-h4">Discovery Session</h4></div></li>
-          <li class="y-step"><span class="y-step-n">02</span><div><h4 class="y-h4">Idea Validation</h4></div></li>
-          <li class="y-step"><span class="y-step-n">03</span><div><h4 class="y-h4">UX Research</h4></div></li>
-          <li class="y-step"><span class="y-step-n">04</span><div><h4 class="y-h4">UI Design</h4></div></li>
-          <li class="y-step"><span class="y-step-n">05</span><div><h4 class="y-h4">Prototyping</h4></div></li>
-          <li class="y-step"><span class="y-step-n">06</span><div><h4 class="y-h4">Deliver</h4></div></li>
-        </ol>
-
-        <h3 class="y-h3 y-sub y-reveal">Where the 80 hours went</h3>
-        <p class="y-p y-reveal">While designing the app we have passed different steps from research to creating final design that make user feel reliable to test and define the final version.</p>
-
-        <!-- Real elements rather than the source chart image: the values stay
-             selectable text and reflow to two columns on a phone. `--h` is
-             each bar's share of the 40-hour peak. -->
-        <dl class="y-chart y-reveal">
-          <div class="y-bar" style="--h:25"><dt>Research</dt><dd>10<span aria-hidden="true">hr</span><span class="y-sr"> hours</span></dd></div>
-          <div class="y-bar" style="--h:40"><dt>Data Analysis</dt><dd>16<span aria-hidden="true">hr</span><span class="y-sr"> hours</span></dd></div>
-          <div class="y-bar" style="--h:35"><dt>Wireframe</dt><dd>14<span aria-hidden="true">hr</span><span class="y-sr"> hours</span></dd></div>
-          <div class="y-bar" style="--h:100"><dt>UI Design</dt><dd>40<span aria-hidden="true">hr</span><span class="y-sr"> hours</span></dd></div>
-        </dl>
-        <div class="y-phases y-reveal" aria-hidden="true">
-          <span>Phase 1</span><span></span><span>Phase 2</span><span>Phase 3</span>
-        </div>
-      </section>
-
-      <!-- ========== ARCHITECTURE ========== -->
-      <section class="y-sec" id="architecture" aria-labelledby="archHead">
-        <p class="y-eyebrow y-reveal">Information Architecture</p>
-        <h2 class="y-h2 y-reveal" id="archHead">One map across five product areas</h2>
-
-        <p class="y-lead y-reveal">We delve into the core structure of our yoga app — how we've carefully designed the information architecture to ensure that users can effortlessly navigate the app, discover content, and achieve their wellness goals with ease.</p>
-
-        <p class="y-p y-reveal">Everything sits behind a single authentication step, then branches into five peers rather than burying four of them inside a menu:</p>
+        <p class="y-lead y-reveal">End-to-end product design, from research to a handoff-ready UI kit.</p>
 
         <div class="y-cards y-cards-3">
           <div class="y-card y-card--blush y-reveal">
-            <h4 class="y-h4">Mindfulness</h4>
-            <p>Categories → series → videos.</p>
+            <h4 class="y-h4">UX Research</h4>
+            <p>Interviews, affinity and empathy mapping, persona.</p>
           </div>
           <div class="y-card y-card--blush y-reveal">
-            <h4 class="y-h4">Yoga</h4>
-            <p>On-demand videos, workshops and live classes, through to booking a session.</p>
+            <h4 class="y-h4">Information Architecture</h4>
+            <p>One site map across mindfulness, yoga, home, shop and recipes.</p>
           </div>
           <div class="y-card y-card--blush y-reveal">
-            <h4 class="y-h4">Home</h4>
-            <p>Activity trackers, courses, mood tracker, learning and premium plans.</p>
-          </div>
-          <div class="y-card y-card--blush y-reveal">
-            <h4 class="y-h4">Shop</h4>
-            <p>Offers, categories and best sellers → product details → cart or buy now → payment.</p>
-          </div>
-          <div class="y-card y-card--blush y-reveal">
-            <h4 class="y-h4">Recipes</h4>
-            <p>Categories → recipe list → recipe details.</p>
+            <h4 class="y-h4">UI Design</h4>
+            <p>Design system, 40+ screens, prototyping and handoff.</p>
           </div>
         </div>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/sitemap.webp" type="image/webp">
-            <img src="public/Yoga/sitemap.jpg" width="1487" height="845" alt="Site map: login and register at the top, branching into Mindfulness, Yoga, Home, Shop and Recipes, each expanding into its own sub-screens." loading="lazy" decoding="async">
-          </picture>
-          <figcaption>The full site map, from authentication down to payment and recipe detail.</figcaption>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Wireframing</h3>
-        <p class="y-p y-reveal">We unveil the blueprint of our app's visual interface — where we've sketched out the app's layout and functionality, ensuring a clear and user-friendly design that aligns with our user-centered approach.</p>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/wireframes.webp" type="image/webp">
-            <img src="public/Yoga/wireframes.jpg" width="1487" height="1160" alt="Low-fidelity wireframes for the recipe list, session detail, home feed and tracker screens, with placeholder image blocks and text lines." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/quote-self.webp" type="image/webp">
-            <img src="public/Yoga/quote-self.jpg" width="1487" height="740" alt="A practitioner in bridge pose against a concrete wall, overlaid with the quote: Yoga is the journey of the self, through the self, to the self." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-      </section>
-
-      <!-- ========== DESIGN SYSTEM ========== -->
-      <section class="y-sec" id="design-system" aria-labelledby="dsHead">
-        <p class="y-eyebrow y-reveal">Design System</p>
-        <h2 class="y-h2 y-reveal" id="dsHead">A calm, consistent visual language</h2>
-
-        <p class="y-lead y-reveal">Explore the foundation of our app's visual identity — the creation of a design system that encompasses our color palette, fonts, icons, and more. These cohesive design elements are instrumental in delivering a consistent and aesthetically pleasing user experience.</p>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/brand-row.webp" type="image/webp">
-            <img src="public/Yoga/brand-row.jpg" width="1487" height="315" alt="The YogaEase identity: the concentric-arc app icon in white on salmon, the wordmark on its construction grid, and the mark applied over a studio photograph." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Colour</h3>
-        <div class="y-swatches y-reveal">
-          <div class="y-swatch">
-            <div class="y-swatch-chip" style="background:#ff9d9d"></div>
-            <div class="y-swatch-meta"><b>Salmon Pink</b><span>#FF9D9D</span></div>
-          </div>
-          <div class="y-swatch">
-            <div class="y-swatch-chip" style="background:#f5c3b5"></div>
-            <div class="y-swatch-meta"><b>Spanish Pink</b><span>#F5C3B5</span></div>
-          </div>
-          <div class="y-swatch">
-            <div class="y-swatch-chip" style="background:#ffffff;box-shadow:inset 0 0 0 1px #e8e2de"></div>
-            <div class="y-swatch-meta"><b>White</b><span>#FFFFFF</span></div>
-          </div>
-          <div class="y-swatch">
-            <div class="y-swatch-chip" style="background:#0b0829"></div>
-            <div class="y-swatch-meta"><b>Rich Black</b><span>#0B0829</span></div>
-          </div>
-        </div>
-
-        <h3 class="y-h3 y-sub y-reveal">Typography</h3>
-        <p class="y-p y-reveal">For our design system, we've carefully chosen fonts that embody the essence of our yoga app. <strong>Playfair Display</strong>, with its elegant and sophisticated style, lends an aesthetic touch that aligns with the serenity of yoga. In contrast, <strong>Montserrat</strong>, known for its modern simplicity, ensures readability and clarity in descriptions and various app elements.</p>
-
-        <div class="y-specimen y-reveal">
-          <div class="y-spec y-spec--serif">
-            <p class="y-spec-name">Playfair Display</p>
-            <p class="y-spec-role">Display &amp; headings</p>
-            <p class="y-spec-glyphs">AaBbCcDd<br>123!&amp;*</p>
-            <p class="y-spec-scale">Used for screen titles, section headings and editorial moments.</p>
-          </div>
-          <div class="y-spec y-spec--sans">
-            <p class="y-spec-name">Montserrat</p>
-            <p class="y-spec-role">Body &amp; interface</p>
-            <p class="y-spec-glyphs">AaBbCcDd<br>123!&amp;*</p>
-            <p class="y-spec-scale">Regular · Medium · Semibold — 12 / 14 / 16 / 20 / 24 px.</p>
-          </div>
-        </div>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/app-icon.webp" type="image/webp">
-            <img src="public/Yoga/app-icon.jpg" width="715" height="610" alt="The YogaEase app icon on an iPhone home screen, sitting beside the Messages and FaceTime icons." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-      </section>
-
-      <!-- ========== THE APP ========== -->
-      <section class="y-sec" id="showcase" aria-labelledby="showHead">
-        <p class="y-eyebrow y-reveal">Final Screens</p>
-        <h2 class="y-h2 y-reveal" id="showHead">Bringing it all together</h2>
-
-        <p class="y-lead y-reveal">The culmination of our design efforts — the final screens of our yoga app. A user-centric approach, intuitive information architecture, and a carefully curated design system come together to create a visually pleasing, user-friendly, holistic wellness experience.</p>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/final-trio.webp" type="image/webp">
-            <img src="public/Yoga/final-trio.jpg" width="1487" height="580" alt="Three YogaEase screens fanned in perspective: the welcome screen, a recipe feed and a session library." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Onboarding</h3>
-        <p class="y-p y-reveal">The first steps of our user journey. Designed with clarity and purpose, these screens serve as a welcoming introduction to the app, ensuring users feel guided and empowered right from the start — through Yoga On Demand, Live Workshops and the Online Store, then into sign-up, email verification and log in.</p>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/splash.webp" type="image/webp">
-            <img src="public/Yoga/splash.jpg" width="1487" height="580" alt="The YogaEase splash screen — the white app mark on a salmon field — shown on a phone lying on grey stone." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/onboarding.webp" type="image/webp">
-            <img src="public/Yoga/onboarding.jpg" width="1487" height="1480" alt="The onboarding and authentication set: four intro screens, the create-account and log-in forms with social sign-in, and the email verification code screen." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Home</h3>
-        <p class="y-p y-reveal">This central space is designed to be your daily sanctuary for holistic well-being. Here's what you'll find at a glance.</p>
-
-        <ul class="y-list y-reveal">
-          <li><b>Mood Tracker</b> — tune in to your emotional well-being. Log your daily mood to foster self-awareness and understand the connection between your emotions and your wellness routine.</li>
-          <li><b>Weekly Activities and Workshops</b> — stay connected with the pulse of the yoga community. Discover the latest activities and workshops happening this week, tailored to enrich your practice.</li>
-          <li><b>Wellness Dashboard</b> — track key wellness indicators seamlessly: water intake, sleep patterns, daily steps and meditation hours.</li>
-        </ul>
 
         <figure class="y-fig y-fig--framed y-reveal">
           <picture>
@@ -513,89 +274,29 @@
             <img src="public/Yoga/home-screen.jpg" width="1487" height="1480" alt="The home screen annotated with its three parts, alongside the full tracker list and the water-consumption detail screen." loading="lazy" decoding="async">
           </picture>
         </figure>
+      </section>
 
-        <h3 class="y-h3 y-sub y-reveal">Mindfulness</h3>
-        <p class="y-p y-reveal">A sanctuary for yogis of all levels. Dive into a curated collection of pre-recorded videos, spanning from beginner essentials to advanced flows, providing a diverse and personalized yoga experience.</p>
-        <p class="y-p y-reveal">Explore transformative Yoga Series designed to guide you through progressive levels, making your wellness journey seamless and enriching. This isn't just a library; it's your personalized gateway to tranquility and growth, tailoring recommendations to suit your evolving practice.</p>
+      <!-- ========== ONBOARDING ========== -->
+      <section class="y-sec" id="onboarding" aria-labelledby="onboardingHead">
+        <p class="y-eyebrow y-reveal">Onboarding Screens</p>
+        <h2 class="y-h2 y-reveal" id="onboardingHead">A guided first run</h2>
 
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/session-phones.webp" type="image/webp">
-            <img src="public/Yoga/session-phones.jpg" width="1487" height="700" alt="Two phones showing the Rise and Shine Flow series listing and its detail screen with episode list and instructor." loading="lazy" decoding="async">
-          </picture>
-        </figure>
+        <p class="y-lead y-reveal">Yoga on demand, live workshops and the store — then sign-up, email verification and log in.</p>
 
         <figure class="y-fig y-fig--framed y-reveal">
           <picture>
-            <source srcset="public/Yoga/mindfulness.webp" type="image/webp">
-            <img src="public/Yoga/mindfulness.jpg" width="1487" height="570" alt="The mindfulness library, a five-minute meditation list, a session detail screen and the landscape video player." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Recipes</h3>
-        <p class="y-p y-reveal">Wholesome recipes for every meal, from sunrise to sunset — each with its benefits and full ingredient list, so nutrition guidance sits inside the same app as the practice rather than somewhere else.</p>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/recipes.webp" type="image/webp">
-            <img src="public/Yoga/recipes.jpg" width="1487" height="670" alt="Recipe screens: the newly added feed, a recipe detail with its benefits, and the ingredients panel for avocado toast with poached eggs." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">Shop</h3>
-        <p class="y-p y-reveal">Your go-to destination for a seamless and enriching shopping experience.</p>
-        <ul class="y-list y-reveal">
-          <li><b>Curated Yoga Essentials</b> — a selection of yoga mats, blocks, apparel and accessories, each handpicked to enhance comfort and style.</li>
-          <li><b>Hassle-Free Purchases</b> — an intuitive interface that streamlines the process from browsing to checkout.</li>
-          <li><b>Exclusive Deals and Offers</b> — quality products at affordable prices, for seasoned yogis and beginners alike.</li>
-        </ul>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/shop.webp" type="image/webp">
-            <img src="public/Yoga/shop.jpg" width="1487" height="920" alt="Shop screens: best-selling products and categories, a product detail page, checkout with price breakdown and delivery address, the cart, and order tracking." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <h3 class="y-h3 y-sub y-reveal">The wider set</h3>
-        <p class="y-p y-reveal">Forty-plus screens in total, covering premium plans, step and sleep tracking, workshop booking, learning progress, password recovery and order history.</p>
-
-        <figure class="y-fig y-fig--framed y-reveal">
-          <picture>
-            <source srcset="public/Yoga/screens-grid.webp" type="image/webp">
-            <img src="public/Yoga/screens-grid.jpg" width="1487" height="2210" alt="A grid of the remaining app screens, including premium plan pricing, the steps tracker at 7,259 steps, sleep tracking, workshop detail and the learning list." loading="lazy" decoding="async">
-          </picture>
-        </figure>
-
-        <div class="y-figs y-figs-2">
-          <figure class="y-fig y-reveal">
-            <picture>
-              <source srcset="public/Yoga/billboard-subway.webp" type="image/webp">
-              <img src="public/Yoga/billboard-subway.jpg" width="1487" height="790" alt="A YogaEase advert on a subway platform screen: Embark on your wellness journey today." loading="lazy" decoding="async">
-            </picture>
-          </figure>
-          <figure class="y-fig y-reveal">
-            <picture>
-              <source srcset="public/Yoga/billboard-wall.webp" type="image/webp">
-              <img src="public/Yoga/billboard-wall.jpg" width="1487" height="920" alt="A pasted street poster for YogaEase on a pale blue wall, with app store badges, as a pedestrian walks past." loading="lazy" decoding="async">
-            </picture>
-          </figure>
-        </div>
-
-        <figure class="y-fig y-reveal">
-          <picture>
-            <source srcset="public/Yoga/billboard-ivy.webp" type="image/webp">
-            <img src="public/Yoga/billboard-ivy.jpg" width="1487" height="600" alt="An ivy-framed billboard reading: Elevate your well-being — yoga, wellness, and more in one app." loading="lazy" decoding="async">
+            <source srcset="public/Yoga/onboarding.webp" type="image/webp">
+            <img src="public/Yoga/onboarding.jpg" width="1487" height="1480" alt="The onboarding and authentication set: four intro screens, the create-account and log-in forms with social sign-in, and the email verification code screen." loading="lazy" decoding="async">
           </picture>
         </figure>
       </section>
 
       <!-- ========== OUTCOME ========== -->
-      <section class="y-sec" id="impact" aria-labelledby="impactHead">
+      <section class="y-sec" id="outcome" aria-labelledby="outcomeHead">
         <p class="y-eyebrow y-reveal">Outcome</p>
-        <h2 class="y-h2 y-reveal" id="impactHead">Five products, one wellness routine</h2>
+        <h2 class="y-h2 y-reveal" id="outcomeHead">Five products, one wellness routine</h2>
 
-        <p class="y-lead y-reveal">What began as five things a person had to juggle — a class timetable, a video library, a meditation app, a recipe folder and a shopping tab — ended as one flow with a single account behind it.</p>
+        <p class="y-lead y-reveal">What was five apps to juggle ended as one flow behind a single account.</p>
 
         <dl class="y-stats y-reveal">
           <div class="y-stat"><b>40+</b><span>Screens designed across the full journey</span></div>
@@ -604,13 +305,11 @@
           <div class="y-stat"><b>5</b><span>Connected product areas under one IA</span></div>
         </dl>
 
-        <p class="y-p y-reveal">The design answers each pain point the research surfaced. <strong>Not enough time</strong> is met with five-minute meditations and on-demand sessions alongside the live timetable. <strong>No sense of progress</strong> is met with a tracker set covering yoga, mindfulness, sleep, mood, water and steps, plus a learning list that remembers where a series was left. <strong>Practice and nutrition living apart</strong> is met by putting recipes in the tab bar, not in a submenu. <strong>Hard to start</strong> is met with a beginner series and a graded content library.</p>
-
-        <p class="y-p y-reveal">This was a design project delivered to handoff, so the honest measure here is the shipped system rather than adoption figures — no post-launch analytics or usability scores were collected, and none are claimed.</p>
+        <p class="y-p y-reveal">Delivered to handoff, so the honest measure is the shipped system rather than adoption figures — no post-launch analytics were collected, and none are claimed.</p>
 
         <div class="y-credit y-reveal">
           <h3 class="y-h3">Crafting wellness together</h3>
-          <p>In the collaborative spirit of this project, a dynamic duo led the way. As an <strong>Associate UI/UX Designer</strong> I worked under the guidance of an experienced Team Lead. Together we blended creativity and expertise to bring the vision of the app to life.</p>
+          <p>As an <strong>Associate UI/UX Designer</strong> I worked under the guidance of an experienced Team Lead to bring the app to life.</p>
           <p><strong>Rakhi Das</strong> — Associate UI/UX Designer</p>
         </div>
       </section>

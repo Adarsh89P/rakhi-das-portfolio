@@ -639,19 +639,57 @@
 }
 .y-card--blush { background: var(--y-blush); border-color: var(--y-blush-2); }
 
-/* A small lotus-ish marker so the goal cards echo the source deck's
-   bullet motif without shipping 40 copies of a raster icon. */
-.y-card-mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+/* ---- Problem / Solution orbs -----------------------------------------------
+   The Orbix pattern: two white rounded panels side by side, each holding a
+   large circle with the statement set inside it — a dark circle for the
+   problem, a warm gradient circle for the solution. */
+.y-ps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(26px, 3vw, 44px);
+}
+.y-ps-panel {
+  background: var(--y-card);
+  border: 1px solid var(--y-line);
+  border-radius: var(--y-r-lg);
+  padding: clamp(20px, 3.4vw, 40px);
   display: grid;
   place-items: center;
-  background: var(--y-rose);
-  color: var(--y-ink);
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 12px;
+}
+.y-ps-orb {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  padding: clamp(30px, 12%, 58px);
+  color: #fff;
+}
+.y-ps-orb--problem { background: var(--y-ink); }
+.y-ps-orb--solution {
+  background: radial-gradient(circle at 30% 26%, #ffc0a6 0%, #ff9276 40%, #e15c37 100%);
+}
+.y-ps-orb h3 {
+  font-size: clamp(19px, 2vw, 24px);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: #fff;
+}
+.y-ps-orb p {
+  margin: 0;
+  font-size: var(--y-fs-cap);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 620px) {
+  .y-ps { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---- Numbered process steps -------------------------------------------- */
@@ -681,225 +719,6 @@
   line-height: 1.6;
   color: var(--y-ink-2);
 }
-
-/* ---- Timeline chart ----------------------------------------------------
-   Rebuilt from the source numbers (10 / 16 / 14 / 40 hours) as real
-   elements rather than used as a flat image: the bars stay crisp at any
-   zoom, the values are selectable text, and a screen reader gets the
-   figures instead of alt prose approximating them. Heights are set inline
-   as a --h custom property, percent of the tallest bar. */
-.y-chart {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  align-items: end;
-  margin-top: 26px;
-  /* 320 so the shortest bar (10hr = 25% of the 40hr peak) still clears the
-     78px floor at its true proportion — at 240 the floor would have
-     inflated it to 32% and flattened the comparison. */
-  min-height: 320px;
-}
-.y-bar {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  height: calc(var(--h) * 1%);
-  min-height: 78px;
-  padding: 14px;
-  border-radius: var(--y-r-md);
-  background: var(--y-blush-2);
-  border: 1px solid var(--y-sand);
-}
-.y-bar:last-child { background: var(--y-rose); border-color: var(--y-rose); }
-.y-bar dt {
-  font-size: var(--y-fs-cap);
-  font-weight: 600;
-  color: var(--y-ink);
-}
-.y-bar dd {
-  font-size: clamp(22px, 2.4vw, 34px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--y-rose-deep);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.05;
-}
-.y-bar:last-child dd { color: #7d1f1b; }
-.y-phases {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 8px;
-  font-size: var(--y-fs-cap);
-  color: var(--y-ink-3);
-}
-
-/* ---- Palette swatches --------------------------------------------------
-   Real colour chips, not a screenshot of them: the hex values become
-   copyable text and each chip is exactly the colour it claims to be. */
-.y-swatches {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-top: 26px;
-}
-.y-swatch {
-  border: 1px solid var(--y-line);
-  border-radius: var(--y-r-md);
-  overflow: hidden;
-  background: var(--y-card);
-}
-.y-swatch-chip { height: 92px; }
-.y-swatch-meta { padding: 12px 14px; }
-.y-swatch-meta b {
-  display: block;
-  font-size: var(--y-fs-sm);
-  font-weight: 600;
-  color: var(--y-ink);
-}
-.y-swatch-meta span {
-  font-size: var(--y-fs-cap);
-  color: var(--y-ink-3);
-  font-variant-numeric: tabular-nums;
-  text-transform: uppercase;
-}
-
-/* ---- Type specimen -----------------------------------------------------
-   The two families the project actually shipped, set in themselves. */
-.y-specimen {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
-  margin-top: 26px;
-}
-.y-spec {
-  padding: 22px;
-  border-radius: var(--y-r-md);
-  background: var(--y-blush);
-  border: 1px solid var(--y-blush-2);
-}
-.y-spec-name {
-  font-size: clamp(26px, 2.6vw, 36px);
-  color: var(--y-ink);
-  margin: 0 0 4px;
-  line-height: 1.1;
-}
-.y-spec-role {
-  font-size: var(--y-fs-cap);
-  color: var(--y-rose-deep);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin: 0 0 14px;
-}
-.y-spec-glyphs {
-  font-size: clamp(19px, 1.8vw, 24px);
-  color: var(--y-ink-2);
-  line-height: 1.45;
-  margin: 0;
-}
-.y-spec--serif .y-spec-name,
-.y-spec--serif .y-spec-glyphs { font-family: var(--y-serif); }
-.y-spec--serif .y-spec-name { font-style: italic; font-weight: 500; }
-.y-spec--sans .y-spec-name,
-.y-spec--sans .y-spec-glyphs { font-family: 'Montserrat', system-ui, sans-serif; }
-.y-spec-scale {
-  margin: 16px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--y-sand);
-  font-size: var(--y-fs-cap);
-  color: var(--y-ink-3);
-  font-family: var(--font-base);
-}
-
-/* ---- Pull quote --------------------------------------------------------- */
-.y-quote {
-  margin: clamp(26px, 3vw, 44px) 0 0;
-  padding: 0 0 0 clamp(18px, 2vw, 28px);
-  border-left: 3px solid var(--y-rose);
-}
-.y-quote p {
-  font-family: var(--y-serif);
-  font-size: clamp(20px, 2.1vw, 30px);
-  line-height: 1.32;
-  color: var(--y-ink);
-  margin: 0;
-}
-.y-quote p em { font-style: italic; }
-.y-quote footer {
-  margin-top: 12px;
-  font-size: var(--y-fs-cap);
-  color: var(--y-ink-3);
-  font-family: var(--font-base);
-}
-
-/* ---- Interview questions ------------------------------------------------ */
-.y-qs {
-  counter-reset: q;
-  display: grid;
-  gap: 10px;
-  margin: 22px 0 0;
-  max-width: 68ch;
-}
-.y-qs li {
-  counter-increment: q;
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
-  gap: 12px;
-  align-items: baseline;
-  font-size: var(--y-fs-sm);
-  line-height: 1.55;
-  color: var(--y-ink-2);
-  padding-bottom: 10px;
-  border-bottom: 1px dashed var(--y-line);
-}
-.y-qs li::before {
-  content: 'Q' counter(q);
-  font-size: var(--y-fs-cap);
-  font-weight: 600;
-  color: var(--y-rose-deep);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---- Persona sheet ------------------------------------------------------ */
-.y-persona {
-  margin-top: 26px;
-  border: 1px solid var(--y-line);
-  border-radius: var(--y-r-md);
-  background: var(--y-card);
-  overflow: hidden;
-}
-.y-persona-top {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 26px;
-  padding: 18px 20px;
-  background: var(--y-blush);
-  border-bottom: 1px solid var(--y-blush-2);
-}
-.y-persona-top div {
-  font-size: var(--y-fs-cap);
-  color: var(--y-ink-3);
-}
-.y-persona-top b {
-  display: block;
-  font-size: var(--y-fs-sm);
-  color: var(--y-ink);
-  font-weight: 600;
-}
-.y-persona-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-}
-.y-persona-grid > div {
-  padding: 18px 20px;
-  border-top: 1px solid var(--y-line);
-  border-right: 1px solid var(--y-line);
-}
-/* Four columns of prose in a narrow cell — a step down from body size so
-   the quadrants stay scannable side by side. */
-.y-persona-grid .y-p { font-size: var(--y-fs-sm); }
-.y-persona-grid > div:nth-child(-n+2) { border-top: 0; }
 
 /* ---- Stats -------------------------------------------------------------- */
 .y-stats {
@@ -1032,26 +851,12 @@
   .y-hero-head { align-items: flex-start; }
   .y-featured { order: -1; padding-bottom: 0; }
 
-  /* Four hour-bars side by side put each under 80px on a 375 screen and
-     the value clipped. Two rows of two keeps the comparison readable. */
-  .y-chart,
-  .y-phases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .y-chart { min-height: 0; }
-  .y-bar { min-height: 108px; }
-  /* Percent heights are meaningless once the bars wrap, so they go
-     content-sized and the number alone carries the comparison. */
-  .y-bar { height: auto; }
-  .y-phases { display: none; }
-
   .y-figs-2 { grid-template-columns: minmax(0, 1fr); }
 
   .y-step {
     grid-template-columns: minmax(0, 1fr);
     gap: 8px;
   }
-
-  .y-persona-grid > div { border-right: 0; }
-  .y-persona-grid > div:nth-child(2) { border-top: 1px solid var(--y-line); }
 
   .y-end { display: block; }
   .y-end-actions { margin-top: 20px; }
