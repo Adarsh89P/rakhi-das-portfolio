@@ -1781,7 +1781,9 @@ a.work-image:focus-visible .work-image-arrow {
   background-color: var(--footer-bg);
   color: var(--footer-ink);
   overflow: hidden;
-  padding-block: var(--section-pad-half) 12px;
+  /* Taller footer: more air above the intro and a real gutter under the
+     copyright rule, instead of the original 12px hairline. */
+  padding-block: var(--section-pad) 20px;
 }
 
 /* The watermark is a backdrop, not a flow item: in Figma it sits behind the
@@ -1819,7 +1821,7 @@ a.work-image:focus-visible .work-image-arrow {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: min(26px, 1.8vw);
+  margin-bottom: min(32px, 2.2vw);
 }
 
 /* The circular crop lives on the img, not here — a clipping container would
@@ -1877,7 +1879,7 @@ a.work-image:focus-visible .work-image-arrow {
 .footer-actions {
   display: flex;
   gap: 10px;
-  margin-bottom: min(26px, 1.8vw);
+  margin-bottom: min(32px, 2.2vw);
 }
 
 /* 16px gap puts the unrotated 56px tiles at x = 0 / 72 / 144 / 216, matching
