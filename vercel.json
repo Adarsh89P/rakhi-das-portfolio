@@ -1,5 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "redirects": [
+    {
+      "source": "/suraksha_case_study.html",
+      "destination": "/case-studies/suraksha_case_study.html",
+      "permanent": true
+    },
+    {
+      "source": "/yoga_case_study.html",
+      "destination": "/case-studies/yoga_case_study.html",
+      "permanent": true
+    }
+  ]
 }

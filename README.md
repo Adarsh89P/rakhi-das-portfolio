@@ -1,23 +1,32 @@
 # Rakhi Das — Portfolio
 
-A two-page static portfolio. **No framework, no build step, no dependencies.**
+A three-page static portfolio. **No framework, no build step, no dependencies.**
 Open `index.html` in a browser and it runs.
 
 ```
-index.html                 Home. Structure only — all copy comes from data.js.
-suraksha_case_study.html   Case study. Self-contained content.
+index.html    Home. Structure only — all copy comes from js/data.js.
 
-motion.js     Motion tokens + the one shared scroll/resize frame. Both pages.
-data.js       Single source of truth for every string, link and asset path.
-script.js     Renders index.html from data.js. Home page only.
-reveal.js     Scroll-reveal. Shared by both pages.
-to-top.js     Back-to-top button. Shared by both pages.
-hero.js       Layered product hero: parallax, tilt, entrance. Both pages.
-cs-nav.js     Case study scrollspy, progress bar, drawer. Case study only.
+case-studies/
+  suraksha_case_study.html   Suraksha case study. Self-contained content.
+  yoga_case_study.html       Yoga case study. Self-contained content.
+  (both reach css/, js/ and public/ with ../ — old root URLs redirect
+   to these, see vercel.json)
 
-styles.css      Design tokens + every shared component. Loaded by both pages.
-hero.css        The layered product hero. Loaded by both pages.
-case-study.css  Only what the case study adds on top.
+js/
+  motion.js     Motion tokens + the one shared scroll/resize frame. Every page.
+  data.js       Single source of truth for every string, link and asset path.
+  script.js     Renders index.html from data.js. Home page only.
+  reveal.js     Scroll-reveal. Shared by every page.
+  to-top.js     Back-to-top button. Shared by every page.
+  hero.js       Layered product hero: parallax, tilt, entrance.
+  cs-nav.js     Suraksha scrollspy, progress bar, drawer.
+  yoga-nav.js   The same, for the yoga case study.
+
+css/
+  styles.css      Design tokens + every shared component. Loaded by every page.
+  hero.css        The layered product hero.
+  case-study.css  Only what the Suraksha case study adds on top.
+  yoga-case.css   Only what the yoga case study adds on top.
 
 public/       Images, video, resume PDF.
 vercel.json   Deploy config (see Deployment).
@@ -32,11 +41,11 @@ different person or project without touching markup, styles or logic.
 **Load order in `index.html` matters:**
 
 ```html
-<script src="motion.js"></script>  <!-- defines SiteMotion; all three below use it -->
-<script src="data.js"></script>    <!-- defines PORTFOLIO_DATA -->
-<script src="script.js"></script>  <!-- builds the DOM from it -->
-<script src="reveal.js"></script>  <!-- must run last: most reveal targets -->
-<script src="to-top.js"></script>  <!-- don't exist until script.js runs -->
+<script src="js/motion.js"></script>  <!-- defines SiteMotion; all three below use it -->
+<script src="js/data.js"></script>    <!-- defines PORTFOLIO_DATA -->
+<script src="js/script.js"></script>  <!-- builds the DOM from it -->
+<script src="js/reveal.js"></script>  <!-- must run last: most reveal targets -->
+<script src="js/to-top.js"></script>  <!-- don't exist until script.js runs -->
 ```
 
 The case study loads `motion.js`, `reveal.js`, `to-top.js`, `cs-nav.js` and

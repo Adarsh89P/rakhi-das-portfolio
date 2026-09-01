@@ -156,7 +156,7 @@ var PORTFOLIO_DATA = {
              the one phone in it with an unoccluded silhouette. */
           { name: 'app',    src: 'public/Surksha/banner/phone-app.png', w: 319,  h: 658, depth: 1, float: true, webp: 'public/Surksha/banner/phone-app.webp' }
         ],
-        href: 'suraksha_case_study.html'
+        href: 'case-studies/suraksha_case_study.html'
       },
       {
         fullWidth: true,
@@ -171,7 +171,7 @@ var PORTFOLIO_DATA = {
            image covers the whole frame, so the mat is never seen there. */
         color: '#f5c6c0',
         image: 'public/MobileBanking/yogaapp.jpg',
-        href: 'yoga_case_study.html'
+        href: 'case-studies/yoga_case_study.html'
       },
       {
         fullWidth: true,
