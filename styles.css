@@ -924,6 +924,8 @@ body.intro-active #heroPhotoWrap {
 
 .hero-badge .icon {
   color: var(--accent-orange);
+  font-size: 0.72em;
+  vertical-align: 0.08em;
 }
 
 .hero-badge .muted {
@@ -1791,7 +1793,7 @@ a.work-image:focus-visible .work-image-arrow {
 .footer-watermark {
   position: absolute;
   left: 50%;
-  bottom: min(178px, 11.1vw);
+  bottom: min(260px, 16.4vw);
   transform: translate(-51.23%, 100%);
   z-index: 0;
   font-weight: 700;
@@ -1799,7 +1801,7 @@ a.work-image:focus-visible .work-image-arrow {
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--footer-ink);
-  opacity: 0.06;
+  opacity: 0.08;
   white-space: nowrap;
 }
 
