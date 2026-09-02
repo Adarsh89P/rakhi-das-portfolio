@@ -12,7 +12,11 @@
   --ink-dim: #4e4e4e;
   --ink-muted: #888888;
   --grey-text: #666666;
-  --text-paragraph: #767676;
+  /* Re-measured against the page ground, not against white. The old #767676
+     was chosen when the page was #ffffff, where it cleared AA at 4.54:1; on
+     the --page-base ground the same grey reads 4.14:1 and fails. #6d6d6d
+     restores the margin (4.70:1 on the ground, 4.95:1 on white). */
+  --text-paragraph: #6d6d6d;
   --accent-orange: #ff8d28;
   --gradient-accent: linear-gradient(96deg, #b16cea 41%, #fa5f72 59%, #ffa44c 86%);
 
@@ -1093,160 +1097,282 @@ body.intro-active #heroPhotoWrap {
   font-weight: 500;
 }
 
-/* Capability pills. A list, because that is what it is — the row reads as
-   eight separate claims, not one sentence. */
+/* ==========================================================================
+   Skills — a rules-based grid, grouped by kind
+   ==========================================================================
+   Was eight equal pills, which gave a reader no way in: every word looked
+   like every other word. Three named groups say what kind of designer this
+   is before the reader has parsed a single item.
+
+   `auto-fit` with a 240px floor means the column count is decided by the
+   available width, not by a breakpoint — three across on a desktop, two on a
+   tablet, and the phone rules further down take it from there.
+
+   The hairlines are pseudo-elements, not the border-top / border-bottom this
+   would otherwise be. That is forced: a border cannot be transformed, and
+   both the hover and the phone reveal scale these from scaleX(0). They sit
+   exactly where those borders would, at 1px and 8% ink, and are fully drawn
+   at rest — so with no animation support at all the grid is indistinguishable
+   from a bordered one. */
 .about-skills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0;
   margin-top: var(--space-5);
+  --skill-rule: rgba(0, 0, 0, 0.08);
 }
 
-.about-skill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  padding: 7px 16px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-pill);
-  background-color: var(--surface);
-  font-weight: 400;
-  /* Held at 14px rather than a rem step: the root scales 15-17px, and a pill
-     label is the one place the type wants to stay put while the prose around
-     it grows. */
-  font-size: 14px;
-  line-height: 1.2;
-  color: var(--ink-dim);
-  transition: border-color var(--transition-fast), color var(--transition-fast);
+/* No `isolation` here on purpose: the sweep below blends in `overlay`, and
+   an isolated stacking context would composite it against the cell's own
+   transparent background — which is to say against nothing, producing no
+   visible sweep at all. Left un-isolated it blends against the page ground,
+   which is what makes it read as light crossing a surface. */
+.skill-group {
+  position: relative;
+  padding: 32px 24px 32px 0;
+  overflow: hidden;
 }
 
-/* Behind (hover: hover) so a touch device cannot land in a stuck hover state
-   after a tap — there the reveal below is the treatment instead. */
-@media (hover: hover) {
-  .about-skill:hover {
-    border-color: var(--ink);
-    color: var(--ink);
-  }
+/* The rule above every cell. */
+.skill-group::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--skill-rule);
+  transform-origin: left;
+  z-index: 1;
 }
 
-/* --------------------------------------------------------------
-   Skills on a phone — a two-column ruled list rather than pills
-   --------------------------------------------------------------
-   Eight pills wrapping freely at 360px produce ragged rows of one, three and
-   two, which reads as a broken row rather than a set. On a grid they line up
-   and the labels can be read down a column.
+/* The rule below the final row only, so two adjacent rows never draw two
+   lines against each other.
 
-   The rules are pseudo-elements, not the `border-top` / `border-bottom` the
-   spec asks for, and that is forced rather than chosen: a border cannot be
-   transformed, and the reveal below scales these from scaleX(0). They sit
-   exactly where those borders would, at the same 1px and the same colour, and
-   at rest they are fully drawn — so with no scroll-driven animation available
-   the component is indistinguishable from the bordered version.
+   `auto-fit` makes this harder than it looks: the column count is not known
+   to CSS, so "the final row" cannot be selected directly. What IS true at
+   every column count is that the last cell always sits in the final row, and
+   with three groups the only case where an earlier cell joins it is the
+   three-column layout, where all three are the final row. Both are covered
+   below, and a wrong guess degrades to a missing hairline rather than a
+   doubled one. */
+.skill-group:last-child {
+  padding-bottom: 32px;
+}
 
-   Cells are padded rather than gapped so each row's rules meet across the
-   column seam and read as one continuous line. */
-@media (max-width: 639px) {
-  .about-skills {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
+.skill-group:last-child .skill-group-items::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--skill-rule);
+  transform-origin: left;
+  z-index: 1;
+}
 
-  .about-skill {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 0;
-    padding: 20px 14px 20px 0;
-    border: 0;
-    border-radius: 0;
-    background-color: transparent;
-    font-size: 0.95rem;
-    line-height: 1.25;
-  }
-
-  /* The `border-top` on every cell. */
-  .about-skill::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--hairline);
-    transform-origin: left;
-  }
-
-  /* The `border-bottom`, on the last row only. Two selectors because a
-     two-column grid's last row is one cell or two depending on the count:
-     the final cell always closes the list, and the cell before it joins in
-     only when the final cell sits in column two (i.e. the one before it is
-     odd, so it starts a row). Correct for both odd and even totals. */
-  .about-skill:last-child::after,
-  .about-skill:nth-last-child(2):nth-child(odd)::after {
+/* Three across: every cell is in the final row. */
+@media (min-width: 800px) {
+  .skill-group .skill-group-items::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 1px;
-    background-color: var(--hairline);
+    background-color: var(--skill-rule);
     transform-origin: left;
+    z-index: 1;
+  }
+}
+
+.skill-group-label {
+  font-weight: 400;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  /* Not --ink-muted (#888888): at 13px on the page ground that measures
+     3.23:1, well under the 4.5 floor for text this size. --grey-text is the
+     next step down and clears it at 5.23:1 while staying clearly quieter than
+     the items it labels. */
+  color: var(--grey-text);
+  margin-bottom: 14px;
+}
+
+.skill-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-item {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ink-dim);
+  /* The nudge on hover. Only the position moves — never the size: scaling
+     text reflows it against a hairline that is not scaling with it, and the
+     two come apart visibly at the cell edge. */
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---- Hover / focus -------------------------------------------------------
+   `:focus-within` carries the keyboard through exactly the same states.
+   Everything here is behind (hover: hover) so a touch device never lands in
+   a stuck hover after a tap — there the scroll reveal is the treatment. */
+@media (hover: hover) {
+  .skill-group:hover .skill-item,
+  .skill-group:focus-within .skill-item {
+    transform: translateX(4px);
+    color: var(--ink);
   }
 
-  /* The reveal. Each row's rules draw themselves left-to-right as the row
-     enters the viewport, replacing the hover the phone cannot offer.
+  .skill-group:hover::after,
+  .skill-group:focus-within::after,
+  .skill-group:hover .skill-group-items::after,
+  .skill-group:focus-within .skill-group-items::after {
+    background-color: var(--accent-orange);
+    animation: skill-rule-draw 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 
-     The stagger is expressed as range, not delay: on a scroll-driven timeline
-     `animation-delay` in ms is meaningless — there is no clock, only the
-     element's position — so each row starts its draw 4% of the entry later
-     than the one above. At a typical scroll speed that reads as the ~70ms
-     step the brief asks for, and unlike a time delay it stays correct when
+  /* The specular sweep: a diagonal band of white crossing the cell once.
+     `overlay` rather than a plain white fill so it lifts what is underneath
+     instead of washing it out — over the page's warm ground that reads as
+     light moving across a surface rather than a rectangle fading in. */
+  .skill-group::before {
+    content: '';
+    position: absolute;
+    inset: -20% -60%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background-image: linear-gradient(
+      108deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.9) 50%,
+      transparent 70%
+    );
+    mix-blend-mode: overlay;
+    transform: translateX(-120%);
+  }
+
+  .skill-group:hover::before,
+  .skill-group:focus-within::before {
+    opacity: 1;
+    animation: skill-sweep 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes skill-sweep {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(120%); }
+}
+
+@keyframes skill-rule-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* The sweep is decorative movement across a large area — the first thing to
+   go. The rule colour change stays: it is the state cue, not the flourish. */
+@media (prefers-reduced-motion: reduce) {
+  .skill-group::before {
+    display: none;
+  }
+
+  .skill-group:hover .skill-item,
+  .skill-group:focus-within .skill-item {
+    transform: none;
+  }
+
+  .skill-group:hover::after,
+  .skill-group:focus-within::after,
+  .skill-group:hover .skill-group-items::after,
+  .skill-group:focus-within .skill-group-items::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+/* ---- Phones --------------------------------------------------------------
+   Two columns, tighter padding, and no hover at all — replaced by rules that
+   draw themselves as each row enters the viewport. */
+@media (max-width: 639px) {
+  .about-skills {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .skill-group {
+    padding: 20px 12px 20px 0;
+  }
+
+  .skill-group-label {
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+  }
+
+  .skill-item {
+    /* Measured at 360px, not assumed — see the note in the report. */
+    font-size: 0.95rem;
+  }
+
+  /* The reveal. The stagger is expressed as range, not delay: on a
+     scroll-driven timeline `animation-delay` in ms is meaningless — there is
+     no clock, only the element's position — so each row starts its draw 4% of
+     the entry after the one above. At an ordinary scroll speed that reads as
+     the ~70ms step asked for, and unlike a time delay it stays correct when
      the visitor scrolls slowly, quickly, or backwards.
 
-     Rows are addressed in pairs because the grid's rows are implicit and
-     there is no row element to hang this on. Eight skills is four rows; a
-     ninth would simply take the last rule's timing, which is a graceful
-     place to end up. */
+     Rows are addressed as nth-child pairs because the grid's rows are
+     implicit; with three groups that is two rows. */
   @supports (animation-timeline: view()) {
-    .about-skill::before,
-    .about-skill:last-child::after,
-    .about-skill:nth-last-child(2):nth-child(odd)::after {
+    .skill-group::after,
+    .skill-group .skill-group-items::after {
       transform: scaleX(0);
       animation: skill-rule-draw linear both;
       animation-timeline: view();
       animation-range: entry 10% entry 55%;
     }
 
-    .about-skill:nth-child(n + 3):nth-child(-n + 4)::before {
+    .skill-group:nth-child(n + 3)::after,
+    .skill-group:nth-child(n + 3) .skill-group-items::after {
       animation-range: entry 14% entry 59%;
     }
 
-    .about-skill:nth-child(n + 5):nth-child(-n + 6)::before {
+    .skill-group:nth-child(n + 5)::after,
+    .skill-group:nth-child(n + 5) .skill-group-items::after {
       animation-range: entry 18% entry 63%;
     }
 
-    .about-skill:nth-child(n + 7)::before,
-    .about-skill:nth-child(n + 7)::after {
-      animation-range: entry 22% entry 67%;
-    }
-
-    @keyframes skill-rule-draw {
-      from { transform: scaleX(0); }
-      to { transform: scaleX(1); }
-    }
-
-    /* A scroll-driven animation is still motion. Reduced-motion visitors get
-       the finished rules immediately. */
+    /* A scroll-driven animation is still motion. */
     @media (prefers-reduced-motion: reduce) {
-      .about-skill::before,
-      .about-skill::after {
+      .skill-group::after,
+      .skill-group .skill-group-items::after {
         animation: none;
         transform: scaleX(1);
       }
     }
   }
+
+  /* Two columns means the last row is the final cell and, when that cell sits
+     in column two, the one before it. Correct for odd and even counts alike. */
+  .skill-group:last-child .skill-group-items::after,
+  .skill-group:nth-last-child(2):nth-child(odd) .skill-group-items::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--skill-rule);
+    transform-origin: left;
+    z-index: 1;
+  }
 }
+
 
 /* ==========================================================================
    My Works
@@ -1997,19 +2123,44 @@ a.work-image:focus-visible .work-image-arrow {
   margin-bottom: var(--space-4);
 }
 
+/* The plate. Always 44px whether it holds a real mark or a monogram, so the
+   four cards line up regardless of which logo files exist.
+
+   Transparent by default: the monogram underneath draws its own circle, and a
+   dark rounded-square plate behind a dark circle just reads as the square —
+   which is the "failed image" look the monogram exists to avoid. Only
+   .has-logo paints a plate, because a real mark needs one. */
 .exp-logo {
+  position: relative;
   width: 44px;
   height: 44px;
   flex-shrink: 0;
   border-radius: 13px;
-  background-color: var(--ink);
+  background-color: transparent;
   color: var(--on-ink);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+/* The monogram, under every plate. A circle rather than the plate's rounded
+   square: on a card whose logo is a letter, a circle reads as a designed mark
+   and a rounded square reads as an image that failed to load. Sized to the
+   full plate so it matches the other three logos exactly. */
+.exp-monogram {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--ink);
+  color: var(--on-ink);
   font-weight: 700;
   font-size: 1.05rem;
-  overflow: hidden;
+  line-height: 1;
+  letter-spacing: 0.01em;
 }
 
 /* A real company mark comes on its own light artwork, so the dark lettermark
@@ -2021,7 +2172,15 @@ a.work-image:focus-visible .work-image-arrow {
   padding: 6px;
 }
 
+/* Once a real mark has loaded it covers the monogram; hiding it keeps the
+   dark circle from showing through a logo with transparency. */
+.exp-logo.has-logo .exp-monogram {
+  display: none;
+}
+
 .exp-logo img {
+  position: relative;
+  z-index: 1;
   width: 70px;
   height: 45px;
   object-fit: contain;
@@ -2511,12 +2670,12 @@ a.work-image:focus-visible .work-image-arrow {
   position: absolute;
   inset: 0;
   opacity: 0.5;
-  filter: blur(60px);
+  filter: blur(24px) saturate(120%);
   background-image:
     radial-gradient(38vmax 38vmax at 18% 22%, var(--wash-sage) 0%, transparent 68%),
     radial-gradient(42vmax 42vmax at 82% 14%, var(--wash-sand) 0%, transparent 70%),
     radial-gradient(46vmax 46vmax at 58% 88%, var(--wash-sage) 0%, transparent 72%);
-  animation: page-bg-drift 42s ease-in-out infinite alternate;
+  animation: page-bg-drift 34s ease-out infinite alternate;
   will-change: transform;
 }
 
@@ -2550,6 +2709,79 @@ a.work-image:focus-visible .work-image-arrow {
   .page-bg::before {
     animation: none;
     transform: translate3d(0, 0, 0) scale(1.06);
+  }
+}
+
+/* ==========================================================================
+   Increased contrast
+   ==========================================================================
+   `prefers-contrast: more` is a request to remove ambiguity from the page,
+   and the two things this design leans on — a tinted ground and translucent
+   glass — are both ambiguity by construction: they make the colour behind any
+   given piece of text a variable rather than a constant.
+
+   So both go. The ground is hidden outright and the page returns to flat
+   white, which is the background every text colour on this site was
+   originally measured against. Every backdrop-filter is dropped and each
+   glass surface is taken to ~96% opaque, so its text sits on a known colour
+   instead of on whatever happens to be sliding underneath it.
+   ========================================================================== */
+@media (prefers-contrast: more) {
+  .page-bg {
+    display: none;
+  }
+
+  body {
+    background-color: #ffffff;
+  }
+
+  /* Every translucent surface on the site, in one place. Each one keeps its
+     own hue and goes near-opaque rather than being flattened to a single
+     colour, so the components still read as themselves. */
+  .glass,
+  .exp-card,
+  .work-image-caption {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .glass {
+    background-color: var(--glass-tint-solid);
+  }
+
+  .exp-card {
+    /* 96% of the card's own tint over the page, not the 52% the glass uses. */
+    background-color: color-mix(in srgb, var(--card-tint, #fff) 96%, #ffffff);
+    border-color: var(--hairline);
+    box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
+    /* Back to the value tuned against a known opaque background. */
+    --text-paragraph: #5c5c5c;
+  }
+
+  .exp-card::before,
+  .exp-card::after {
+    display: none;
+  }
+
+  .work-image-caption {
+    background-color: rgba(18, 18, 22, 0.96);
+  }
+
+  .work-image-caption-date {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  /* The hairlines are a 8% wash that all but disappears at high contrast. */
+  .about-skills {
+    --skill-rule: rgba(0, 0, 0, 0.32);
+  }
+
+  .skill-item {
+    color: var(--ink);
+  }
+
+  .skill-group-label {
+    color: var(--ink-dim);
   }
 }
 

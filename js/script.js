@@ -433,14 +433,26 @@
       copy.appendChild(fadeParagraph('about-line', text));
     });
 
-    /* Run the fade before the pills go in: it only collects `.about-word`,
-       and the pills are not part of the sentence being read. */
+    /* Run the fade before the skills go in: it only collects `.about-word`,
+       and the skill groups are not part of the sentence being read. */
     initAboutFade(copy);
 
-    if (data.about.skills && data.about.skills.length) {
+    if (data.about.skillGroups && data.about.skillGroups.length) {
       var list = el('ul', 'about-skills');
-      data.about.skills.forEach(function (skill) {
-        list.appendChild(el('li', 'about-skill', skill));
+      data.about.skillGroups.forEach(function (group) {
+        /* One cell per group. A <li> holding a heading and its own list keeps
+           the grouping in the markup rather than only in the layout: a screen
+           reader hears "Research, list of 4 items" instead of eleven
+           undifferentiated words. */
+        var cell = el('li', 'skill-group');
+        cell.appendChild(el('p', 'skill-group-label', group.label));
+
+        var items = el('ul', 'skill-group-items');
+        group.items.forEach(function (skill) {
+          items.appendChild(el('li', 'skill-item', skill));
+        });
+        cell.appendChild(items);
+        list.appendChild(cell);
       });
       copy.appendChild(list);
     }
@@ -562,17 +574,37 @@
 
       var top = el('div', 'exp-card-top');
       var logo = el('span', 'exp-logo');
+
+      /* The monogram is not a fallback that gets swapped in — it is always
+         rendered, and a real logo is layered over it. That ordering is what
+         guarantees the failure mode: if the image 404s, is blocked, or is
+         still in flight, what shows through is a finished circular monogram
+         rather than a broken-image glyph or the alt string as raw text.
+
+         `alt=""` is deliberate and is the other half of that guarantee: an
+         empty alt cannot render as text when the image fails. Nothing is lost
+         to assistive tech, because the company name is right there in
+         .exp-company two lines below — the mark is decoration for it. */
+      var monogram = el('span', 'exp-monogram', job.logoLetter || job.company.charAt(0));
+      monogram.setAttribute('aria-hidden', 'true');
+      logo.appendChild(monogram);
+
       if (job.logo) {
         /* Flags the plate for styles.css: a real mark needs a light plate and
-           a contained fit, where the lettermark fallback wants the dark one. */
+           a contained fit, where the monogram underneath wants the dark one. */
         logo.classList.add('has-logo');
         var logoImg = el('img');
+        logoImg.alt = '';
+        logoImg.setAttribute('aria-hidden', 'true');
+        /* onerror before src, so a cached failure cannot fire first. Dropping
+           .has-logo returns the plate to its dark monogram styling, and the
+           img is removed rather than hidden so nothing is left to re-fire. */
+        logoImg.onerror = function () {
+          logo.classList.remove('has-logo');
+          if (logoImg.parentNode) logoImg.parentNode.removeChild(logoImg);
+        };
         logoImg.src = job.logo;
-        logoImg.alt = job.company + ' logo';
         logo.appendChild(logoImg);
-      } else {
-        logo.textContent = job.logoLetter;
-        logo.setAttribute('aria-hidden', 'true');
       }
       top.appendChild(logo);
       top.appendChild(el('span', 'exp-date gradient-text', job.dateRange));

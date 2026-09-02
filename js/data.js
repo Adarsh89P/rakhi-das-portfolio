@@ -7,7 +7,7 @@ var PORTFOLIO_DATA = {
 
   meta: {
     title: 'Rakhi Das | UI/UX Designer',
-    description: 'Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and intuitive product design.'
+    description: 'Portfolio of Rakhi Das, a UI/UX Designer based in Kolkata, India specializing in usability testing, heuristic evaluation, and end-to-end product design.'
   },
 
   profile: {
@@ -73,15 +73,25 @@ var PORTFOLIO_DATA = {
     /* Capability pills under the copy. Order is deliberate: tools first, then
        research, then the craft — it reads as a working sequence rather than
        an alphabetised dump. */
-    skills: [
-      'Figma',
-      'User Research',
-      'Design Systems',
-      'Prototyping',
-      'Wireframing',
-      'Usability Testing',
-      'Interaction Design',
-      'Design Tokens'
+    /* Grouped rather than a flat list: eight equal pills said "here are eight
+       words"; three named groups say what kind of designer this is. The group
+       name is the claim, the items under it are the evidence.
+
+       `skills` (the old flat array) is gone — script.js renders from
+       skillGroups now, and a leftover array would silently diverge. */
+    skillGroups: [
+      {
+        label: 'Research',
+        items: ['User research', 'Usability testing', 'Personas', 'Accessibility']
+      },
+      {
+        label: 'Craft',
+        items: ['Figma', 'Wireframing', 'Prototyping', 'HTML/CSS']
+      },
+      {
+        label: 'Systems',
+        items: ['Design systems', 'Product strategy']
+      }
     ]
   },
 
@@ -127,7 +137,7 @@ var PORTFOLIO_DATA = {
            five products, not a dashboard. */
         heading: 'Suraksha — Diagnostic Ecosystem',
         dateRange: 'Mar 2025 – Jul 2025',
-        description: 'Five connected products — patient app, front desk and admin dashboards, home collector app and website — redesigned into one diagnostic system for patients, technicians and administrators.',
+        description: 'Five connected products, four user types, one system. Simplified patient, doctor and admin workflows across app, website and dashboard.',
         /* The plate colour behind the layers — the original export's own
            background, sampled from it rather than picked. */
         color: '#0044c5',
@@ -162,7 +172,7 @@ var PORTFOLIO_DATA = {
         fullWidth: true,
         heading: 'Yoga All-in-One Elevate Health & Serenity.',
         dateRange: 'Jan 2024 – Nov 2024',
-        description: 'A unified app offering guided yoga sessions, personalized routines, progress tracking, and a calming, intuitive experience to support a consistent wellness journey',
+        description: 'Replaced five scattered wellness apps — timetable, video library, meditation, recipes and shop — with one. Four-screen onboarding into guided sessions, routines and progress tracking.',
         /* Sampled from the artwork's own top and bottom edge rows (#f6c9c9 and
            #f4c3b6), not picked from the pastel set: below 608px this artwork
            is letterboxed rather than cropped, so `color` becomes a visible mat
@@ -177,7 +187,7 @@ var PORTFOLIO_DATA = {
         fullWidth: true,
         heading: 'Influencer Marketing Platform',
         dateRange: 'Jan 2023 - Sept 2023',
-        description: 'Designed a centralized platform to simplify influencer–brand collaboration, from discovery and communication to payments and campaign tracking.',
+        description: 'One platform for influencer–brand collaboration covering the full four-stage journey: discovery, communication, payments and campaign tracking.',
         /* The one artwork not authored at the frame's 1314x580: it is
            1032x580, so `cover` had to scale it up 1.27x to fill the width
            and lost ~21% off the top and bottom. `fit: 'contain'` shows it
@@ -200,7 +210,13 @@ var PORTFOLIO_DATA = {
       {
         heading: 'Mobile Banking Onboarding',
         dateRange: 'Nov 2025 - Nov 2025',
-        description: 'Redesigned QIIB’s digital banking experience with a scalable design system, creating a more consistent and intuitive experience across products.',
+        /* TODO (needs a real figure — do not guess): this line is the one
+           card without a count, because nothing in this repo or its case
+           studies records how many components, screens or products the
+           QIIB system covered. Supply the number and it slots straight in:
+           'Rebuilt QIIB's onboarding on a design system of N components,
+           aligning M products.' */
+        description: 'Rebuilt QIIB’s digital banking onboarding on a shared design system, aligning components across the bank’s mobile products.',
         color: '#ffe9d1',
         image: 'public/Banking/bankingOnboarding.png',
         href: 'https://www.figma.com/deck/H9bCGMIJ1tQf27i2qyglc7/Mobile-Banking-Onboarding?node-id=1-152&t=J5FDokLa6WodmhZT-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
@@ -218,7 +234,7 @@ var PORTFOLIO_DATA = {
     items: [
       {
         role: 'Associate UI/UX Designer',
-        company: 'Sundew',
+        company: 'Sundew Solutions',
         dateRange: 'Dec 2024 – Present',
         logoLetter: 'S',
         logo: 'public/logos/sundew.png',
@@ -227,15 +243,15 @@ var PORTFOLIO_DATA = {
       },
       {
         role: 'Associate UI/UX Designer',
-        company: 'Fortmindz',
-        dateRange: 'Jun 2023 – Feb 2025',
+        company: 'Fortmindz Pvt. Ltd.',
+        dateRange: 'Jun 2023 – Dec 2024',
         logoLetter: 'F',
         logo: 'public/logos/Fortmindz.png',
         color: 'var(--exp-cream)',
         description: 'Owned interface design for web and mobile products, backed by a reusable component library.'
       },
       {
-        role: 'User Experience Designer',
+        role: 'Junior UI/UX Designer',
         company: 'Pixel Consultancy',
         dateRange: 'Nov 2022 – Jun 2023',
         logoLetter: 'P',
@@ -245,8 +261,8 @@ var PORTFOLIO_DATA = {
       },
       {
         role: 'Jr. Implementation Associate',
-        company: 'Granicus',
-        dateRange: 'Oct 2020 – Feb 2023',
+        company: "Logic 'n' Color (Granicus)",
+        dateRange: 'Oct 2020 – Jul 2022',
         logoLetter: 'G',
         logo: 'public/logos/Granicus.png',
         color: 'var(--exp-stone)',
