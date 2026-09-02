@@ -95,13 +95,35 @@
 
 /* One positioned box per layer. It owns the parallax offset only — the
    entrance lives on the image inside, so the two never overwrite each other. */
+/* Two independent offsets, composed in one transform rather than written by
+   two rules: --px/--py are the pointer parallax (hero.js, per data-depth) and
+   --fx-y is the scroll separation below. If each owned its own `transform`
+   declaration the later rule would win outright and silently cancel the
+   other — the same trap documented on [data-reveal] in styles.css. */
 .hero-lyr {
   position: absolute;
   left: var(--l);
   top: var(--t);
   width: var(--w);
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transform: translate3d(var(--px, 0px), calc(var(--py, 0px) + var(--fx-y, 0px)), 0);
   transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The scroll separation. --fx-scroll is 0 to 1, written on the stage by
+   hero.js; --d is the layer's rank, 0 at the back to 4 at the front, set in
+   the markup. The product is the layer's travel.
+
+   It counts down, not up: at --fx-scroll 0 the deepest layer is furthest
+   displaced and the row is flat-ish, and as the section rises the offsets
+   resolve to nothing and the composition settles into its authored position.
+   The alternative — separating on the way in — leaves the banner sitting in
+   a distorted state whenever the page is opened part-scrolled.
+
+   -18px per rank of depth: at rank 4 that is 72px of travel on a plate around
+   800px tall, which separates the phones from the dashboard behind them
+   without ever pulling art outside the plate. */
+.hero-stage[data-fx-depth] .hero-lyr {
+  --fx-y: calc((1 - var(--fx-scroll, 1)) * var(--d, 0) * -18px);
 }
 
 .hero-stage[data-tracking] .hero-lyr {

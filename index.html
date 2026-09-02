@@ -32,6 +32,12 @@
 </head>
 <body class="intro-active">
 
+<!-- The page's ground. A fixed layer rather than a body background: it has to
+     stay put while the page scrolls over it, and it carries an animation and a
+     grain overlay that a background-color cannot. Inert and unlabelled — it is
+     scenery, so it takes no pointer events and is not in the a11y tree. -->
+<div class="page-bg" aria-hidden="true"></div>
+
 <a class="skip-link" href="#main">Skip to main content</a>
 
 <!-- All page copy is rendered from data.js by script.js. Real crawlers and
@@ -132,7 +138,18 @@
       <p class="eyebrow-rule" id="experienceEyebrow"></p>
       <h2 class="experience-heading" id="experienceHeading"></h2>
 
-      <div class="experience-list" id="experienceList"></div>
+      <!-- The rail exists to give the timeline a box to measure against: it
+           wraps the list and nothing else, so `inset: 0` on the track is
+           exactly the height of the roles. The timeline must not be a child
+           of the list itself — .exp-card's fan is cycled with :nth-child,
+           and an extra child would shift every card one step around it. -->
+      <div class="experience-rail">
+        <div class="exp-timeline" aria-hidden="true">
+          <span class="exp-timeline-fill"></span>
+        </div>
+
+        <div class="experience-list" id="experienceList"></div>
+      </div>
     </div>
   </section>
 
@@ -226,5 +243,9 @@
 <script src="js/to-top.js"></script>
 <!-- After script.js: the hero stage it binds to is built from data.js. -->
 <script src="js/hero.js"></script>
+<!-- Liquid glass, WebGL refraction. Opt-in prototype: does nothing unless
+     the page is loaded with ?glass=webgl. After script.js, which builds the
+     cards it binds to. -->
+<script src="js/glass-refraction.js"></script>
 </body>
 </html>

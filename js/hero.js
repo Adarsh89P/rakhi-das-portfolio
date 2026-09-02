@@ -38,6 +38,58 @@
   var SHIFT_RATIO = 0.016;
 
   stages.forEach(setup);
+  stages.forEach(setupScrollDepth);
+
+  /* ---- Scroll depth -------------------------------------------------------
+     The banner's layers separate vertically as the section comes up the
+     viewport, so the flat row resolves into stacked planes on the way in.
+
+     Only stages marked `data-fx-depth` take it. The home page has a
+     .hero-stage too — inside a work tile that already runs its own entrance —
+     and a second transform arriving on those layers mid-animation would fight
+     it. The attribute keeps this to the case study banner that asked for it.
+
+     One number is published, `--fx-scroll`, 0 to 1 across the stage's travel
+     through the viewport. Everything else is CSS: each layer carries a --d
+     from 0 to 4 and multiplies the two. That split is deliberate — the depths
+     are a design decision and belong next to the layout, not in here.
+
+     No scroll listener of its own. motion.js already owns one passive scroll
+     handler feeding a single requestAnimationFrame, and every reader on the
+     page shares it; adding a second would mean two rAF loops measuring the
+     same scroll on the same frame. `motion.onFrame` is that shared frame, and
+     it hands the scroll position in already read. */
+  function setupScrollDepth(stage) {
+    if (!stage.hasAttribute('data-fx-depth')) return;
+
+    /* Reduced motion gets the resolved composition, not the animation: the
+       layers sit at their final separation and stay there. */
+    if (motion.reduced) {
+      stage.style.setProperty('--fx-scroll', '1');
+      return;
+    }
+
+    var last = -1;
+
+    motion.onFrame(function (scrollY, viewport) {
+      var box = stage.getBoundingClientRect();
+
+      /* 0 when the stage's top edge is at the bottom of the viewport, 1 by
+         the time it has risen to a fifth of the way up. Clamped, so the
+         layers hold their end position for the rest of the scroll rather
+         than sliding back apart past the section. */
+      var progress = 1 - (box.top - viewport * 0.2) / (viewport * 0.8);
+      progress = progress < 0 ? 0 : progress > 1 ? 1 : progress;
+
+      /* Two decimals is finer than a pixel of travel at these distances, and
+         skipping the write when nothing changed keeps a still page from
+         dirtying style every frame. */
+      var rounded = Math.round(progress * 100) / 100;
+      if (rounded === last) return;
+      last = rounded;
+      stage.style.setProperty('--fx-scroll', String(rounded));
+    });
+  }
 
   function setup(stage) {
     var tilt = stage.querySelector('.hero-tilt');
@@ -85,8 +137,13 @@
 
     /* Touch devices have no hovering pointer. Skipping the listeners also means
        no pointermove work during a scroll-drag, which is when a phone can least
-       afford it. The entrance and the drift still run. */
-    if (motion.touch || !tilt) return;
+       afford it. The entrance and the drift still run.
+
+       Tested positively — a real hovering, fine pointer — rather than by
+       ruling out coarse ones, so nothing is attached on touch in the first
+       place. Reduced motion is already handled a few lines up. */
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (!tilt) return;
 
     var pending = null;
     var tracking = false;

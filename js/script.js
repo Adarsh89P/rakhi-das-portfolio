@@ -273,6 +273,22 @@
     var fill = el('div', 'work-image-fill');
     applyTileFill(fill, project, project.heading + ' — project preview');
     frame.appendChild(fill);
+
+    /* The cursor light. A span rather than a pseudo-element on the frame
+       because the frame already spends ::before/::after on the entrance
+       wipe; the light needs its own box to track --mx/--my in. */
+    frame.appendChild(el('span', 'work-image-light'));
+
+    /* The caption that rises on hover. Its text is the title and date the
+       body already carries a few lines up, so it is aria-hidden: a sighted
+       visitor reads it as a label on the image, and a screen reader would
+       otherwise hear the same project announced twice in a row. */
+    var caption = el('div', 'work-image-caption');
+    caption.setAttribute('aria-hidden', 'true');
+    caption.appendChild(el('p', 'work-image-caption-title', project.heading));
+    caption.appendChild(el('p', 'work-image-caption-date', project.dateRange));
+    frame.appendChild(caption);
+
     if (hasLink) frame.appendChild(el('span', 'work-image-arrow', ARROW_DIAGONAL_SVG));
 
     var body = el('div', 'work-item-body');
@@ -308,6 +324,63 @@
     return item;
   }
 
+  /* Publishes the pointer's position inside a frame as --mx/--my, in percent,
+     for the radial light in styles.css to centre itself on.
+
+     One listener on the list rather than one per card: the frames are built
+     here and never move between parents, so a single delegated handler covers
+     every one of them and any added later.
+
+     `pointermove` fires far more often than the screen refreshes, so the
+     write is deferred into a rAF and the last sample wins — writing a custom
+     property on every event dirties style on an element with a
+     backdrop-filtered sibling, which is the expensive case. Touch is skipped
+     outright: there is no hover there, the caption is permanently visible
+     (see the (hover: none) block in styles.css), and a light that lands
+     wherever the last tap was is worse than no light. */
+  function initWorkPointerLight(list) {
+    /* Stated positively — the pointer must actually hover and be fine — so
+       the listener is never attached on a touch device rather than attached
+       and then wasted. (motion.touch is the same test inverted; this is the
+       form the effect is actually about.) Reduced motion opts out too: a
+       light chasing the cursor is decorative movement. */
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (motion.reduced) return;
+
+    var pending = 0;
+    var queued = null;
+
+    function flush() {
+      pending = 0;
+      if (!queued) return;
+      queued.frame.style.setProperty('--mx', queued.x.toFixed(1) + '%');
+      queued.frame.style.setProperty('--my', queued.y.toFixed(1) + '%');
+      queued = null;
+    }
+
+    list.addEventListener('pointermove', function (e) {
+      var frame = e.target.closest && e.target.closest('.work-image');
+      if (!frame) return;
+      var box = frame.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      queued = {
+        frame: frame,
+        x: ((e.clientX - box.left) / box.width) * 100,
+        y: ((e.clientY - box.top) / box.height) * 100
+      };
+      if (!pending) pending = window.requestAnimationFrame(flush);
+    }, { passive: true });
+
+    /* Leaving parks the light back at the centre, so the next hover does not
+       start from wherever the pointer happened to exit. */
+    list.addEventListener('pointerleave', function (e) {
+      var frame = e.target.closest && e.target.closest('.work-image');
+      if (!frame) return;
+      frame.style.setProperty('--mx', '50%');
+      frame.style.setProperty('--my', '50%');
+    }, true);
+  }
+
   function renderWorks() {
     document.getElementById('worksEyebrow').textContent = data.works.eyebrow;
 
@@ -332,6 +405,8 @@
       openRow.appendChild(buildWorkItem(project));
       if (openRow.children.length === 2) openRow = null;
     });
+
+    initWorkPointerLight(list);
 
     var more = document.getElementById('worksMoreCta');
     var moreLabel = el('span');
@@ -479,7 +554,11 @@
     var list = document.getElementById('experienceList');
     data.experience.items.forEach(function (job) {
       var card = el('div', 'exp-card');
-      if (job.color) card.style.backgroundColor = job.color;
+      /* A custom property, not backgroundColor: the card is liquid glass and
+         styles.css needs the raw tint to mix down to a translucent fill (and
+         to fall back to the opaque one where backdrop-filter or color-mix is
+         missing). Setting background directly would defeat both. */
+      if (job.color) card.style.setProperty('--card-tint', job.color);
 
       var top = el('div', 'exp-card-top');
       var logo = el('span', 'exp-logo');

@@ -26,13 +26,6 @@
      can move them independently. */
   --surface: #ffffff;
   --surface-raised: #f4f4f4;
-
-  /* The page's ground (see .page-bg). --surface stays pure white on purpose:
-     it is what the intro overlay and the pills paint with, and both want to
-     read as *on top of* the ground rather than part of it. */
-  --page-base: #f7f5f2;
-  --wash-sage: #cfe0d9;
-  --wash-sand: #e8dcd0;
   --hairline: #e5e5e5;
   --hairline-soft: rgba(0, 0, 0, 0.06);
 
@@ -259,10 +252,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font-base);
-  /* Not --surface any more: the page has a ground now, and this is what
-     shows for the frame before .page-bg paints and behind it if the
-     gradients ever fail to. */
-  background-color: var(--page-base);
+  background-color: var(--surface);
   color: var(--ink);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -934,8 +924,6 @@ body.intro-active #heroPhotoWrap {
 
 .hero-badge .icon {
   color: var(--accent-orange);
-  font-size: 0.72em;
-  vertical-align: 0.08em;
 }
 
 .hero-badge .muted {
@@ -1120,132 +1108,9 @@ body.intro-active #heroPhotoWrap {
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
-/* Behind (hover: hover) so a touch device cannot land in a stuck hover state
-   after a tap — there the reveal below is the treatment instead. */
-@media (hover: hover) {
-  .about-skill:hover {
-    border-color: var(--ink);
-    color: var(--ink);
-  }
-}
-
-/* --------------------------------------------------------------
-   Skills on a phone — a two-column ruled list rather than pills
-   --------------------------------------------------------------
-   Eight pills wrapping freely at 360px produce ragged rows of one, three and
-   two, which reads as a broken row rather than a set. On a grid they line up
-   and the labels can be read down a column.
-
-   The rules are pseudo-elements, not the `border-top` / `border-bottom` the
-   spec asks for, and that is forced rather than chosen: a border cannot be
-   transformed, and the reveal below scales these from scaleX(0). They sit
-   exactly where those borders would, at the same 1px and the same colour, and
-   at rest they are fully drawn — so with no scroll-driven animation available
-   the component is indistinguishable from the bordered version.
-
-   Cells are padded rather than gapped so each row's rules meet across the
-   column seam and read as one continuous line. */
-@media (max-width: 639px) {
-  .about-skills {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-
-  .about-skill {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 0;
-    padding: 20px 14px 20px 0;
-    border: 0;
-    border-radius: 0;
-    background-color: transparent;
-    font-size: 0.95rem;
-    line-height: 1.25;
-  }
-
-  /* The `border-top` on every cell. */
-  .about-skill::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--hairline);
-    transform-origin: left;
-  }
-
-  /* The `border-bottom`, on the last row only. Two selectors because a
-     two-column grid's last row is one cell or two depending on the count:
-     the final cell always closes the list, and the cell before it joins in
-     only when the final cell sits in column two (i.e. the one before it is
-     odd, so it starts a row). Correct for both odd and even totals. */
-  .about-skill:last-child::after,
-  .about-skill:nth-last-child(2):nth-child(odd)::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--hairline);
-    transform-origin: left;
-  }
-
-  /* The reveal. Each row's rules draw themselves left-to-right as the row
-     enters the viewport, replacing the hover the phone cannot offer.
-
-     The stagger is expressed as range, not delay: on a scroll-driven timeline
-     `animation-delay` in ms is meaningless — there is no clock, only the
-     element's position — so each row starts its draw 4% of the entry later
-     than the one above. At a typical scroll speed that reads as the ~70ms
-     step the brief asks for, and unlike a time delay it stays correct when
-     the visitor scrolls slowly, quickly, or backwards.
-
-     Rows are addressed in pairs because the grid's rows are implicit and
-     there is no row element to hang this on. Eight skills is four rows; a
-     ninth would simply take the last rule's timing, which is a graceful
-     place to end up. */
-  @supports (animation-timeline: view()) {
-    .about-skill::before,
-    .about-skill:last-child::after,
-    .about-skill:nth-last-child(2):nth-child(odd)::after {
-      transform: scaleX(0);
-      animation: skill-rule-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 10% entry 55%;
-    }
-
-    .about-skill:nth-child(n + 3):nth-child(-n + 4)::before {
-      animation-range: entry 14% entry 59%;
-    }
-
-    .about-skill:nth-child(n + 5):nth-child(-n + 6)::before {
-      animation-range: entry 18% entry 63%;
-    }
-
-    .about-skill:nth-child(n + 7)::before,
-    .about-skill:nth-child(n + 7)::after {
-      animation-range: entry 22% entry 67%;
-    }
-
-    @keyframes skill-rule-draw {
-      from { transform: scaleX(0); }
-      to { transform: scaleX(1); }
-    }
-
-    /* A scroll-driven animation is still motion. Reduced-motion visitors get
-       the finished rules immediately. */
-    @media (prefers-reduced-motion: reduce) {
-      .about-skill::before,
-      .about-skill::after {
-        animation: none;
-        transform: scaleX(1);
-      }
-    }
-  }
+.about-skill:hover {
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 /* ==========================================================================
@@ -1434,10 +1299,7 @@ body.intro-active #heroPhotoWrap {
 .work-image-fill {
   position: absolute;
   inset: 0;
-  /* 1.1s is a slow zoom on purpose: the caption below rises against it, and
-     at the old 600ms the image had already settled before the panel arrived,
-     which read as two separate events rather than one. */
-  transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Video is the one thing not authored to the frame: it was recorded to a
@@ -1455,116 +1317,11 @@ body.intro-active #heroPhotoWrap {
   object-fit: cover;
 }
 
-/* The zoom, the caption and the light all fire from the same two states.
-   `:focus-within` is what carries the keyboard: the frame is a link, so
-   tabbing to it puts focus inside and everything hover does happens.
-
-   The old rule here was `a.work-image:hover` only — an unlinked project got
-   no response at all, on the reasoning that movement promises a click. That
-   restriction is lifted: the caption is a label, not an affordance, and it
-   is worth reading on a project with no case study too. The arrow badge
-   below is still linked-only, which is where the click promise actually
-   lives. */
-.work-image:hover .work-image-fill,
-.work-image:focus-within .work-image-fill {
-  transform: scale(1.045);
-}
-
-/* ---- The caption panel ---------------------------------------------------
-   Frosted glass over the image's own bottom edge, holding the title and date.
-   It starts fully below the frame and slides up into it, so at rest there is
-   nothing to see and no space reserved — `overflow: hidden` on .work-image
-   does the clipping. */
-.work-image-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  color: var(--on-ink);
-  background-color: rgba(18, 18, 22, 0.42);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-  backdrop-filter: blur(18px) saturate(160%);
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  opacity: 0;
-  transform: translateY(100%);
-  transition:
-    transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 380ms ease;
-  pointer-events: none;
-}
-
-/* Without backdrop-filter the panel would be a 42%-opaque grey wash over the
-   artwork, which is not legible — go near-solid there instead. */
-@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .work-image-caption {
-    background-color: rgba(18, 18, 22, 0.88);
-  }
-}
-
-.work-image-caption-title {
-  font-weight: 500;
-  font-size: var(--fs-work-desc);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-
-.work-image-caption-date {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.3;
-  /* Not --ink-muted: that token is tuned for dark text on a light ground and
-     lands under 3:1 against this panel. */
-  color: rgba(255, 255, 255, 0.76);
-}
-
-.work-image:hover .work-image-caption,
-.work-image:focus-within .work-image-caption {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ---- The cursor light ----------------------------------------------------
-   A soft radial highlight centred on the pointer. --mx/--my are written by
-   initWorkPointerLight in script.js as percentages; the 50% defaults here
-   mean the layer is still centred and sane if that never runs. */
-.work-image-light {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 420ms ease;
-  background: radial-gradient(
-    26% 38% at var(--mx, 50%) var(--my, 50%),
-    rgba(255, 255, 255, 0.34) 0%,
-    rgba(255, 255, 255, 0.12) 42%,
-    transparent 72%
-  );
-  mix-blend-mode: soft-light;
-}
-
-.work-image:hover .work-image-light {
-  opacity: 1;
-}
-
-/* Touch has no hover to reveal anything with, so the caption is simply part
-   of the card — and the light, which tracks a pointer that does not exist,
-   is not rendered at all. */
-@media (hover: none) {
-  .work-image-caption {
-    opacity: 1;
-    transform: translateY(0);
-    transition: none;
-  }
-
-  .work-image-light {
-    display: none;
-  }
+/* Only a linked frame zooms. A project without a case study renders its
+   frame as a plain <div>, and a hover response there would promise a click
+   that goes nowhere. */
+a.work-image:hover .work-image-fill {
+  transform: scale(1.04);
 }
 
 /* --------------------------------------------------------------
@@ -1739,151 +1496,23 @@ a.work-image:focus-visible .work-image-arrow {
   padding-block: var(--space-3) var(--space-6);
 }
 
-/* ---- Liquid glass ------------------------------------------------------
-   Geometry ported from dashersw/liquid-glass-js, whose WebGL fragment shader
-   models the material as three exponential falloffs measured from the shape
-   edge inward, summed and used to displace the sampled backdrop along the
-   shape normal:
-
-     rimIntensity  = exp(-d * u_rimDistance)  * u_rimIntensity
-     edgeIntensity = exp(-d * u_edgeDistance) * u_edgeIntensity
-     baseIntensity = (1 - exp(-d * u_baseDistance)) * u_baseIntensity
-
-   with d in pixels from the edge, and defaults rim 0.05/0.8, edge 0.01/0.15,
-   base 0.01/0.1, plus a corner term exp(-d * 0.3) * 0.02. Those decay rates
-   are the whole look, and they are much tighter than they sound: the rim
-   falls to 1/e in 1.25px, the edge in 6.7px, the corner boost in 3.3px. So
-   the material is a hard 1px rim, a soft ~7px shoulder, then a flat middle.
-   That is what the inset shadows below reproduce.
-
-   Two things in that shader do not survive the port, and it is worth being
-   plain about which:
-     - the displacement itself. It resamples the backdrop texture at an
-       offset; CSS has no backdrop-relative displacement, so the bands are
-       drawn as light rather than as bent content. Real refraction needs the
-       WebGL path.
-     - the ripple, `sin(distFromEdge * 25.0) * 0.1 * rimIntensity`. At the
-       default rim decay it is multiplied by ~0.2 within 2px of the edge and
-       by ~0 beyond, so it contributes a sub-pixel wobble. Dropped rather
-       than faked.
-   The tint is ported exactly: the shader mixes the backdrop toward a
-   vertical gradient running white at the top to 0.7 grey at the bottom, at
-   tintOpacity 0.2. That top-to-bottom darkening is what makes the material
-   read as a solid object rather than a hole, and it costs one gradient here.
-   Blur is the one deliberate deviation — see the note on it below.
-
-   `--card-tint` is set per card in script.js from data.js. */
 .exp-card {
   position: relative;
-  isolation: isolate;
   flex: 0 0 auto;
   width: min(300px, 72vw);
   padding: var(--space-4);
-  /* The library defaults to a 48px radius on controls far smaller than these
-     cards; 28px is that proportion carried over, and the edge bands need the
-     curve to read as a curve. */
-  border-radius: 28px;
+  border-radius: 18px;
   border: 1px solid var(--hairline-soft);
-  /* No-backdrop-filter fallback: the original solid tint. */
-  background-color: var(--card-tint, transparent);
   box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
+  /* Background color comes from data.js per item (applied inline in
+     script.js) — one of --exp-lilac/-blush/-cream/-stone. */
 
   /* --text-paragraph is tuned against white, where it clears AA at 4.54:1.
      On a tinted fill it does not — even against the lightest of these four it
      only reaches 3.75:1. Re-pointing the token on the card covers every
-     descendant at once, the same trick the dark-theme block above uses.
-     Held one step darker than the old #5c5c5c: translucency means the
-     backdrop is no longer a known constant — under a card's overlapping
-     corner it is busier than plain white. */
-  --text-paragraph: #4f4f4f;
-}
-
-/* Gated on both features because the fill depends on color-mix: without it
-   the tint would resolve to nothing and leave the text on bare white. */
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) and
-          (background: color-mix(in srgb, red 50%, transparent)) {
-  .exp-card {
-    background-color: color-mix(in srgb, var(--card-tint, #fff) 52%, transparent);
-    /* The shader blurs at sigma = blurRadius / 2, default 5 → 2.5px, i.e.
-       almost clear: there, refraction carries the effect and the blur only
-       softens what the displacement drags in. With no displacement to carry
-       it, 2.5px here reads as a flat pastel rectangle, so the blur is doing
-       that work instead. 12px is the compromise — enough to register as
-       glass where the fanned cards overlap, well short of the 18px
-       milkiness that buries the tint. saturate() has no equivalent in the
-       shader either; it is the one bit of Apple vibrancy kept on purpose,
-       and kept mild. */
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    backdrop-filter: blur(12px) saturate(150%);
-    border-color: transparent;
-    box-shadow:
-      /* rim: exp(-d * 0.8), 1/e at 1.25px — a hard bright line, no spread */
-      inset 0 0 0 1px rgba(255, 255, 255, 0.75),
-      inset 0 0 3px rgba(255, 255, 255, 0.45),
-      /* edge: exp(-d * 0.15), 1/e at 6.7px — the soft shoulder inside it */
-      inset 0 0 9px -2px rgba(255, 255, 255, 0.38),
-      /* ambient drop, unchanged in spirit from the solid version */
-      0 24px 48px -28px rgba(20, 20, 30, 0.35),
-      0 2px 8px rgba(20, 20, 30, 0.05);
-  }
-}
-
-/* The specular streak. One diagonal pass, strongest at the top-left corner
-   and gone by the middle — a single light source, not an even glow. */
-/* Two layers from the shader, in one element.
-   1. The corner boost, exp(-d * 0.3) * 0.02: the shader adds it on top of the
-      edge terms wherever both axes are near a corner, which is why its glass
-      brightens where two edges meet rather than evenly around the rim. Four
-      radial gradients, 1/e at 3.3px so ~26px to visually nothing.
-   2. The vertical tint, mix(backdrop, white -> 0.7 grey, 0.2) — ported at
-      its default 0.2, giving the pane a lit top and a settled bottom. */
-.exp-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  background-image:
-    radial-gradient(24px 24px at 0% 0%, rgba(255, 255, 255, 0.55), transparent 70%),
-    radial-gradient(24px 24px at 100% 0%, rgba(255, 255, 255, 0.55), transparent 70%),
-    radial-gradient(24px 24px at 0% 100%, rgba(255, 255, 255, 0.4), transparent 70%),
-    radial-gradient(24px 24px at 100% 100%, rgba(255, 255, 255, 0.4), transparent 70%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(179, 179, 179, 0.2) 100%);
-  opacity: 0.9;
-  transition: opacity var(--transition-base);
-}
-
-/* The bevel ring: fill the padding box with the gradient, then punch the
-   content box back out so only the rim survives. Same mask-composite trick
-   as .glass, gated the same way — without it the gradient would render as a
-   slab over the whole card, and no ring at all is the safe degradation. */
-@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
-  .exp-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-    padding: 1.5px;
-    background-image: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0.45) 28%,
-      rgba(20, 20, 30, 0.1) 55%,
-      rgba(255, 255, 255, 0.35) 78%,
-      rgba(255, 255, 255, 0.9) 100%
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
+     descendant at once, the same trick the dark-theme block above uses, and
+     lands at 5.65-6.03:1 across the set while staying a muted grey. */
+  --text-paragraph: #5c5c5c;
 }
 
 /* Rotation, resting stagger and stacking order — cycled per position so
@@ -1898,95 +1527,11 @@ a.work-image:focus-visible .work-image-arrow {
 .exp-card:nth-child(6n+5) { --card-rotate: -3deg; --base-y: 10px; z-index: 2; }
 .exp-card:nth-child(6n+6) { --card-rotate: 3deg; --base-y: 16px; z-index: 1; }
 
-/* Straightening out of the fan lifts the card off its neighbours, so less is
-   passing behind it — the glass compensates by brightening its own rim and
-   pushing saturation, which is also what Apple's material does under a
-   press. The streak swings toward the top edge as the card rotates flat. */
 .exp-card:hover {
   --card-rotate: 0deg;
   --lift: -22px;
   z-index: 20;
   box-shadow: 0 32px 60px -24px rgba(20, 20, 30, 0.4);
-}
-
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) and
-          (background: color-mix(in srgb, red 50%, transparent)) {
-  .exp-card:hover {
-    -webkit-backdrop-filter: blur(15px) saturate(170%);
-    backdrop-filter: blur(15px) saturate(170%);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.95),
-      inset 0 0 4px rgba(255, 255, 255, 0.6),
-      inset 0 0 11px -2px rgba(255, 255, 255, 0.5),
-      0 32px 60px -24px rgba(20, 20, 30, 0.4),
-      0 2px 8px rgba(20, 20, 30, 0.06);
-  }
-}
-
-.exp-card:hover::before {
-  opacity: 1;
-}
-
-/* Transparency is a system-level accessibility setting on macOS and iOS, and
-   the people who turn it off are the ones the tinted fill was hurting. Give
-   them the original opaque card. */
-@media (prefers-reduced-transparency: reduce) {
-  .exp-card {
-    background-color: var(--card-tint, transparent);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    border-color: var(--hairline-soft);
-    box-shadow: 0 24px 48px -28px rgba(20, 20, 30, 0.35);
-    --text-paragraph: #5c5c5c;
-  }
-
-  .exp-card::before,
-  .exp-card::after {
-    display: none;
-  }
-}
-
-/* ---- The WebGL path (prototype, opt-in) --------------------------------
-   glass-refraction.js runs only on ?glass=webgl. When it does, it appends a
-   canvas per card and flags the card, and everything the CSS was painting to
-   *stand in* for refraction has to get out of the way: the shader draws the
-   fill, the tint, the rim and the edge itself, from the real distance field.
-   What stays is the ambient drop shadow, which was never part of the
-   material. Without this the two would stack and read as fog. */
-.exp-card.has-webgl-glass {
-  background-color: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  border-color: transparent;
-  box-shadow:
-    0 24px 48px -28px rgba(20, 20, 30, 0.35),
-    0 2px 8px rgba(20, 20, 30, 0.05);
-}
-
-.exp-card.has-webgl-glass:hover {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow:
-    0 32px 60px -24px rgba(20, 20, 30, 0.4),
-    0 2px 8px rgba(20, 20, 30, 0.06);
-}
-
-.exp-card.has-webgl-glass::before,
-.exp-card.has-webgl-glass::after {
-  display: none;
-}
-
-/* Same slot the pseudo-elements used: painted over the card's own background
-   but under its content, held there by the isolation on .exp-card. */
-.exp-card-glass {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  pointer-events: none;
 }
 
 .exp-card-top {
@@ -2209,19 +1754,6 @@ a.work-image:focus-visible .work-image-arrow {
    script.js publishes the measured track width as --track-w, and the fallback
    rebuilds it from the same tokens .container uses (a hair wide, since 100vw
    counts the scrollbar) for the frame before that measurement lands. */
-/* Both ends of the strip fade out instead of being cut off by the container.
-   Scoped to the gallery: the testimonials strip (parked) is a row of cards
-   with text in them, where a fade would clip words mid-letter rather than
-   read as a soft edge. The percentages are the request's — opaque from 9% to
-   91%, so the fade is about a tile's width at each end.
-
-   Hover already pauses the strip (see .marquee-track:hover above); this
-   leaves that rule alone. */
-.gallery .marquee-track {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
-}
-
 .gallery-tile {
   --tiles-visible: 4;
   --tile-gap: 16px;
@@ -2234,7 +1766,7 @@ a.work-image:focus-visible .work-image-arrow {
   /* Matches the testimonial photo's footprint: ~306px wide at full width,
      and the same rounding. */
   aspect-ratio: 306 / 265;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   /* margin, not gap — see the .marquee-strip note on why the seam needs it. */
   margin-right: var(--tile-gap);
 }
@@ -2247,9 +1779,7 @@ a.work-image:focus-visible .work-image-arrow {
   background-color: var(--footer-bg);
   color: var(--footer-ink);
   overflow: hidden;
-  /* Taller footer: more air above the intro and a real gutter under the
-     copyright rule, instead of the original 12px hairline. */
-  padding-block: var(--section-pad) 20px;
+  padding-block: var(--section-pad-half) 12px;
 }
 
 /* The watermark is a backdrop, not a flow item: in Figma it sits behind the
@@ -2261,7 +1791,7 @@ a.work-image:focus-visible .work-image-arrow {
 .footer-watermark {
   position: absolute;
   left: 50%;
-  bottom: min(260px, 16.4vw);
+  bottom: min(178px, 11.1vw);
   transform: translate(-51.23%, 100%);
   z-index: 0;
   font-weight: 700;
@@ -2269,7 +1799,7 @@ a.work-image:focus-visible .work-image-arrow {
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--footer-ink);
-  opacity: 0.08;
+  opacity: 0.06;
   white-space: nowrap;
 }
 
@@ -2287,7 +1817,7 @@ a.work-image:focus-visible .work-image-arrow {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: min(32px, 2.2vw);
+  margin-bottom: min(26px, 1.8vw);
 }
 
 /* The circular crop lives on the img, not here — a clipping container would
@@ -2345,7 +1875,7 @@ a.work-image:focus-visible .work-image-arrow {
 .footer-actions {
   display: flex;
   gap: 10px;
-  margin-bottom: min(32px, 2.2vw);
+  margin-bottom: min(26px, 1.8vw);
 }
 
 /* 16px gap puts the unrotated 56px tiles at x = 0 / 72 / 144 / 216, matching
@@ -2453,197 +1983,6 @@ a.work-image:focus-visible .work-image-arrow {
 [data-reveal].in-view {
   --reveal-y: 0px;
   opacity: 1;
-}
-
-/* Held slightly desaturated at rest so the strip reads as one texture rather
-   than eight competing photographs, and restored on the tile you point at.
-   The scale is small — these are 300px tiles moving continuously, and
-   anything larger fights the marquee's own travel.
-
-   The transform is on the image, not the tile: the tile is a flex item whose
-   width feeds the marquee's measured loop duration, and scaling it would
-   change that mid-run. */
-.gallery-tile .tile-img {
-  filter: saturate(0.72);
-  transition:
-    filter 420ms ease,
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.gallery-tile:hover .tile-img,
-.gallery-tile:focus-within .tile-img {
-  filter: saturate(1);
-  transform: scale(1.05);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gallery-tile:hover .tile-img,
-  .gallery-tile:focus-within .tile-img {
-    transform: none;
-  }
-}
-
-/* ==========================================================================
-   The page ground
-   ==========================================================================
-   Three soft washes on a warm off-white, fixed behind everything. Two things
-   this is not: it is not a body background (it has to hold still under the
-   scroll and carry an animation), and it is not decoration for its own sake
-   — flat white gives the glass on the experience cards nothing to refract,
-   and a backdrop-filter over nothing is a no-op.
-
-   Sizing is deliberately sloppy in the right direction: `inset: -10vmax`
-   pushes all four edges well outside the viewport so the 60px blur has room
-   to fall off, and the drift below never drags a hard edge into view.
-   ========================================================================== */
-.page-bg {
-  position: fixed;
-  inset: -10vmax;
-  z-index: -1;
-  pointer-events: none;
-  background-color: var(--page-base);
-}
-
-/* The washes. Held at 50% against the base so they stay a suggestion of
-   colour — at full strength the sage reads as a green page. */
-.page-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.5;
-  filter: blur(60px);
-  background-image:
-    radial-gradient(38vmax 38vmax at 18% 22%, var(--wash-sage) 0%, transparent 68%),
-    radial-gradient(42vmax 42vmax at 82% 14%, var(--wash-sand) 0%, transparent 70%),
-    radial-gradient(46vmax 46vmax at 58% 88%, var(--wash-sage) 0%, transparent 72%);
-  animation: page-bg-drift 42s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-/* Grain. A blurred gradient this large bands into visible steps on a wide
-   display — 8-bit colour simply runs out of values across 40vmax — and a
-   little noise breaks the steps up. feTurbulence rather than an image file:
-   it is a few hundred bytes inline and needs no request. */
-.page-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* Small travel, long cycle: the point is that you cannot catch it moving,
-   only notice the page is not quite where it was. */
-@keyframes page-bg-drift {
-  from {
-    transform: translate3d(-2%, -1%, 0) scale(1.04);
-  }
-  to {
-    transform: translate3d(2%, 2%, 0) scale(1.1);
-  }
-}
-
-/* The global reduced-motion reset collapses animations to 0.001ms, which
-   would strand this at its end frame — harmless here, but stopping it
-   outright is the honest reading of the request. */
-@media (prefers-reduced-motion: reduce) {
-  .page-bg::before {
-    animation: none;
-    transform: translate3d(0, 0, 0) scale(1.06);
-  }
-}
-
-/* ==========================================================================
-   Experience — the timeline
-   ==========================================================================
-   A faint full-length track with a coloured line drawn over it as the
-   section passes through the viewport. Scroll-driven entirely in CSS:
-   `animation-timeline: view()` ties the progress to the element's own
-   travel, so there is no observer, no scroll handler and nothing to
-   unsubscribe.
-
-   The whole thing is inside @supports. Where view() is unsupported the rule
-   never applies, the fill keeps its default scale of 1, and the timeline
-   reads as a plain finished line — which is the right thing to show rather
-   than an empty track that never fills.
-
-   Orientation follows the layout: the cards are a horizontal fan on the
-   desktop, where "down the left" has nothing to run down, so the rail lies
-   flat under them and draws left-to-right. Below 900px the cards stack and
-   it stands up on the left, which is where the request's vertical line is
-   the literal description of the layout.
-   ========================================================================== */
-.experience-rail {
-  position: relative;
-}
-
-.exp-timeline {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  border-radius: 2px;
-  background-color: var(--hairline-soft);
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.exp-timeline-fill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  /* The site's one accent, not a new colour. */
-  background-image: var(--gradient-accent);
-  transform-origin: left center;
-}
-
-@supports (animation-timeline: view()) {
-  .exp-timeline-fill {
-    transform: scaleX(0);
-    animation: exp-timeline-draw linear both;
-    animation-timeline: view();
-    animation-range: cover 12% cover 78%;
-  }
-
-  @keyframes exp-timeline-draw {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
-  }
-}
-
-@media (max-width: 900px) {
-  .exp-timeline {
-    top: 0;
-    right: auto;
-    bottom: 0;
-    width: 2px;
-    height: auto;
-  }
-
-  .exp-timeline-fill {
-    /* --gradient-accent's own stops, turned to run down the rail. */
-    background-image: linear-gradient(186deg, #b16cea 41%, #fa5f72 59%, #ffa44c 86%);
-    transform-origin: top center;
-  }
-
-  @supports (animation-timeline: view()) {
-    .exp-timeline-fill {
-      transform: scaleY(0);
-      animation-name: exp-timeline-draw-y;
-    }
-
-    @keyframes exp-timeline-draw-y {
-      from { transform: scaleY(0); }
-      to { transform: scaleY(1); }
-    }
-  }
-
-  /* The stacked cards need to clear the rail. */
-  .experience-list {
-    padding-left: var(--space-4);
-  }
 }
 
 /* ==========================================================================
