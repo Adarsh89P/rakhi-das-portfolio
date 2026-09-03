@@ -1375,6 +1375,193 @@ body.intro-active #heroPhotoWrap {
 
 
 /* ==========================================================================
+   Learn-more button — expanding circle, in glass
+   ==========================================================================
+   The Uiverse cssbuttons-io component, rebuilt on this site's own liquid
+   glass rather than a flat fill: the pill is the same material as the nav
+   and the works badge, and the circle that floods it on hover is solid ink,
+   so the two states read as glass then ink rather than one colour swapping
+   for another.
+
+   Sizes are driven by --lm-h, so the section CTA is the same component one
+   step larger and not a second set of rules.
+   ========================================================================== */
+.learn-more {
+  --lm-h: 46px;
+  --lm-pad: 5px;
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  height: var(--lm-h);
+  padding: 0 calc(var(--lm-h) * 0.55) 0 calc(var(--lm-h) + var(--lm-pad) * 2);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+  /* Near-opaque fallback: without backdrop-filter a 42% wash over the page
+     ground leaves the label thin. */
+  background-color: var(--glass-tint-solid);
+  box-shadow: var(--glass-shadow);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .learn-more {
+    background-color: var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+/* Specular sheen and lit bevel, the same two layers .glass builds. Both sit
+   below the circle, which is why the flood covers them on hover. */
+.learn-more::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: var(--glass-specular);
+}
+
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  .learn-more::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    pointer-events: none;
+    padding: 1px;
+    background-image: var(--glass-ring);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+/* The circle. At rest it is a disc at the left holding the arrow; on hover
+   it grows to the full pill and the label rides on top of it. */
+.learn-more .circle {
+  position: absolute;
+  left: var(--lm-pad);
+  top: 50%;
+  z-index: 0;
+  display: block;
+  width: calc(var(--lm-h) - var(--lm-pad) * 2);
+  height: calc(var(--lm-h) - var(--lm-pad) * 2);
+  border-radius: var(--radius-pill);
+  background-color: var(--ink);
+  transform: translateY(-50%);
+  transition: width 450ms cubic-bezier(0.65, 0, 0.076, 1);
+}
+
+.learn-more:hover .circle,
+.learn-more:focus-visible .circle {
+  width: calc(100% - var(--lm-pad) * 2);
+}
+
+/* The arrow, drawn rather than an asset: a 2px bar with a rotated square
+   corner for the head, so it scales with the button and inherits its
+   colour. Held at the circle's resting centre and nudged right on hover. */
+.learn-more .icon.arrow {
+  position: absolute;
+  top: 50%;
+  /* Anchored to the circle's left inset, NOT centred on it: the circle grows
+     to the full pill on hover, so a 50% offset would carry the arrow to the
+     middle of the button and straight through the label. Pinned here it
+     stays in the left cap where it started, whatever the circle does. */
+  left: calc((var(--lm-h) - var(--lm-pad) * 2 - 17px) / 2);
+  width: 17px;
+  height: 2px;
+  margin-top: -1px;
+  background-color: var(--on-ink);
+  border-radius: 1px;
+  transition: transform 450ms cubic-bezier(0.65, 0, 0.076, 1);
+}
+
+.learn-more .icon.arrow::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid var(--on-ink);
+  border-right: 2px solid var(--on-ink);
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+/* A short travel as the flood arrives — enough to read as the arrow leading
+   the way, short enough to stay clear of the label. */
+.learn-more:hover .icon.arrow,
+.learn-more:focus-visible .icon.arrow {
+  transform: translateX(7px);
+}
+
+.learn-more .button-text {
+  position: relative;
+  z-index: 1;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color 450ms cubic-bezier(0.65, 0, 0.076, 1);
+}
+
+.learn-more:hover .button-text,
+.learn-more:focus-visible .button-text {
+  color: var(--on-ink);
+}
+
+/* One step up for the section CTA — same component, larger. */
+.learn-more--lg {
+  --lm-h: 56px;
+}
+
+.learn-more--lg .button-text {
+  font-size: 1.0625rem;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .learn-more {
+    background-color: var(--glass-tint-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .learn-more::before,
+  .learn-more::after {
+    display: none;
+  }
+}
+
+/* The flood is the whole idea, so it stays — but it arrives rather than
+   sweeps, and the arrow stops travelling. */
+@media (prefers-reduced-motion: reduce) {
+  .learn-more .circle,
+  .learn-more .icon.arrow,
+  .learn-more .button-text {
+    transition-duration: 1ms;
+  }
+
+  .learn-more:hover .icon.arrow,
+  .learn-more:focus-visible .icon.arrow {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
    My Works
    ========================================================================== */
 .works {
@@ -1796,22 +1983,104 @@ body.intro-active #heroPhotoWrap {
 }
 
 /* Hidden until hover, then eases in — the "view project" affordance. */
+/* The badge, in the same liquid glass as the nav pill and the experience
+   cards. It sits over the artwork *and* over the caption panel, so it needs
+   a z-index: the caption is z-index 2, and without one this badge — which
+   comes later in the DOM but carries no index of its own — was painting
+   underneath the caption's backdrop-filter and being blurred into a smudge.
+
+   Not the shared `.glass` class, tempting as that is: `.glass` sets
+   `position: relative`, and this badge has to stay absolutely positioned in
+   the frame's bottom-right. Same tokens, own positioning. */
 .work-image-arrow {
   position: absolute;
   right: var(--space-4);
   bottom: var(--space-4);
+  z-index: 3;
+  isolation: isolate;
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background-color: var(--ink);
-  color: var(--on-ink);
+  /* Near-opaque fallback where backdrop-filter is unavailable — over a
+     photograph a 42% wash would leave the arrow unreadable. */
+  background-color: var(--glass-tint-solid);
+  color: var(--ink);
+  box-shadow: var(--glass-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transform: translateY(10px) scale(0.7);
   transition: opacity 350ms ease, transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Hoverable in its own right, so the badge can respond to the pointer
+     landing on it rather than only to the frame. It sits inside the frame's
+     anchor, so it is still the same link — this changes what can be hovered,
+     not what can be clicked. */
+  pointer-events: auto;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .work-image-arrow {
+    background-color: var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+/* The specular sheen and the lit bevel, exactly as .glass builds them: a
+   vertical falloff for volume, then a 1px ring run at an angle so the rim
+   catches light unevenly. Both sit at z-index -1 against the isolation
+   above, which paints them over the badge's own fill but under the arrow. */
+.work-image-arrow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   pointer-events: none;
+  background-image: var(--glass-specular);
+}
+
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  .work-image-arrow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    padding: 1px;
+    background-image: var(--glass-ring);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+/* Same reasoning as the experience cards: the people who switch transparency
+   off are the ones a translucent badge over a photograph hurts most. */
+@media (prefers-reduced-transparency: reduce) {
+  .work-image-arrow {
+    background-color: var(--glass-tint-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .work-image-arrow::before,
+  .work-image-arrow::after {
+    display: none;
+  }
+}
+
+/* The caption's text would otherwise run under the badge. Only linked frames
+   carry one, so only they give up the room. */
+a.work-image .work-image-caption {
+  padding-right: calc(var(--space-4) * 2 + 52px);
 }
 
 /* `focus-visible` on the frame itself, not `focus-within`: the frame is the
@@ -1822,9 +2091,43 @@ a.work-image:focus-visible .work-image-arrow {
   transform: translateY(0) scale(1);
 }
 
+/* The arrow settles into place as the badge arrives — it enters a little
+   behind and eases forward, so the badge reads as one gesture rather than a
+   disc that pops with a static glyph inside it. */
 .work-image-arrow svg {
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 15px;
+  transform: translateX(-5px);
+  transition: transform 450ms cubic-bezier(0.65, 0, 0.076, 1);
+}
+
+a.work-image:hover .work-image-arrow svg,
+a.work-image:focus-visible .work-image-arrow svg {
+  transform: translateX(0);
+}
+
+/* Pointer directly on the badge: it lifts and the arrow leads, the same
+   short travel the section button's arrow makes.
+
+   Qualified with `a.work-image` deliberately. The frame-hover rule above is
+   `a.work-image:hover .work-image-arrow`, which outranks a bare
+   `.work-image-arrow:hover` — and since hovering the badge always means
+   hovering the frame too, the unqualified version would simply never win.
+   Matching its specificity and coming later is what lets it apply. */
+a.work-image .work-image-arrow:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+
+a.work-image .work-image-arrow:hover svg {
+  transform: translateX(5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-image-arrow svg,
+  a.work-image:hover .work-image-arrow svg,
+  a.work-image .work-image-arrow:hover svg {
+    transform: none;
+  }
 }
 
 /* ==========================================================================
@@ -3128,9 +3431,13 @@ a.work-image:focus-visible .work-image-arrow {
     height: 36px;
   }
 
+  a.work-image .work-image-caption {
+    padding-right: calc(var(--space-3) * 2 + 36px);
+  }
+
   .work-image-arrow svg {
     width: 15px;
-    height: 15px;
+    height: 11px;
   }
 
   .gallery-head {

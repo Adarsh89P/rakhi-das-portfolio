@@ -1,0 +1,1181 @@
+<title>Signal Review Console</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;450;500;600&display=swap">
+<style>
+  /* ============================================================
+     Signal — fraud review console
+     A single dark visual world on purpose: analysts run long shifts
+     in low light, so there is no light theme to design. Every colour
+     is painted explicitly so the page holds on any host ground.
+     ============================================================ */
+  :root {
+    color-scheme: dark;
+
+    /* Ground */
+    --base: #141416;
+    --raised: #1c1c1f;
+    --raised-2: #232327;
+    --sunken: #101012;
+    --line: #2c2c31;
+    --line-2: #3a3a41;
+
+    /* Ink — cool, so the warm state scale never collides with text */
+    --ink: #e4e6e9;
+    --ink-2: #9198a1;
+    --ink-3: #6a7079;
+
+    /* The three states. A neutral-to-warm ramp, not a hue triad:
+       clear is dim and cool, flagged is bright and warm. Luminance
+       does the work, so it survives any colour vision. */
+    --clear: #7c838d;
+    --uncertain: #c2a57c;
+    --flagged: #f3ddb8;
+    --uncertain-wash: rgba(194, 165, 124, 0.07);
+    --flagged-wash: rgba(243, 221, 184, 0.06);
+
+    /* The model's voice. One saturated accent, nothing else may use it. */
+    --model: #7c8cff;
+    --model-dim: rgba(124, 140, 255, 0.16);
+
+    /* Focus is white, never the accent — the accent is spoken for. */
+    --focus: #ffffff;
+
+    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+    --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--base);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- Page frame ---------------------------------------------------- */
+  .shell {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    gap: var(--s7);
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: var(--s7) var(--s6) var(--s8);
+  }
+
+  @media (max-width: 1080px) {
+    .shell { grid-template-columns: 1fr; gap: var(--s6); }
+    .rail { position: static !important; }
+  }
+
+  .rail {
+    position: sticky;
+    top: var(--s7);
+    align-self: start;
+    font-size: 13px;
+  }
+
+  .rail-mark {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    margin-bottom: var(--s2);
+  }
+
+  .rail-mark svg { display: block; }
+
+  .rail-sub {
+    color: var(--ink-3);
+    font-size: 12px;
+    line-height: 1.45;
+    margin: 0 0 var(--s5);
+    max-width: 20ch;
+  }
+
+  .rail nav { display: flex; flex-direction: column; gap: 1px; }
+
+  .rail a {
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 5px var(--s2);
+    border-left: 2px solid var(--line);
+    display: flex;
+    gap: var(--s2);
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+
+  .rail a:hover { color: var(--ink); border-left-color: var(--line-2); }
+  .rail a .n { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .rail-group {
+    color: var(--ink-3);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin: var(--s4) 0 var(--s2) var(--s2);
+  }
+
+  /* ---- Type scale ----------------------------------------------------- */
+  h1 {
+    font-size: 30px;
+    font-weight: 500;
+    letter-spacing: -0.022em;
+    line-height: 1.18;
+    margin: 0 0 var(--s4);
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+
+  h2 {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    margin: 0 0 var(--s2);
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0;
+    margin: 0 0 var(--s2);
+  }
+
+  p { margin: 0 0 var(--s3); max-width: 68ch; color: var(--ink-2); font-size: 14px; }
+  p strong { color: var(--ink); font-weight: 500; }
+  p:last-child { margin-bottom: 0; }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 var(--s3);
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+  }
+
+  .eyebrow::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: var(--line);
+  }
+
+  section { margin-bottom: var(--s8); scroll-margin-top: var(--s5); }
+
+  /* ---- The argument --------------------------------------------------- */
+  .thesis {
+    border-left: 2px solid var(--model);
+    padding: var(--s1) 0 var(--s1) var(--s4);
+    margin: 0 0 var(--s5);
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 62ch;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+
+  .badges { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s5); }
+
+  .badge {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    padding: 3px 9px;
+    background: var(--raised);
+  }
+
+  .badge.is-concept { color: var(--ink); border-color: var(--ink-3); }
+
+  /* ---- Spec grid ------------------------------------------------------ */
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--s5) var(--s5);
+  }
+
+  .note {
+    border-top: 1px solid var(--line);
+    padding-top: var(--s3);
+  }
+
+  .note h3 { color: var(--ink); }
+  .note p { font-size: 13px; margin: 0; }
+
+  /* ---- Swatches ------------------------------------------------------- */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .swatch { background: var(--raised); padding: var(--s3); display: flex; flex-direction: column; gap: var(--s2); }
+  .chipcolor { height: 40px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.06); }
+  .swatch dt { font-size: 13px; font-weight: 450; color: var(--ink); }
+  .swatch dd { margin: 0; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+  .swatch dd.role { color: var(--ink-2); letter-spacing: 0; line-height: 1.4; }
+
+  /* ============================================================
+     COMPONENT: confidence indicator
+     Three segments. The differences are structural, not chromatic:
+     clear is continuous, uncertain is broken with a hatched middle,
+     flagged is one heavy mass. Readable in greyscale.
+     ============================================================ */
+  .conf { display: inline-flex; align-items: center; gap: var(--s2); }
+  .conf-glyph { display: flex; align-items: center; gap: 2px; height: 12px; }
+  .conf-glyph i { display: block; width: 5px; height: 12px; border-radius: 1px; }
+
+  .conf[data-state="clear"] .conf-glyph { gap: 0; }
+  .conf[data-state="clear"] .conf-glyph i { background: var(--clear); height: 3px; width: 7px; border-radius: 0; }
+  .conf[data-state="clear"] .conf-glyph i:first-child { border-radius: 2px 0 0 2px; }
+  .conf[data-state="clear"] .conf-glyph i:last-child { border-radius: 0 2px 2px 0; }
+
+  .conf[data-state="uncertain"] .conf-glyph { gap: 3px; }
+  .conf[data-state="uncertain"] .conf-glyph i { background: var(--uncertain); height: 12px; width: 4px; }
+  .conf[data-state="uncertain"] .conf-glyph i:nth-child(2) {
+    background: repeating-linear-gradient(135deg, var(--uncertain) 0 2px, transparent 2px 4px);
+    opacity: 0.9;
+  }
+  .conf[data-state="uncertain"] .conf-glyph i:nth-child(3) { opacity: 0.42; }
+
+  .conf[data-state="flagged"] .conf-glyph { gap: 0; }
+  .conf[data-state="flagged"] .conf-glyph i { background: var(--flagged); height: 14px; width: 6px; border-radius: 0; }
+  .conf[data-state="flagged"] .conf-glyph i:first-child { width: 3px; margin-right: 2px; }
+
+  .conf-label { font-size: 12px; letter-spacing: 0.02em; font-weight: 450; }
+  .conf[data-state="clear"] .conf-label { color: var(--clear); }
+  .conf[data-state="uncertain"] .conf-label { color: var(--uncertain); }
+  .conf[data-state="flagged"] .conf-label { color: var(--flagged); }
+
+  /* ============================================================
+     COMPONENT: evidence chip
+     Every chip links to the data that produced it. A chip that
+     cannot be traced is not a chip — it is a claim.
+     ============================================================ */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: left;
+    color: var(--ink);
+    background: var(--raised-2);
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    padding: 7px 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 120ms ease, background 120ms ease;
+  }
+
+  .chip:hover { border-color: var(--ink-3); background: #26262b; }
+  .chip .chip-src { color: var(--ink-3); font-size: 11px; letter-spacing: 0.03em; white-space: nowrap; }
+  .chip .chip-mark { width: 3px; align-self: stretch; border-radius: 1px; background: var(--clear); flex: 0 0 3px; }
+  .chip[data-side="for"] .chip-mark { background: var(--clear); }
+  .chip[data-side="against"] .chip-mark { background: var(--flagged); }
+  .chip[data-side="tension"] .chip-mark { background: var(--uncertain); }
+
+  /* ============================================================
+     COMPONENT: decision button group
+     15px, because these are the primary decisions. The model's
+     recommendation is the only element permitted the accent.
+     ============================================================ */
+  .decisions { display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
+
+  .btn {
+    font: inherit;
+    font-size: 15px;
+    font-weight: 450;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    background: var(--raised-2);
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    padding: 9px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 120ms ease, background 120ms ease;
+  }
+
+  .btn:hover { border-color: var(--ink-3); }
+  .btn kbd {
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--ink-3);
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    padding: 0 5px;
+    line-height: 16px;
+    background: var(--sunken);
+  }
+
+  /* The recommended action. Accent, and only here. */
+  .btn[data-recommended="true"] {
+    border-color: var(--model);
+    background: var(--model-dim);
+    color: var(--ink);
+  }
+  .btn[data-recommended="true"] kbd { border-color: rgba(124,140,255,0.4); color: #b9c1ff; }
+
+  /* Degraded mode suppresses the accent everywhere at once. */
+  .frame.is-degraded .btn[data-recommended="true"] {
+    border-color: var(--line-2);
+    background: var(--raised-2);
+  }
+  .frame.is-degraded .btn[data-recommended="true"] kbd { border-color: var(--line-2); color: var(--ink-3); }
+
+  /* ---- Focus: one visible model everywhere -------------------------- */
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ============================================================
+     SCREEN FRAMES
+     ============================================================ */
+  .frame {
+    background: var(--base);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: var(--s3);
+  }
+
+  .frame-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: var(--s5);
+    flex-wrap: wrap;
+  }
+
+  .frame-caption span { font-variant-numeric: tabular-nums; }
+
+  /* Console header — queue depth and pace, always present */
+  .console-head {
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    padding: 10px var(--s4);
+    background: var(--raised);
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .console-mark { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+  .console-stats { display: flex; gap: var(--s5); margin-left: auto; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; line-height: 1.25; }
+  .stat dt { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  .stat dd { margin: 0; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 450; }
+  .stat dd small { font-size: 11px; color: var(--ink-3); font-weight: 400; }
+
+  /* ---- Queue table ---------------------------------------------------- */
+  .queue-wrap { overflow-x: auto; }
+
+  table.queue {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 900px;
+  }
+
+  table.queue caption { text-align: left; padding: 0; height: 0; overflow: hidden; position: absolute; clip-path: inset(50%); }
+
+  table.queue th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--ink-3);
+    padding: 8px var(--s3);
+    border-bottom: 1px solid var(--line);
+    background: var(--sunken);
+    white-space: nowrap;
+  }
+
+  table.queue th.num, table.queue td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  table.queue td {
+    padding: 9px var(--s3);
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    vertical-align: middle;
+  }
+
+  table.queue td.amount { color: var(--ink); font-weight: 450; font-variant-numeric: tabular-nums; }
+  table.queue td.merchant { color: var(--ink); }
+  table.queue td.merchant small { display: block; color: var(--ink-3); font-size: 11px; }
+
+  /* Row state. Categorical, never a gradient: no rule / dashed rule /
+     solid heavy rule. Uncertainty is its own thing, not a midpoint. */
+  tr.row { outline-offset: -2px; }
+  tr.row > td:first-child { border-left: 3px solid transparent; }
+  tr.row[data-state="uncertain"] > td { background: var(--uncertain-wash); }
+  tr.row[data-state="uncertain"] > td:first-child { border-left: 3px dashed var(--uncertain); }
+  tr.row[data-state="flagged"] > td { background: var(--flagged-wash); }
+  tr.row[data-state="flagged"] > td:first-child { border-left: 3px solid var(--flagged); }
+
+  tr.row:hover > td { background: var(--raised); }
+  tr.row[data-state="uncertain"]:hover > td { background: rgba(194,165,124,0.11); }
+  tr.row[data-state="flagged"]:hover > td { background: rgba(243,221,184,0.1); }
+
+  tr.row:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
+  tr.row:focus > td { background: #26262b; }
+
+  /* The model's recommendation in the queue — accent, and only here. */
+  .rec { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--model); font-weight: 450; }
+  .rec::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--model); flex: 0 0 5px; }
+  .frame.is-degraded .rec { color: var(--ink-2); font-style: italic; }
+  .frame.is-degraded .rec::before { background: var(--ink-3); }
+
+  .queue-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding: 8px var(--s4);
+    background: var(--sunken);
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--ink-3);
+    flex-wrap: wrap;
+  }
+
+  .keyhint { display: flex; gap: var(--s3); flex-wrap: wrap; }
+  .keyhint b { font-weight: 400; color: var(--ink-2); }
+  .keyhint kbd {
+    font-family: inherit; font-size: 10px; border: 1px solid var(--line-2);
+    border-radius: 2px; padding: 0 4px; color: var(--ink-2); background: var(--raised);
+  }
+
+  /* ---- Degraded banner ------------------------------------------------ */
+  .banner {
+    display: none;
+    gap: var(--s3);
+    padding: 11px var(--s4);
+    background: var(--raised-2);
+    border-bottom: 1px solid var(--line-2);
+    align-items: flex-start;
+  }
+
+  .frame.is-degraded .banner { display: flex; }
+  .banner-glyph { flex: 0 0 auto; margin-top: 3px; }
+  .banner-body { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+  .banner-body b { color: var(--ink); font-weight: 500; display: block; font-size: 13px; }
+
+  .modeswitch { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s3); flex-wrap: wrap; }
+  .modeswitch p { margin: 0; font-size: 12px; color: var(--ink-3); }
+
+  /* ---- Case detail ---------------------------------------------------- */
+  .case {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: 1px;
+    background: var(--line);
+  }
+
+  @media (max-width: 860px) { .case { grid-template-columns: 1fr; } }
+
+  .case-main, .case-side { background: var(--base); padding: var(--s4); }
+  .case-side { background: var(--sunken); }
+
+  .txn { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s2); }
+  .txn-amount { font-size: 26px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .txn-merchant { font-size: 15px; color: var(--ink); }
+  .txn-meta { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  .subhead {
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-3); margin: var(--s4) 0 var(--s2);
+    display: flex; align-items: center; gap: var(--s2);
+  }
+  .subhead::after { content: ''; height: 1px; flex: 1; background: var(--line); }
+  .subhead:first-child { margin-top: 0; }
+
+  .chips { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  .chips.wide .chip { width: 100%; }
+
+  /* The tension line — the whole point of the low-confidence screen. */
+  .tension {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    border-left: 2px solid var(--uncertain);
+    padding-left: var(--s3);
+    margin: 0 0 var(--s4);
+    max-width: none;
+    font-weight: 400;
+  }
+  .tension em { font-style: normal; color: var(--uncertain); }
+
+  /* Two sides, equal weight. Same width, same type, same treatment —
+     the layout must not quietly pick a winner. */
+  .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (max-width: 700px) { .sides { grid-template-columns: 1fr; } }
+  .side { background: var(--base); padding: var(--s3); }
+  .side-head { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: var(--s2); color: var(--ink-2); }
+  .side[data-side="for"] .side-head { color: var(--clear); }
+  .side[data-side="against"] .side-head { color: var(--flagged); }
+
+  .notchecked { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+  .notchecked li { font-size: 12.5px; color: var(--ink-2); display: flex; gap: var(--s2); line-height: 1.45; }
+  .notchecked li::before { content: '—'; color: var(--ink-3); flex: 0 0 auto; }
+
+  /* "This deserves more time" — an ambient cue, not a nag. It does not
+     block, count down, or ask for acknowledgement. */
+  .pace { display: flex; align-items: center; gap: var(--s2); font-size: 11.5px; color: var(--ink-3); margin-top: var(--s3); }
+  .pace-bar { width: 54px; height: 3px; border-radius: 2px; background: var(--line-2); overflow: hidden; }
+  .pace-bar i { display: block; height: 100%; width: 34%; background: var(--uncertain); }
+
+  .fold {
+    border-top: 1px dashed var(--line-2);
+    margin-top: var(--s4);
+    padding-top: var(--s2);
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  /* ---- Anatomy table -------------------------------------------------- */
+  .anatomy { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .anatomy th { text-align: left; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; padding: 0 var(--s3) var(--s2) 0; border-bottom: 1px solid var(--line); }
+  .anatomy td { padding: 9px var(--s3) 9px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; }
+  .anatomy td:first-child { color: var(--ink); white-space: nowrap; }
+  .anatomy td code, code { font-family: var(--sans); font-size: 12px; color: var(--ink); background: var(--raised-2); border: 1px solid var(--line); border-radius: 2px; padding: 1px 5px; font-variant-numeric: tabular-nums; }
+
+  .specimen {
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: var(--s4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4);
+    align-items: center;
+    margin-bottom: var(--s3);
+  }
+
+  .specimen.stack { flex-direction: column; align-items: flex-start; gap: var(--s3); }
+
+  .todo {
+    border: 1px dashed var(--line-2);
+    border-radius: 2px;
+    padding: var(--s4);
+    background: var(--sunken);
+  }
+
+  .todo h3 { color: var(--uncertain); }
+  .todo ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 13px; }
+  .todo li { margin-bottom: var(--s1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <aside class="rail">
+    <div class="rail-mark">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+        <rect x="0" y="6" width="3" height="2" fill="#7c838d"></rect>
+        <rect x="5" y="3" width="2" height="8" fill="#c2a57c"></rect>
+        <rect x="9" y="1" width="4" height="12" fill="#f3ddb8"></rect>
+      </svg>
+      Signal
+    </div>
+    <p class="rail-sub">Fraud review console. Design system and four screens.</p>
+
+    <nav aria-label="Sections">
+      <div class="rail-group">System</div>
+      <a href="#argument"><span class="n">00</span> The argument</a>
+      <a href="#colour"><span class="n">01</span> Colour</a>
+      <a href="#type"><span class="n">02</span> Type &amp; density</a>
+      <a href="#states"><span class="n">03</span> Three states</a>
+      <a href="#focus"><span class="n">04</span> Focus model</a>
+      <a href="#components"><span class="n">05</span> Components</a>
+      <div class="rail-group">Screens</div>
+      <a href="#s1"><span class="n">S1</span> Queue</a>
+      <a href="#s2"><span class="n">S2</span> High confidence</a>
+      <a href="#s3"><span class="n">S3</span> Low confidence</a>
+      <a href="#s6"><span class="n">S6</span> Model degraded</a>
+      <div class="rail-group">Notes</div>
+      <a href="#open"><span class="n">—</span> Still open</a>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- ============================ ARGUMENT ======================== -->
+    <section id="argument">
+      <h1>A console for deciding faster than you can think.</h1>
+
+      <p class="thesis">When a model scores 400 transactions an hour and a human has eight seconds each, the design problem isn't showing the score — it's stopping the human from either trusting it blindly or ignoring it entirely.</p>
+
+      <div class="badges">
+        <span class="badge is-concept">Concept project</span>
+        <span class="badge">Self-directed</span>
+        <span class="badge">4 screens designed of 9 specified</span>
+        <span class="badge">3 confidence states</span>
+        <span class="badge">Sample data is synthetic</span>
+      </div>
+
+      <div class="cols">
+        <div class="note">
+          <h3>Automation bias</h3>
+          <p>Under time pressure people approve whatever the model suggests without reading. Accuracy looks fine right up until the model drifts.</p>
+        </div>
+        <div class="note">
+          <h3>Alert fatigue</h3>
+          <p>Flag too much and analysts start clearing the queue rather than reviewing it. Volume is itself a design failure.</p>
+        </div>
+        <div class="note">
+          <h3>Asymmetric cost</h3>
+          <p>A false positive freezes a real customer's card at a petrol station. A false negative loses money. The interface has to reflect that these are not equal.</p>
+        </div>
+        <div class="note">
+          <h3>No ground truth</h3>
+          <p>The analyst never finds out whether they were right. There is no feedback loop unless the interface builds one.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ COLOUR ========================== -->
+    <section id="colour">
+      <p class="eyebrow">01 — Colour</p>
+      <h2>A luminance ramp, not a traffic light</h2>
+      <p>Red, amber and green are out: a meaningful share of analysts cannot separate them, and red produces a panic response in a job where the correct posture is steady attention. The three states run <strong>neutral to warm along a luminance ramp</strong> — clear is dim and cool, flagged is bright and warm. Photocopy this interface in greyscale and it still reads. One saturated accent is held back entirely for the model's own voice.</p>
+
+      <dl class="swatches">
+        <div class="swatch">
+          <div class="chipcolor" style="background:#141416"></div>
+          <dt>Base</dt><dd>#141416</dd>
+          <dd class="role">Page ground. Not pure black — pure black on OLED smears during scroll.</dd>
+        </div>
+        <div class="swatch">
+          <div class="chipcolor" style="background:#1c1c1f"></div>
+          <dt>Raised</dt><dd>#1C1C1F</dd>
+          <dd class="role">Headers, chips, controls. The only elevation step.</dd>
+        </div>
+        <div class="swatch">
+          <div class="chipcolor" style="background:#7c838d"></div>
+          <dt>Clear</dt><dd>#7C838D</dd>
+          <dd class="role">Dim, cool, quiet. Costs the analyst no attention.</dd>
+        </div>
+        <div class="swatch">
+          <div class="chipcolor" style="background:#c2a57c"></div>
+          <dt>Uncertain</dt><dd>#C2A57C</dd>
+          <dd class="role">Warm, mid. Its own state — never drawn as a midpoint.</dd>
+        </div>
+        <div class="swatch">
+          <div class="chipcolor" style="background:#f3ddb8"></div>
+          <dt>Flagged</dt><dd>#F3DDB8</dd>
+          <dd class="role">Brightest thing on screen. Weight, not alarm.</dd>
+        </div>
+        <div class="swatch">
+          <div class="chipcolor" style="background:#7c8cff"></div>
+          <dt>Model</dt><dd>#7C8CFF</dd>
+          <dd class="role">The machine speaking. Nothing else may use it — that is what makes it legible.</dd>
+        </div>
+      </dl>
+
+      <div class="cols" style="margin-top:var(--s5)">
+        <div class="note">
+          <h3>Why periwinkle</h3>
+          <p>The accent had to sit outside the warm ramp so it never reads as a state, and outside green and cyan, which analysts read as "good". Periwinkle carries no verdict.</p>
+        </div>
+        <div class="note">
+          <h3>Why focus is white</h3>
+          <p>The obvious focus colour is the accent — but the accent means "the model said this". A focus ring that borrows it would put the model's voice on whatever the analyst happens to be standing on.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ TYPE ============================ -->
+    <section id="type">
+      <p class="eyebrow">02 — Type &amp; density</p>
+      <h2>One family, two sizes that matter</h2>
+      <p>IBM Plex Sans throughout — it holds up at 13px, and its figures are genuinely tabular, which a column of amounts needs. Two sizes carry meaning: <strong>13px for data</strong>, where density is the point, and <strong>15px for primary decisions</strong>, where a misclick costs a customer their card. Everything else is supporting.</p>
+
+      <table class="anatomy">
+        <thead>
+          <tr><th>Role</th><th>Size</th><th>Weight</th><th>Applied to</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Data</td><td><code>13px / 1.4</code></td><td>400</td><td>Table cells, evidence chips, metadata</td></tr>
+          <tr><td>Decision</td><td><code>15px / 1.3</code></td><td>450</td><td>Decision buttons, the tension line, transaction merchant</td></tr>
+          <tr><td>Figure</td><td><code>26px</code></td><td>500</td><td>Transaction amount, the one number read first</td></tr>
+          <tr><td>Label</td><td><code>10px, 0.08em</code></td><td>500</td><td>Column heads, section labels — uppercase, spaced</td></tr>
+          <tr><td>Numerals</td><td colspan="3"><code>font-variant-numeric: tabular-nums</code> on every column of figures, without exception</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================ STATES ========================== -->
+    <section id="states">
+      <p class="eyebrow">03 — Three states</p>
+      <h2>Uncertain is a state, not a midpoint</h2>
+      <p>The easy mistake is drawing confidence as a continuum and letting "uncertain" be the middle of it — which tells the analyst it is a weaker version of clear. It isn't. It is a different instruction: <strong>clear means confirm, flagged means investigate, uncertain means the model is telling you it cannot help.</strong> So the encoding is categorical. Continuous bar, broken bar, single heavy mass. No shared geometry between them.</p>
+
+      <div class="specimen">
+        <span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span>
+        <span class="conf" data-state="uncertain"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Uncertain</span></span>
+        <span class="conf" data-state="flagged"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Flagged</span></span>
+      </div>
+
+      <table class="anatomy">
+        <thead>
+          <tr><th>State</th><th>Glyph</th><th>Row treatment</th><th>What the analyst should do</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Clear</td>
+            <td>Continuous low bar, dim</td>
+            <td>No left rule, no wash</td>
+            <td>Confirm and move. Reading the evidence is optional; it is one keystroke away if you want it.</td>
+          </tr>
+          <tr>
+            <td>Uncertain</td>
+            <td>Three separated segments, middle hatched, third faded</td>
+            <td><strong>Dashed</strong> left rule, warm wash</td>
+            <td>Slow down. The model has named a tension it cannot resolve — you are the one resolving it.</td>
+          </tr>
+          <tr>
+            <td>Flagged</td>
+            <td>Single heavy mass with a leading cap, brightest</td>
+            <td><strong>Solid</strong> left rule, warm wash</td>
+            <td>Investigate before rejecting. Confidence that it is fraud is not permission to skip the evidence.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cols" style="margin-top:var(--s5)">
+        <div class="note">
+          <h3>No percentages</h3>
+          <p>"87% confident" is falsely precise and uninterpretable at speed — nobody can act differently at 87 than at 84. Bands force the model to say what it means.</p>
+        </div>
+        <div class="note">
+          <h3>Dashed versus solid</h3>
+          <p>The rule style does the categorical work. Dashed reads as incomplete at a glance and needs no colour, no legend and no training to interpret.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ FOCUS =========================== -->
+    <section id="focus">
+      <p class="eyebrow">04 — Focus model</p>
+      <h2>The mouse is the fallback</h2>
+      <p>Analysts work this tool almost entirely from the keyboard, so focus is not an accessibility afterthought here — it is the primary interface. <strong>2px solid white, 2px offset, on every focusable element</strong>, including table rows. White because the accent belongs to the model. Rows use a roving tabindex, so the queue is one tab stop and the arrow keys move within it.</p>
+
+      <div class="specimen stack">
+        <p style="margin:0;font-size:12px">Tab into these — the ring is the same object everywhere.</p>
+        <div class="decisions">
+          <button class="btn" type="button" data-recommended="true">Confirm legitimate <kbd>C</kbd></button>
+          <button class="btn" type="button">Reject <kbd>R</kbd></button>
+          <button class="btn" type="button">Escalate <kbd>E</kbd></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ COMPONENTS ====================== -->
+    <section id="components">
+      <p class="eyebrow">05 — Components</p>
+      <h2>Four objects the whole tool is built from</h2>
+
+      <h3 style="margin-top:var(--s5)">Evidence chip</h3>
+      <p>Every claim the model makes links to the data that produced it. A chip is a claim plus its source, and the source is not optional — an untraceable chip would be the model asserting rather than showing. The left mark carries which side the evidence falls on, so a column of chips reads before it is read.</p>
+      <div class="specimen">
+        <a class="chip" data-side="for" href="#components"><span class="chip-mark"></span>Device seen 47 times <span class="chip-src">device history →</span></a>
+        <a class="chip" data-side="against" href="#components"><span class="chip-mark"></span>First charge in Türkiye <span class="chip-src">geo log →</span></a>
+        <a class="chip" data-side="tension" href="#components"><span class="chip-mark"></span>Travel pattern, 6 countries <span class="chip-src">12-month history →</span></a>
+      </div>
+
+      <h3 style="margin-top:var(--s5)">Data row</h3>
+      <p>13px, tabular figures, 9px vertical padding — tuned so twelve rows fit a 900px viewport with the header and still clear a comfortable pointer target. State lives in the left rule; the row background carries only the faintest wash, because twelve saturated rows would be a wall.</p>
+
+      <h3 style="margin-top:var(--s5)">Confidence indicator</h3>
+      <p>Shown above in <a href="#states" style="color:var(--ink)">Three states</a>. Always paired with its plain-language label — the glyph is a fast read for someone who has seen ten thousand of them, not a replacement for the word.</p>
+
+      <h3 style="margin-top:var(--s5)">Decision button group</h3>
+      <p>15px. Every action carries its single-key shortcut in the button itself, so the keyboard path is learned by using the mouse path. Exactly one button may carry the accent: the one the model recommends. When the model has no useful opinion, no button carries it.</p>
+      <div class="specimen stack">
+        <div class="decisions">
+          <button class="btn" type="button" data-recommended="true">Confirm legitimate <kbd>C</kbd></button>
+          <button class="btn" type="button">Reject <kbd>R</kbd></button>
+          <button class="btn" type="button">Escalate <kbd>E</kbd></button>
+        </div>
+        <p style="margin:0;font-size:12px;color:var(--ink-3)">Escalate is always present. A binary forces a decision on genuinely ambiguous cases, and a forced decision is where analysts learn to guess.</p>
+      </div>
+    </section>
+
+    <!-- ============================ S1 QUEUE ======================== -->
+    <section id="s1">
+      <p class="eyebrow">S1 — Queue</p>
+      <h2>Twelve rows, three states, one keystroke each</h2>
+      <p>The persistent header carries queue depth and pace, because those are the two numbers that change how an analyst works — a queue of 40 and a queue of 400 are different jobs. Pace is shown next to a target rather than alone: a bare average invites optimising for speed.</p>
+
+      <div class="modeswitch">
+        <button class="btn" type="button" id="modeBtn" aria-pressed="false" style="font-size:13px;padding:7px 12px">Switch to degraded model state</button>
+        <p>Shows S6 in place — watch the accent disappear.</p>
+      </div>
+
+      <div class="frame" id="queueFrame">
+        <div class="console-head">
+          <div class="console-mark">
+            <svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true">
+              <rect x="0" y="6" width="3" height="2" fill="#7c838d"></rect>
+              <rect x="5" y="3" width="2" height="8" fill="#c2a57c"></rect>
+              <rect x="9" y="1" width="4" height="12" fill="#f3ddb8"></rect>
+            </svg>
+            Signal
+          </div>
+          <dl class="console-stats">
+            <div class="stat"><dt>In queue</dt><dd>247</dd></div>
+            <div class="stat"><dt>Oldest</dt><dd>11m 40s</dd></div>
+            <div class="stat"><dt>Avg / case</dt><dd>8.2s <small>target 10s</small></dd></div>
+            <div class="stat"><dt>Model</dt><dd id="modelStat">Current</dd></div>
+          </dl>
+        </div>
+
+        <div class="banner">
+          <svg class="banner-glyph" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+            <rect x="0" y="4" width="3" height="6" fill="#c2a57c"></rect>
+            <rect x="5" y="4" width="3" height="6" fill="#c2a57c" opacity="0.5"></rect>
+            <rect x="10" y="4" width="3" height="6" fill="#c2a57c" opacity="0.22"></rect>
+          </svg>
+          <div class="banner-body">
+            <b>The model is running on data from 6 days ago and is less sure than usual.</b>
+            Recommendations are shown as suggestions until it retrains, expected 14:00. Read the evidence on every case, including the clear ones. Bulk actions are off. Nothing is broken — the queue works normally, the model is just claiming less.
+          </div>
+        </div>
+
+        <div class="queue-wrap">
+          <table class="queue">
+            <caption>Fraud review queue, twelve cases. Sample data.</caption>
+            <thead>
+              <tr>
+                <th class="num">Amount</th>
+                <th>Merchant</th>
+                <th class="num">Tenure</th>
+                <th>Risk band</th>
+                <th id="recHead">Recommended</th>
+                <th class="num">In queue</th>
+              </tr>
+            </thead>
+            <tbody id="queueBody">
+              <tr class="row" data-state="flagged" tabindex="0"><td class="num amount">£2,480.00</td><td class="merchant">Selfridges<small>London, in person</small></td><td class="num">3 days</td><td><span class="conf" data-state="flagged"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Flagged</span></span></td><td><span class="rec">Reject</span></td><td class="num">11m 40s</td></tr>
+              <tr class="row" data-state="uncertain" tabindex="-1"><td class="num amount">£312.55</td><td class="merchant">Getir<small>Istanbul, card not present</small></td><td class="num">4 yr 2 mo</td><td><span class="conf" data-state="uncertain"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Uncertain</span></span></td><td><span class="rec">Review</span></td><td class="num">9m 02s</td></tr>
+              <tr class="row" data-state="clear" tabindex="-1"><td class="num amount">£48.20</td><td class="merchant">Pret A Manger<small>Manchester, in person</small></td><td class="num">6 yr 8 mo</td><td><span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span></td><td><span class="rec">Approve</span></td><td class="num">7m 55s</td></tr>
+              <tr class="row" data-state="clear" tabindex="-1"><td class="num amount">£129.99</td><td class="merchant">Uniqlo<small>Leeds, in person</small></td><td class="num">2 yr 1 mo</td><td><span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span></td><td><span class="rec">Approve</span></td><td class="num">7m 12s</td></tr>
+              <tr class="row" data-state="uncertain" tabindex="-1"><td class="num amount">£899.00</td><td class="merchant">Apple Store<small>Online, new device</small></td><td class="num">11 mo</td><td><span class="conf" data-state="uncertain"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Uncertain</span></span></td><td><span class="rec">Review</span></td><td class="num">6m 41s</td></tr>
+              <tr class="row" data-state="flagged" tabindex="-1"><td class="num amount">£1,150.00</td><td class="merchant">CryptoFast Ltd<small>Online, first use</small></td><td class="num">9 days</td><td><span class="conf" data-state="flagged"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Flagged</span></span></td><td><span class="rec">Reject</span></td><td class="num">5m 58s</td></tr>
+              <tr class="row" data-state="clear" tabindex="-1"><td class="num amount">£22.40</td><td class="merchant">TfL Travel<small>London, contactless</small></td><td class="num">8 yr 3 mo</td><td><span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span></td><td><span class="rec">Approve</span></td><td class="num">5m 30s</td></tr>
+              <tr class="row" data-state="uncertain" tabindex="-1"><td class="num amount">£640.00</td><td class="merchant">Ticketmaster<small>Online, 4th attempt</small></td><td class="num">3 yr 7 mo</td><td><span class="conf" data-state="uncertain"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Uncertain</span></span></td><td><span class="rec">Review</span></td><td class="num">4m 47s</td></tr>
+              <tr class="row" data-state="clear" tabindex="-1"><td class="num amount">£76.15</td><td class="merchant">Sainsbury's<small>Bristol, in person</small></td><td class="num">5 yr 0 mo</td><td><span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span></td><td><span class="rec">Approve</span></td><td class="num">4m 03s</td></tr>
+              <tr class="row" data-state="flagged" tabindex="-1"><td class="num amount">£3,999.00</td><td class="merchant">Gold Exchange NW<small>Online, card not present</small></td><td class="num">1 day</td><td><span class="conf" data-state="flagged"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Flagged</span></span></td><td><span class="rec">Reject</span></td><td class="num">3m 19s</td></tr>
+              <tr class="row" data-state="clear" tabindex="-1"><td class="num amount">£15.00</td><td class="merchant">Spotify<small>Recurring, 31 months</small></td><td class="num">7 yr 5 mo</td><td><span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span></td><td><span class="rec">Approve</span></td><td class="num">2m 44s</td></tr>
+              <tr class="row" data-state="uncertain" tabindex="-1"><td class="num amount">£455.80</td><td class="merchant">Booking.com<small>Online, new payee</small></td><td class="num">1 yr 9 mo</td><td><span class="conf" data-state="uncertain"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Uncertain</span></span></td><td><span class="rec">Review</span></td><td class="num">1m 12s</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="queue-foot">
+          <div class="keyhint">
+            <span><kbd>↑</kbd><kbd>↓</kbd> <b>move</b></span>
+            <span><kbd>Enter</kbd> <b>open case</b></span>
+            <span><kbd>C</kbd> <b>confirm</b></span>
+            <span><kbd>R</kbd> <b>reject</b></span>
+            <span><kbd>E</kbd> <b>escalate</b></span>
+          </div>
+          <span>Sample data — no real cardholders</span>
+        </div>
+      </div>
+
+      <div class="frame-caption">
+        <span>S1 · queue · 12 rows visible at 1440×900</span>
+        <span>Click a row, then use ↑ ↓ — the focus ring is the real one</span>
+      </div>
+
+      <div class="cols">
+        <div class="note">
+          <h3>Why "Review" and not a number</h3>
+          <p>The recommended-action column names an action, not a probability. The analyst's job is to act, so the model's output is phrased as the thing they will do.</p>
+        </div>
+        <div class="note">
+          <h3>Sorting is by age, not risk</h3>
+          <p>Sorting by risk buries uncertain cases under flagged ones and lets the oldest cases rot. Age is the only ordering that doesn't quietly encode a priority the model has not earned.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ S2 ============================== -->
+    <section id="s2">
+      <p class="eyebrow">S2 — High confidence</p>
+      <h2>The happy path, and what it admits it didn't check</h2>
+      <p>Confirmable in one keystroke and readable in about three seconds. The whole decision sits above the fold at 1440×900 — if the analyst has to scroll to decide, the eight-second budget is already gone. The <strong>Not checked</strong> list is the part that earns trust: a model that names its blind spots is one an analyst can calibrate against.</p>
+
+      <div class="frame">
+        <div class="console-head">
+          <div class="console-mark">Case 44-9182</div>
+          <dl class="console-stats">
+            <div class="stat"><dt>In queue</dt><dd>246</dd></div>
+            <div class="stat"><dt>This case</dt><dd>0m 04s</dd></div>
+          </dl>
+        </div>
+
+        <div class="case">
+          <div class="case-main">
+            <div class="txn">
+              <span class="txn-amount">£48.20</span>
+              <span class="txn-merchant">Pret A Manger</span>
+            </div>
+            <p class="txn-meta" style="margin-bottom:var(--s4)">Manchester Piccadilly · in person, chip &amp; PIN · today 08:14 · customer 6 yr 8 mo</p>
+
+            <p class="subhead">Evidence</p>
+            <div class="chips wide">
+              <a class="chip" data-side="for" href="#s2"><span class="chip-mark"></span>Same terminal used 23 times in 6 months <span class="chip-src">terminal history →</span></a>
+              <a class="chip" data-side="for" href="#s2"><span class="chip-mark"></span>£38–£54 is this customer's normal weekday range <span class="chip-src">spend profile →</span></a>
+              <a class="chip" data-side="for" href="#s2"><span class="chip-mark"></span>Card physically present, PIN correct first try <span class="chip-src">auth log →</span></a>
+            </div>
+
+            <p class="subhead">Not checked</p>
+            <ul class="notchecked">
+              <li>Whether the card was reported lost in the last 40 minutes — the report feed lags</li>
+              <li>Anything about the cardholder's phone or session; this was an in-person chip transaction</li>
+              <li>Merchant-side compromise. If the terminal itself is skimming, nothing here would show it</li>
+            </ul>
+          </div>
+
+          <div class="case-side">
+            <p class="subhead">Model</p>
+            <div style="margin-bottom:var(--s4)">
+              <span class="conf" data-state="clear"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Clear</span></span>
+            </div>
+            <p style="font-size:13px;color:var(--ink-2);margin-bottom:var(--s4)">Routine purchase at a merchant this customer uses most weeks, on a card that was physically present. Nothing in the transaction departs from their pattern.</p>
+
+            <p class="subhead">Decision</p>
+            <div class="decisions" style="flex-direction:column;align-items:stretch">
+              <button class="btn" type="button" data-recommended="true" style="justify-content:space-between">Confirm legitimate <kbd>C</kbd></button>
+              <button class="btn" type="button" style="justify-content:space-between">Reject <kbd>R</kbd></button>
+              <button class="btn" type="button" style="justify-content:space-between">Escalate <kbd>E</kbd></button>
+            </div>
+            <p class="fold">Fold line at 1440×900 sits below this button group.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame-caption">
+        <span>S2 · case detail, high confidence · decision above the fold</span>
+        <span>3 evidence chips · 3 named blind spots · 1 keystroke</span>
+      </div>
+    </section>
+
+    <!-- ============================ S3 ============================== -->
+    <section id="s3">
+      <p class="eyebrow">S3 — Low confidence</p>
+      <h2>Name the tension, then get out of the way</h2>
+      <p>This is the screen the whole system exists for. A low score tells the analyst nothing they can act on. <strong>The model has to say what it is torn between</strong>, in a sentence a person would say out loud — and then present both sides at genuinely equal weight, in matched columns, so the layout does not quietly pick a winner while claiming neutrality.</p>
+
+      <div class="frame">
+        <div class="console-head">
+          <div class="console-mark">Case 44-9186</div>
+          <dl class="console-stats">
+            <div class="stat"><dt>In queue</dt><dd>245</dd></div>
+            <div class="stat"><dt>This case</dt><dd>0m 22s</dd></div>
+          </dl>
+        </div>
+
+        <div class="case">
+          <div class="case-main">
+            <div class="txn">
+              <span class="txn-amount">£312.55</span>
+              <span class="txn-merchant">Getir</span>
+            </div>
+            <p class="txn-meta" style="margin-bottom:var(--s4)">Istanbul · card not present · today 09:31 · customer 4 yr 2 mo</p>
+
+            <p class="tension">Unusual location — but <em>this customer travels frequently</em>, and the amount is four times their normal grocery spend.</p>
+
+            <div class="sides">
+              <div class="side" data-side="for">
+                <p class="side-head">Reads as legitimate</p>
+                <div class="chips wide">
+                  <a class="chip" data-side="for" href="#s3"><span class="chip-mark"></span>6 countries in 12 months <span class="chip-src">geo history →</span></a>
+                  <a class="chip" data-side="for" href="#s3"><span class="chip-mark"></span>Device seen 47 times <span class="chip-src">device history →</span></a>
+                  <a class="chip" data-side="for" href="#s3"><span class="chip-mark"></span>Flight booked on this card Tuesday <span class="chip-src">transaction log →</span></a>
+                </div>
+              </div>
+              <div class="side" data-side="against">
+                <p class="side-head">Reads as fraud</p>
+                <div class="chips wide">
+                  <a class="chip" data-side="against" href="#s3"><span class="chip-mark"></span>4× normal grocery amount <span class="chip-src">spend profile →</span></a>
+                  <a class="chip" data-side="against" href="#s3"><span class="chip-mark"></span>First charge in Türkiye <span class="chip-src">geo log →</span></a>
+                  <a class="chip" data-side="against" href="#s3"><span class="chip-mark"></span>Delivery address not on file <span class="chip-src">address book →</span></a>
+                </div>
+              </div>
+            </div>
+
+            <p class="subhead">Not checked</p>
+            <ul class="notchecked">
+              <li>Whether the flight actually departed — the airline feed only confirms booking</li>
+              <li>Whether the delivery address belongs to someone the cardholder knows</li>
+            </ul>
+          </div>
+
+          <div class="case-side">
+            <p class="subhead">Model</p>
+            <div style="margin-bottom:var(--s4)">
+              <span class="conf" data-state="uncertain"><span class="conf-glyph" aria-hidden="true"><i></i><i></i><i></i></span><span class="conf-label">Uncertain</span></span>
+            </div>
+            <p style="font-size:13px;color:var(--ink-2);margin-bottom:var(--s4)">Travel explains the location but not the amount. I cannot separate a legitimate holiday grocery run from a card tested abroad.</p>
+
+            <p class="subhead">Decision</p>
+            <div class="decisions" style="flex-direction:column;align-items:stretch">
+              <button class="btn" type="button" style="justify-content:space-between">Approve <kbd>C</kbd></button>
+              <button class="btn" type="button" style="justify-content:space-between">Reject <kbd>R</kbd></button>
+              <button class="btn" type="button" style="justify-content:space-between">Escalate <kbd>E</kbd></button>
+            </div>
+
+            <div class="pace">
+              <span class="pace-bar" aria-hidden="true"><i></i></span>
+              <span>Cases like this usually take about 40s</span>
+            </div>
+
+            <p class="fold">No button carries the accent. The model has no recommendation to make here, and pretending otherwise is how analysts learn to ignore it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame-caption">
+        <span>S3 · case detail, low confidence · 3 actions, no default</span>
+        <span>Both sides: 3 chips each, matched columns, identical type</span>
+      </div>
+
+      <div class="cols">
+        <div class="note">
+          <h3>The pace cue</h3>
+          <p>A short line and a bar, sitting under the buttons. It does not count down, block, flash or ask to be dismissed — it states a norm and lets the analyst decide. A nag would just teach them to work around it.</p>
+        </div>
+        <div class="note">
+          <h3>Why no recommendation</h3>
+          <p>The accent is the model's voice. Withholding it on a case the model genuinely cannot call is what keeps it meaningful on the cases it can.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ S6 ============================== -->
+    <section id="s6">
+      <p class="eyebrow">S6 — Model degraded</p>
+      <h2>The tool still works. It just claims less.</h2>
+      <p>Almost nobody designs this state, which is why it is worth designing. When the model goes stale or its confidence drops across the board, the interface shifts mode rather than erroring: <strong>the accent is suppressed everywhere</strong>, the "Recommended" column becomes "Suggested" and its entries go italic and neutral, bulk actions switch off, and a banner says plainly what changed and what to do differently.</p>
+      <p>Nothing turns warning-coloured. This is not a failure — the queue works exactly as before, and treating it as an error would train analysts to dismiss the banner. <a href="#s1" style="color:var(--ink)">Use the toggle on S1</a> to see the same queue switch between the two modes.</p>
+
+      <div class="cols">
+        <div class="note">
+          <h3>What the banner has to answer</h3>
+          <p>What changed, why, when it resolves, and what the analyst should do differently. Anything less and it is decoration that gets banner-blindness within a shift.</p>
+        </div>
+        <div class="note">
+          <h3>Suppression over substitution</h3>
+          <p>The accent is removed rather than swapped for another colour. Introducing a second accent for degraded mode would mean teaching a new signal at exactly the moment the analyst needs to be reading evidence instead.</p>
+        </div>
+        <div class="note">
+          <h3>Bulk actions off</h3>
+          <p>Bulk clearing is where automation bias becomes measurable harm. It is the first thing to go when the model's confidence drops, and it comes back when the model does.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ OPEN ============================ -->
+    <section id="open">
+      <p class="eyebrow">Still open</p>
+      <h2>What this is, and what it isn't</h2>
+      <p>A concept project. There is no client, no shipped product and no live model. The transactions, merchants and queue statistics on this page are <strong>synthetic sample data written to exercise the layout</strong> — they are not measurements of anything.</p>
+
+      <div class="todo">
+        <h3>Not yet done — and not to be invented</h3>
+        <ul>
+          <li><strong>Research.</strong> Five interviews with fraud analysts, risk ops and chargeback teams, synthesised into 4–6 themes. No quotes exist yet, so none appear here. Sample size gets stated plainly when they do.</li>
+          <li><strong>Testing.</strong> A moderated test, 5 participants, timed, with planted known-fraud cases. Measures: time per case paired with accuracy, override rate, confidence calibration, missed-flag rate. The failures are the findings worth publishing.</li>
+          <li><strong>Five remaining screens.</strong> S4 conflicting signals, S5 override capture, S7 bulk-action guardrail, S8 post-decision recall, S9 analyst calibration.</li>
+          <li><strong>Wait states.</strong> Evidence streaming in as it resolves, with what is still pending named — specified in the system, not yet drawn.</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    'use strict';
+
+    /* Roving tabindex: the queue is a single tab stop and the arrow keys
+       move within it, which is how an analyst actually drives this — Tab
+       through twelve rows to reach the thirteenth is not a keyboard-first
+       interface, it is a mouse interface with Tab bolted on. */
+    var body = document.getElementById('queueBody');
+    if (body) {
+      var rows = Array.prototype.slice.call(body.querySelectorAll('tr.row'));
+
+      function focusRow(next) {
+        rows.forEach(function (r) { r.setAttribute('tabindex', '-1'); });
+        next.setAttribute('tabindex', '0');
+        next.focus();
+      }
+
+      body.addEventListener('keydown', function (e) {
+        var current = e.target.closest('tr.row');
+        if (!current) return;
+        var i = rows.indexOf(current);
+
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          var next = rows[e.key === 'ArrowDown' ? Math.min(i + 1, rows.length - 1) : Math.max(i - 1, 0)];
+          if (next) focusRow(next);
+        } else if (e.key === 'Home' || e.key === 'End') {
+          e.preventDefault();
+          focusRow(e.key === 'Home' ? rows[0] : rows[rows.length - 1]);
+        }
+      });
+
+      body.addEventListener('click', function (e) {
+        var row = e.target.closest('tr.row');
+        if (row) focusRow(row);
+      });
+    }
+
+    /* Degraded mode. One class on the frame drives every change — the
+       accent suppression, the column rename, the banner — because the
+       whole point of the state is that it is one shift, not a scatter of
+       independent tweaks. */
+    var btn = document.getElementById('modeBtn');
+    var frame = document.getElementById('queueFrame');
+    var head = document.getElementById('recHead');
+    var stat = document.getElementById('modelStat');
+
+    if (btn && frame && head && stat) {
+      btn.addEventListener('click', function () {
+        var degraded = frame.classList.toggle('is-degraded');
+        btn.setAttribute('aria-pressed', String(degraded));
+        btn.textContent = degraded ? 'Switch to current model state' : 'Switch to degraded model state';
+        head.textContent = degraded ? 'Suggested' : 'Recommended';
+        stat.textContent = degraded ? 'Stale · 6d' : 'Current';
+      });
+    }
+  })();
+</script>

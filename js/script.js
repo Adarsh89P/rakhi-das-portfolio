@@ -239,6 +239,26 @@
      prototype, a write-up) open in a new tab so the portfolio itself is
      never navigated away from. Shared by the title and the image, which
      are two separate links to the same destination. */
+  /* The expanding-circle button, as an anchor rather than a <button> —
+     every place it is used navigates somewhere, and a <button> that
+     navigates is a link wearing a costume.
+
+     Structure is the Uiverse component's: a circle that grows to flood the
+     pill on hover, an arrow riding inside it, and the label sitting above
+     both. The circle is decoration, so it is hidden from assistive tech and
+     the label carries the accessible name. */
+  function buildLearnMore(label, className) {
+    var a = el('a', 'learn-more' + (className ? ' ' + className : ''));
+
+    var circle = el('span', 'circle');
+    circle.setAttribute('aria-hidden', 'true');
+    circle.appendChild(el('span', 'icon arrow'));
+    a.appendChild(circle);
+
+    a.appendChild(el('span', 'button-text', label));
+    return a;
+  }
+
   function linkToProject(anchor, project) {
     var href = project.href || '#';
     anchor.href = href;
@@ -289,7 +309,11 @@
     caption.appendChild(el('p', 'work-image-caption-date', project.dateRange));
     frame.appendChild(caption);
 
-    if (hasLink) frame.appendChild(el('span', 'work-image-arrow', ARROW_DIAGONAL_SVG));
+    /* The straight arrow, not the diagonal one. The badge only appears on
+       hover, and at that moment it is a "go" affordance for a link that
+       opens in place — a diagonal arrow is the convention for leaving the
+       site, which these case studies do not do. */
+    if (hasLink) frame.appendChild(el('span', 'work-image-arrow', ARROW_SVG));
 
     var body = el('div', 'work-item-body');
 
@@ -318,6 +342,11 @@
     body.appendChild(headline);
 
     body.appendChild(el('p', 'work-item-desc', project.description));
+
+    /* No button in the card body. The frame and the title are already links
+       to the same place, and the badge on the artwork is the affordance —
+       a third copy under the summary was one more thing to read past.
+       buildLearnMore is still used, once, for the section CTA below. */
 
     item.appendChild(body);
     item.appendChild(frame);
@@ -408,11 +437,14 @@
 
     initWorkPointerLight(list);
 
+    /* Same component as the per-project buttons, one size up. The markup in
+       index.html is an empty <a>, so the pieces are built here and moved
+       across rather than the anchor being replaced — the id and its position
+       in the layout stay put. */
     var more = document.getElementById('worksMoreCta');
-    var moreLabel = el('span');
-    moreLabel.textContent = data.works.ctaMore.label;
-    more.appendChild(moreLabel);
-    more.insertAdjacentHTML('beforeend', ARROW_SVG);
+    var built = buildLearnMore(data.works.ctaMore.label, 'learn-more--lg');
+    more.className = built.className;
+    while (built.firstChild) more.appendChild(built.firstChild);
     more.href = data.works.ctaMore.href;
     if (/^https?:/i.test(more.href)) {
       more.target = '_blank';
