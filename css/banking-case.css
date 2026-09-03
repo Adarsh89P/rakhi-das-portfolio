@@ -1,0 +1,699 @@
+/* ==========================================================================
+   BANKING CASE STUDY — QIIB Mobile Banking Onboarding
+   ==========================================================================
+   Structure and components follow the Quantra case study (Behance) that this
+   page was briefed against: gradient dot-pills, a two-tone lead quote, a spec
+   row, tinted panels holding white cards, a typography specimen, a colour
+   palette strip, a design-process board, a stats row and a problem/solution
+   board.
+
+   THE COLOURS ARE NOT THE REFERENCE'S. Quantra runs coral-to-magenta on pink.
+   This palette was sampled from the project's own artwork
+   (public/Banking/bankingOnboarding.png) rather than borrowed or invented —
+   the shares below are the measured proportions of that image:
+
+       #FFE9D1  62.3%   cream ground (already the card tint in data.js)
+       #FFFFFF  12.5%   surface
+       #D30222   6.9%   QIIB red — the app's actual accent
+       #C00320   0.9%   the deeper red in the same artwork
+       #010101   1.8%   ink
+
+   Everything below is built from those five. --q-grad extends the two reds
+   into a warm gradient for the pill treatment, which is the one place the
+   reference's device is worth copying directly.
+
+   styles.css still supplies the font stack, the button component, the skip
+   link and the footer. Everything here is prefixed `b-` and owns this page's
+   grid, scale, colour and its two scroll mechanics.
+
+   TWO MECHANICS ARE THIS FILE'S OWN:
+     1. The device-emerging hero (`--b-rise`, 0 to 1, from banking-nav.js).
+     2. The sticky flow, where the device pins while the steps scroll past.
+   Both are content-agnostic and both degrade to a finished static state.
+   ========================================================================== */
+
+.b-doc {
+  /* ---- Sampled from the artwork ---------------------------------------- */
+  --q-red: #d30222;
+  --q-red-2: #c00320;
+  --q-cream: #ffe9d1;
+  --q-ink: #131011;
+  --q-sand: #c4a27c;
+
+  /* ---- Derived ground -------------------------------------------------- */
+  --b-bg: #fdf7f0;
+  --b-panel: #ffeadb;
+  --b-panel-2: #fff3e8;
+  --b-card: #ffffff;
+  --b-line: rgba(19, 16, 17, 0.1);
+  --b-line-2: rgba(19, 16, 17, 0.18);
+
+  /* ---- Ink. Measured against --b-bg, not picked by eye. ----------------- */
+  --b-ink: #131011;
+  --b-ink-2: #5d5450;
+  /* Measured against --b-bg, not picked by eye: #857a74 reads 3.92:1 there
+     and fails AA on the spec labels, swatch hexes and rail links. */
+  --b-ink-3: #6f655f;
+
+  /* The far end was #e8622a, matching the reference's coral. White text on
+     that measures 3.38:1 — under AA at the pill sizes it is used for. Pulled
+     back to a red-orange that clears it (4.92:1) while the near end sits at
+     5.63:1, so the label is legible across the whole sweep. */
+  --b-grad: linear-gradient(100deg, #d30222 0%, #cf3a12 100%);
+
+  /* ---- Layout ---------------------------------------------------------- */
+  --b-shell: 1240px;
+  --b-gut: clamp(20px, 4vw, 56px);
+  --b-rail: 232px;
+  --b-rail-gap: clamp(32px, 4.4vw, 64px);
+  --b-topbar-h: 58px;
+  --b-sec-pad: clamp(52px, 5.4vw, 104px);
+  --b-round: 28px;
+
+  /* ---- Type ------------------------------------------------------------ */
+  --b-fs-h1: clamp(52px, 9vw, 150px);
+  --b-fs-h2: clamp(28px, 3.1vw, 44px);
+  --b-fs-h3: clamp(19px, 1.4vw, 23px);
+  --b-fs-quote: clamp(24px, 3.1vw, 46px);
+  --b-fs-body: clamp(15px, 14.4px + 0.18vw, 17px);
+  --b-fs-cap: 13px;
+
+  background-color: var(--b-bg);
+  color: var(--b-ink);
+}
+
+/* ==========================================================================
+   Top bar
+   ========================================================================== */
+.b-top {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background-color: rgba(253, 247, 240, 0.86);
+  border-bottom: 1px solid var(--b-line);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .b-top {
+    background-color: rgba(253, 247, 240, 0.66);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    backdrop-filter: blur(20px) saturate(170%);
+  }
+}
+
+.b-top-inner { display: flex; align-items: center; gap: 14px; height: var(--b-topbar-h); }
+
+.b-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: var(--b-fs-cap); font-weight: 500;
+  color: var(--b-ink); text-decoration: none;
+}
+
+.b-back svg { width: 15px; height: 11px; }
+.b-back:hover { color: var(--q-red); }
+.b-top-sep { width: 1px; height: 18px; background-color: var(--b-line-2); }
+
+.b-top-title {
+  font-size: var(--b-fs-cap); color: var(--b-ink-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.b-top-cta {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: var(--b-fs-cap); font-weight: 500;
+  color: var(--b-ink); text-decoration: none; white-space: nowrap;
+}
+
+.b-top-cta svg { width: 12px; height: 12px; }
+.b-top-cta:hover { color: var(--q-red); }
+
+.b-progress {
+  height: 2px;
+  background-image: var(--b-grad);
+  transform: scaleX(var(--b-read, 0));
+  transform-origin: left center;
+}
+
+/* ==========================================================================
+   Shell, panels, bands
+   ========================================================================== */
+.b-shell { width: 100%; max-width: var(--b-shell); margin: 0 auto; padding-inline: var(--b-gut); }
+
+/* The reference's signature container: a big soft-cornered tinted panel
+   holding white cards. Used by Design Process, Problem/Solution and the
+   Visual Languages block. */
+.b-panel {
+  background-color: var(--b-panel);
+  border-radius: var(--b-round);
+  padding: clamp(28px, 4vw, 64px) clamp(20px, 3vw, 48px);
+}
+
+.b-panel--soft { background-color: var(--b-panel-2); }
+
+.b-panel-head { text-align: center; max-width: 62ch; margin: 0 auto clamp(28px, 3.4vw, 52px); }
+.b-panel-head .b-h2 { margin-inline: auto; }
+.b-panel-head p { color: var(--b-ink-2); font-size: var(--b-fs-body); line-height: 1.6; margin: 0; }
+
+/* ==========================================================================
+   The gradient dot pill — the reference's section label
+   ========================================================================== */
+.b-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px 7px 12px;
+  border-radius: var(--radius-pill);
+  background-image: var(--b-grad);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin: 0 0 clamp(18px, 2.2vw, 30px);
+}
+
+.b-tag::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background-color: #ffffff; flex: 0 0 6px;
+}
+
+.b-tag--center { display: inline-flex; }
+
+/* An outline variant for the hero's scattered labels. */
+.b-tag-ghost {
+  display: inline-flex; align-items: center;
+  padding: 8px 16px;
+  border: 1px solid var(--b-line-2);
+  border-radius: var(--radius-pill);
+  background-color: rgba(255, 255, 255, 0.6);
+  font-size: 12.5px;
+  color: var(--b-ink-2);
+}
+
+/* ==========================================================================
+   Hero — giant wordmark behind the device, labels scattered around it
+   ========================================================================== */
+.b-hero {
+  position: relative;
+  overflow: hidden;
+  background-image:
+    radial-gradient(90% 70% at 50% 0%, rgba(211, 2, 34, 0.13) 0%, transparent 62%),
+    linear-gradient(180deg, var(--q-cream) 0%, var(--b-bg) 88%);
+  border-bottom: 1px solid var(--b-line);
+}
+
+.b-hero-inner { position: relative; padding-block: clamp(28px, 3.4vw, 56px) clamp(36px, 4vw, 76px); }
+
+.b-hero-top {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; flex-wrap: wrap;
+  margin-bottom: clamp(20px, 3vw, 44px);
+}
+
+/* The wordmark sits behind the device and is deliberately allowed to be
+   occluded by it — that overlap is the reference's strongest single move. */
+.b-wordmark {
+  position: absolute;
+  left: 50%;
+  top: clamp(120px, 15vw, 210px);
+  transform: translateX(-50%);
+  z-index: 0;
+  font-size: var(--b-fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  white-space: nowrap;
+  background-image: var(--b-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+
+.b-h1 {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(28px, 3.2vw, 46px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin: 0 0 14px;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+.b-hero-sub {
+  position: relative;
+  z-index: 2;
+  font-size: var(--b-fs-body);
+  line-height: 1.6;
+  color: var(--b-ink-2);
+  max-width: 46ch;
+  margin: 0 0 clamp(20px, 2.6vw, 36px);
+}
+
+.b-hero-stage-wrap { position: relative; z-index: 1; }
+
+/* The reference scatters these labels around a device that floats on its own
+   wash. Ours sits on an opaque black plate — see the artwork stage note — so
+   scattered labels would land on top of the render rather than around it.
+   A plain row above the plate keeps the device intact, which is the thing
+   worth looking at. */
+.b-scatter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: clamp(20px, 2.6vw, 34px);
+}
+
+/* ---- The device-emerging hero ------------------------------------------ */
+.b-stage { perspective: 1500px; perspective-origin: 50% 26%; padding-block: clamp(20px, 2.6vw, 44px); }
+
+.b-device {
+  transform-style: preserve-3d;
+  transform:
+    rotateX(calc((1 - var(--b-rise, 1)) * 24deg))
+    scale(calc(0.9 + var(--b-rise, 1) * 0.1))
+    translateY(calc((1 - var(--b-rise, 1)) * 28px));
+  transition: transform 120ms linear;
+  will-change: transform;
+}
+
+.b-device-frame {
+  position: relative;
+  margin: 0 auto;
+  width: min(300px, 72vw);
+  border-radius: 44px;
+  padding: 9px;
+  background: linear-gradient(165deg, #3a3a44, #14141a 55%, #2a2a33);
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.3) inset,
+    0 48px 88px -44px rgba(19, 16, 17, 0.5),
+    0 10px 30px -16px rgba(211, 2, 34, 0.28);
+}
+
+.b-device-screen {
+  position: relative; border-radius: 36px; overflow: hidden;
+  background-color: var(--q-cream); aspect-ratio: 9 / 19.5;
+}
+
+.b-device-screen img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.b-device-frame::after {
+  content: '';
+  position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+  width: 92px; height: 24px; border-radius: 0 0 14px 14px;
+  background: #14141a; z-index: 2;
+}
+
+/* ==========================================================================
+   Artwork stage
+   ==========================================================================
+   The device renders are RGB PNGs, not RGBA — their backdrop is solid black,
+   not transparent. Dropped straight onto the cream page they would read as a
+   black rectangle someone forgot to mask.
+
+   So they get a dark stage of their own. The reference alternates contained
+   type sections with full-bleed mockup bands on dark surfaces for exactly
+   this reason, and the artwork's own backdrop then reads as the band rather
+   than as a mistake.
+   ========================================================================== */
+.b-artwork {
+  margin: 0;
+  border-radius: var(--b-round);
+  overflow: hidden;
+  background-color: #000000;
+  box-shadow: 0 40px 80px -50px rgba(19, 16, 17, 0.55);
+}
+
+.b-artwork img { display: block; width: 100%; height: auto; }
+
+.b-artwork figcaption {
+  padding: 14px clamp(16px, 2vw, 26px) 18px;
+  font-size: var(--b-fs-cap);
+  color: rgba(255, 255, 255, 0.72);
+  background-color: #000000;
+}
+
+.b-artwork figcaption b { color: #ffffff; font-weight: 500; }
+
+/* In the hero the stage carries the rise transform, so the perspective is
+   applied to the whole plate rather than to a CSS phone frame. */
+.b-stage .b-artwork { box-shadow: 0 50px 90px -46px rgba(19, 16, 17, 0.6); }
+
+/* ==========================================================================
+   Overview — two-tone lead quote + spec row
+   ==========================================================================
+   The reference alternates full-strength and muted words inside one
+   sentence. `<b>` carries the emphasis so the effect survives with styles
+   off and reads as emphasis to a screen reader rather than as decoration.
+   ========================================================================== */
+.b-quote {
+  font-size: var(--b-fs-quote);
+  font-weight: 400;
+  line-height: 1.28;
+  letter-spacing: -0.028em;
+  color: var(--b-ink-3);
+  max-width: 26ch;
+  margin: 0 0 clamp(28px, 3.4vw, 52px);
+  text-wrap: balance;
+}
+
+.b-quote b { color: var(--b-ink); font-weight: 400; }
+
+.b-specrow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: clamp(18px, 2.4vw, 40px);
+  padding-top: clamp(20px, 2.4vw, 32px);
+  border-top: 1px solid var(--b-line);
+}
+
+.b-specrow dt { font-size: var(--b-fs-cap); color: var(--b-ink-3); margin-bottom: 8px; }
+.b-specrow dd { margin: 0; font-size: var(--b-fs-h3); font-weight: 500; letter-spacing: -0.015em; }
+.b-specrow .b-topics { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.b-topic {
+  padding: 7px 15px;
+  border-radius: var(--radius-pill);
+  background-color: var(--b-panel);
+  font-size: var(--b-fs-cap);
+  font-weight: 400;
+  color: var(--q-red-2);
+}
+
+/* ==========================================================================
+   Body grid: rail + column
+   ========================================================================== */
+.b-body {
+  display: grid;
+  grid-template-columns: var(--b-rail) minmax(0, 1fr);
+  gap: var(--b-rail-gap);
+  align-items: start;
+  padding-block: var(--b-sec-pad);
+}
+
+@media (max-width: 1023px) {
+  .b-body { grid-template-columns: minmax(0, 1fr); }
+  .b-rail { display: none; }
+}
+
+.b-rail { position: sticky; top: calc(var(--b-topbar-h) + 24px); }
+
+.b-rail-card {
+  border: 1px solid var(--b-line);
+  border-radius: 18px;
+  background-color: var(--b-card);
+  padding: 18px;
+}
+
+.b-rail-label {
+  font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--b-ink-3); margin: 0 0 12px;
+}
+
+.b-plain { list-style: none; margin: 0; padding: 0; }
+
+.b-rail-link {
+  display: block;
+  padding: 7px 0 7px 13px;
+  border-left: 2px solid var(--b-line);
+  font-size: var(--b-fs-cap);
+  color: var(--b-ink-3);
+  text-decoration: none;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.b-rail-link:hover { color: var(--b-ink); }
+.b-rail-link.is-active { color: var(--b-ink); border-left-color: var(--q-red); font-weight: 500; }
+
+.b-chips {
+  position: sticky; top: var(--b-topbar-h); z-index: 55;
+  background-color: var(--b-bg); border-bottom: 1px solid var(--b-line);
+}
+
+@media (min-width: 1024px) { .b-chips { display: none; } }
+
+.b-chips-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 10px var(--b-gut); }
+.b-chips-scroll::-webkit-scrollbar { display: none; }
+
+.b-chip {
+  flex: 0 0 auto; padding: 6px 13px;
+  border: 1px solid var(--b-line-2); border-radius: var(--radius-pill);
+  background-color: var(--b-card); font-size: 12px; color: var(--b-ink-2);
+  text-decoration: none; white-space: nowrap;
+}
+
+.b-chip.is-active { color: #ffffff; background-image: var(--b-grad); border-color: transparent; }
+
+/* ==========================================================================
+   Sections and type
+   ========================================================================== */
+.b-sec { padding-block: var(--b-sec-pad); scroll-margin-top: calc(var(--b-topbar-h) + 20px); }
+.b-sec + .b-sec { border-top: 1px solid var(--b-line); }
+
+.b-h2 {
+  font-size: var(--b-fs-h2); font-weight: 500; line-height: 1.1;
+  letter-spacing: -0.03em; margin: 0 0 16px; max-width: 22ch; text-wrap: balance;
+}
+
+.b-h3 {
+  font-size: var(--b-fs-h3); font-weight: 500; line-height: 1.25;
+  letter-spacing: -0.015em; margin: 0 0 10px; color: var(--b-ink);
+}
+
+.b-p { font-size: var(--b-fs-body); line-height: 1.7; color: var(--b-ink-2); max-width: 66ch; margin: 0 0 16px; }
+.b-p:last-child { margin-bottom: 0; }
+
+.b-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(16px, 2vw, 26px); }
+
+.b-card {
+  border-radius: 20px;
+  background-color: var(--b-card);
+  padding: clamp(20px, 2.2vw, 30px);
+  border: 1px solid var(--b-line);
+}
+
+/* ==========================================================================
+   Design process board
+   ========================================================================== */
+.b-proc { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: clamp(14px, 1.8vw, 24px); }
+
+.b-proc-card { background-color: var(--b-card); border-radius: 20px; padding: clamp(18px, 2vw, 26px); }
+
+.b-proc-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+
+.b-proc-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  background-image: var(--b-grad);
+  display: flex; align-items: center; justify-content: center;
+  color: #ffffff; flex: 0 0 42px;
+}
+
+.b-proc-icon svg { width: 19px; height: 19px; }
+.b-proc-head h3 { margin: 0; font-size: var(--b-fs-h3); font-weight: 500; }
+.b-proc-dur { margin-left: auto; font-size: var(--b-fs-cap); color: var(--b-ink-3); white-space: nowrap; }
+
+.b-proc-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.b-proc-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 14px 7px 9px;
+  border-radius: var(--radius-pill);
+  background-color: var(--b-panel);
+  font-size: 12.5px;
+  color: var(--b-ink-2);
+}
+
+.b-proc-tag::before {
+  content: '';
+  width: 16px; height: 16px; border-radius: 50%;
+  background-color: #ffffff;
+  background-image: radial-gradient(circle at 50% 50%, var(--q-red) 0 34%, transparent 36%);
+  flex: 0 0 16px;
+}
+
+/* ==========================================================================
+   Stats row
+   ==========================================================================
+   Big figure, label, and a dot matrix reading the proportion. The matrix is
+   generated from --b-fill (0 to 100) rather than hand-authored dots, so a
+   number change never needs the markup touched.
+   ========================================================================== */
+.b-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: clamp(18px, 2.4vw, 40px); }
+
+.b-stat { border-left: 3px solid var(--q-red); padding-left: 18px; }
+.b-stat-n { font-size: clamp(34px, 4vw, 54px); font-weight: 600; letter-spacing: -0.035em; line-height: 1; margin: 0 0 6px; font-variant-numeric: tabular-nums; }
+.b-stat-l { font-size: var(--b-fs-body); color: var(--b-ink-2); margin: 0 0 16px; }
+
+.b-dots {
+  --b-fill: 0;
+  height: 56px;
+  border-radius: 4px;
+  background-image:
+    radial-gradient(circle at 3px 3px, var(--q-red) 1.6px, transparent 1.7px),
+    radial-gradient(circle at 3px 3px, var(--b-line-2) 1.6px, transparent 1.7px);
+  background-size: 11px 11px, 11px 11px;
+  background-repeat: repeat, repeat;
+  /* The first layer is clipped to the fill percentage, the second shows
+     through beneath it — one element, no per-dot markup. */
+  background-clip: content-box, border-box;
+  padding-right: calc((100 - var(--b-fill)) * 1%);
+}
+
+/* ==========================================================================
+   Problem / solution board
+   ========================================================================== */
+.b-sol { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(16px, 2vw, 28px); align-items: start; }
+
+@media (max-width: 860px) { .b-sol { grid-template-columns: minmax(0, 1fr); } }
+
+.b-sol-list { display: flex; flex-direction: column; gap: clamp(12px, 1.6vw, 20px); }
+.b-sol-card { background-color: var(--b-card); border-radius: 18px; padding: clamp(16px, 1.8vw, 24px); }
+
+.b-sol-n {
+  display: inline-flex;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  background-image: var(--b-grad);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.b-sol-fig { margin: 0; border-radius: 20px; overflow: hidden; background-color: var(--b-card); }
+.b-sol-fig img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* ==========================================================================
+   Visual language: typography specimen + palette strip
+   ========================================================================== */
+.b-type { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 56px); align-items: start; }
+
+@media (max-width: 860px) { .b-type { grid-template-columns: minmax(0, 1fr); } }
+
+.b-type-name { font-size: clamp(44px, 6vw, 88px); font-weight: 700; letter-spacing: -0.045em; line-height: 1; margin: 0 0 24px; }
+
+.b-type-meta {
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding: 14px 0; border-block: 1px solid var(--b-line);
+  font-size: var(--b-fs-cap); color: var(--b-ink-2); margin-bottom: 20px;
+}
+
+.b-type-glyphs { font-size: clamp(19px, 2vw, 28px); line-height: 1.35; letter-spacing: -0.01em; word-break: break-word; margin: 0; }
+
+.b-weights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background-color: var(--b-line); border: 1px solid var(--b-line); border-radius: 14px; overflow: hidden; }
+.b-weight { background-color: var(--b-card); padding: 18px 16px; }
+.b-weight span { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--b-ink-3); margin-bottom: 10px; }
+.b-weight p { margin: 0; font-size: clamp(22px, 2.4vw, 34px); line-height: 1; letter-spacing: -0.02em; }
+
+/* The palette strip: a tall swatch with its name and hex beneath, as the
+   reference presents it. Values are the sampled ones — see the file header. */
+.b-palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: clamp(10px, 1.2vw, 16px); }
+.b-swatch { display: flex; flex-direction: column; gap: 10px; }
+
+.b-swatch i {
+  display: block;
+  height: clamp(120px, 15vw, 200px);
+  border-radius: 14px;
+  border: 1px solid var(--b-line);
+}
+
+.b-swatch b { font-size: var(--b-fs-cap); font-weight: 500; }
+.b-swatch code { font-family: inherit; font-size: 12px; color: var(--b-ink-3); letter-spacing: 0.04em; }
+.b-swatch em { font-style: normal; font-size: 11px; color: var(--b-ink-3); }
+
+/* ==========================================================================
+   The sticky flow
+   ========================================================================== */
+.b-flow { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 80px); align-items: start; }
+.b-flow-pin { position: sticky; top: calc(var(--b-topbar-h) + clamp(24px, 6vh, 72px)); }
+.b-flow-steps { display: flex; flex-direction: column; gap: clamp(40px, 8vh, 104px); padding-block: clamp(20px, 6vh, 72px); }
+
+.b-step {
+  border-left: 2px solid var(--b-line);
+  padding-left: clamp(16px, 2vw, 30px);
+  transition: border-color 320ms ease, opacity 320ms ease;
+  opacity: 0.5;
+}
+
+.b-step.is-active { border-left-color: var(--q-red); opacity: 1; }
+.b-step-n { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--b-ink-3); margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+.b-step.is-active .b-step-n { color: var(--q-red); }
+
+@media (max-width: 899px) {
+  .b-flow { grid-template-columns: minmax(0, 1fr); }
+  .b-flow-pin { position: static; }
+  .b-flow-steps { gap: 32px; padding-block: 28px; }
+  .b-step { opacity: 1; }
+}
+
+/* ==========================================================================
+   Screens: numbered frosted notes over the artwork
+   ========================================================================== */
+.b-shot { position: relative; border-radius: 20px; overflow: hidden; background-color: var(--b-card); border: 1px solid var(--b-line); margin: 0; }
+.b-shot img { display: block; width: 100%; height: auto; }
+
+.b-note {
+  position: absolute;
+  left: clamp(14px, 2vw, 24px);
+  bottom: clamp(14px, 2vw, 24px);
+  max-width: min(300px, 64%);
+  padding: 13px 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+}
+
+/* Without backdrop-filter a 72% wash over a screenshot is not legible. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .b-note { background-color: rgba(255, 255, 255, 0.95); }
+}
+
+.b-note-h { font-size: var(--b-fs-cap); font-weight: 600; color: var(--b-ink); margin: 0 0 5px; font-variant-numeric: tabular-nums; }
+.b-note p { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--b-ink-2); }
+
+.b-grid-shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: clamp(14px, 1.6vw, 22px); }
+
+/* ==========================================================================
+   Pending-content marker
+   ==========================================================================
+   Deliberately visible: the deck has not been exported, and a placeholder
+   that looked like finished copy would be the single worst thing this file
+   could contain. Each one names the slides that fill it, and they must all
+   be gone before this page is linked from anywhere public.
+   ========================================================================== */
+.b-pending {
+  border: 1px dashed rgba(211, 2, 34, 0.45);
+  border-radius: 12px;
+  background-color: rgba(211, 2, 34, 0.05);
+  padding: 15px 17px;
+  margin: 0 0 18px;
+  max-width: 66ch;
+}
+
+.b-pending p { margin: 0; font-size: var(--b-fs-cap); line-height: 1.6; color: var(--b-ink-2); }
+.b-pending p + p { margin-top: 7px; }
+
+.b-pending b {
+  display: block; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  font-size: 10px; color: var(--q-red-2); margin-bottom: 5px;
+}
+
+.b-pending code { font-family: inherit; color: var(--b-ink); background-color: rgba(19, 16, 17, 0.06); border-radius: 3px; padding: 1px 5px; }
+
+/* ==========================================================================
+   Shared components, re-pointed
+   ========================================================================== */
+.b-doc .b-end .btn-primary { background-image: var(--b-grad); background-color: var(--q-red); color: #ffffff; }
+.b-doc .b-end .btn-outline { color: var(--b-ink); border: 1px solid var(--b-line-2); }
+.b-doc .b-end .btn-outline:hover { border-color: var(--b-ink-3); }
+
+.b-end { padding-block: var(--b-sec-pad); border-top: 1px solid var(--b-line); }
+.b-end-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .b-device { transition: none; }
+}

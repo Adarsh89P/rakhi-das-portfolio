@@ -61,6 +61,9 @@
        studies' stylesheets never have to agree on a shared class. */
     '.y-reveal',
 
+    /* --- banking case study --- */
+    '.b-reveal',
+
     /* --- footer, on both pages --- */
     '.footer-intro',
     '.footer-actions',

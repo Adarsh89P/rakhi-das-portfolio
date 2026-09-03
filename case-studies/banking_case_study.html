@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fdf7f0">
+<title>QIIB Mobile Banking Onboarding | Rakhi Das</title>
+<!-- NOTE: this description, and the og/twitter pair below it, are the page's
+     only invented sentences and they are deliberately generic. Rewrite them
+     from the deck. -->
+<meta name="description" content="UI/UX case study: onboarding for QIIB's mobile banking app, designed on a shared design system.">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rakhi Das">
+<meta property="og:title" content="QIIB Mobile Banking Onboarding">
+<meta property="og:description" content="UI/UX case study: onboarding for QIIB's mobile banking app, designed on a shared design system.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QIIB Mobile Banking Onboarding">
+<meta name="twitter:description" content="UI/UX case study: onboarding for QIIB's mobile banking app, designed on a shared design system.">
+
+<!-- Still noindex: the works grid now links here, but the content slots are
+     empty. Delete this line in the same commit that removes the last
+     .b-pending block. -->
+<meta name="robots" content="noindex">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23fff' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/banking-case.css">
+
+</head>
+<body class="b-doc">
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<div class="b-top">
+  <div class="b-shell b-top-inner">
+    <a class="b-back" href="../index.html#works">
+      <svg viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M14 5.5H2M7 1 2 5.5 7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Rakhi.UX
+    </a>
+    <span class="b-top-sep" aria-hidden="true"></span>
+    <span class="b-top-title">QIIB — Mobile Banking Onboarding</span>
+
+    <a class="b-top-cta" href="https://www.figma.com/deck/H9bCGMIJ1tQf27i2qyglc7/Mobile-Banking-Onboarding?node-id=1-152" target="_blank" rel="noopener" aria-label="View the original deck on Figma (opens in a new tab)">
+      <span>View the deck</span>
+      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9 9 3M9 3H4M9 3v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+  <div class="b-progress" id="bProgress" aria-hidden="true"></div>
+</div>
+
+<nav class="b-chips" id="bChips" aria-label="Sections">
+  <div class="b-chips-scroll">
+    <a class="b-chip" href="#overview">Overview</a>
+    <a class="b-chip" href="#problem">Problem</a>
+    <a class="b-chip" href="#research">Research</a>
+    <a class="b-chip" href="#process">Process</a>
+    <a class="b-chip" href="#visual">Visual language</a>
+    <a class="b-chip" href="#flow">The flow</a>
+    <a class="b-chip" href="#screens">Screens</a>
+    <a class="b-chip" href="#outcome">Outcome</a>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- =====================================================================
+       HERO — the reference's opening: giant gradient wordmark behind the
+       device, outline labels scattered around it, warm wash behind.
+       ===================================================================== -->
+  <header class="b-hero">
+    <div class="b-shell b-hero-inner">
+      <div class="b-hero-top">
+        <span class="b-tag-ghost">Official UI/UX case study</span>
+        <span class="b-tag-ghost">Banking · 2025</span>
+      </div>
+
+      <!-- Both lines are the deck's own, read off the title slide — not a
+           rewrite of them. -->
+      <h1 class="b-h1">Redefining the digital banking experience</h1>
+      <p class="b-hero-sub">Designed for speed, security and simplicity.</p>
+
+      <p class="b-wordmark" aria-hidden="true">QIIB</p>
+
+      <div class="b-hero-stage-wrap">
+        <div class="b-scatter" aria-hidden="true">
+          <span class="b-tag-ghost s1">Finance app</span>
+          <span class="b-tag-ghost s2">Design system</span>
+          <span class="b-tag-ghost s3">Onboarding</span>
+          <span class="b-tag-ghost s4">Mobile</span>
+        </div>
+
+        <!-- The real render, not a CSS phone frame: the artwork already
+             contains its devices. --b-rise still drives the plate, so the
+             composition rises as the hero scrolls. -->
+        <div class="b-stage" id="bStage">
+          <div class="b-device">
+            <figure class="b-artwork">
+              <img src="../public/MobileBanking/qiib-devices.png"
+                   alt="Two iPhones showing the QIIB app: the currency converter with a live USD to QAR rate, and the home screen with a QAR 24,000 balance, a Visa card and recent transactions."
+                   width="2680" height="2160" fetchpriority="high" decoding="async">
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section class="b-sec b-shell" id="overview">
+    <p class="b-tag b-reveal">Project overview</p>
+
+    <p class="b-quote b-reveal"><b>QIIB</b> — Qatar International Islamic Bank — needed its mobile banking app <b>redefined for speed, security and simplicity</b>, delivered at Sundew Solutions.</p>
+
+    <div class="b-pending b-reveal">
+      <p><b>Overview — still needs the context slides</b></p>
+      <p>The sentence above is assembled from the title slide and the agency credit on it. What is still missing: what state the app was in before, what QIIB actually asked for, and what your specific remit was. Mark the load-bearing words with <code>&lt;b&gt;</code> and the two-tone effect does the rest.</p>
+    </div>
+
+    <dl class="b-specrow b-reveal">
+      <div><dt>Project</dt><dd>Mobile Banking Onboarding</dd></div>
+      <div><dt>Year</dt><dd>2025</dd></div>
+      <div><dt>Client</dt><dd>QIIB</dd></div>
+      <div><dt>Delivered at</dt><dd>Sundew Solutions</dd></div>
+      <div>
+        <dt>Topic</dt>
+        <dd class="b-topics">
+          <span class="b-topic">Research</span>
+          <span class="b-topic">UX/UI Design</span>
+          <span class="b-topic">Design System</span>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ===================== BODY: RAIL + COLUMN ===================== -->
+  <div class="b-shell b-body">
+
+    <aside class="b-rail">
+      <nav class="b-rail-card" id="bRail" aria-label="In this project">
+        <p class="b-rail-label">In this project</p>
+        <ul class="b-plain">
+          <li><a class="b-rail-link" href="#overview">Overview</a></li>
+          <li><a class="b-rail-link" href="#problem">Problem</a></li>
+          <li><a class="b-rail-link" href="#research">Research</a></li>
+          <li><a class="b-rail-link" href="#process">Process</a></li>
+          <li><a class="b-rail-link" href="#visual">Visual language</a></li>
+          <li><a class="b-rail-link" href="#flow">The flow</a></li>
+          <li><a class="b-rail-link" href="#screens">Screens</a></li>
+          <li><a class="b-rail-link" href="#outcome">Outcome</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="b-col">
+
+      <!-- ---------- PROBLEM + SOLUTION BOARD ---------- -->
+      <section class="b-sec" id="problem">
+        <div class="b-panel">
+          <div class="b-panel-head">
+            <p class="b-tag b-tag--center b-reveal">Problem &amp; solution</p>
+            <h2 class="b-h2 b-reveal">What was breaking, and what fixed it</h2>
+            <p class="b-reveal">One or two sentences framing the problem, from the deck's problem slides.</p>
+          </div>
+
+          <div class="b-pending b-reveal" style="margin-inline:auto">
+            <p><b>Problem — from the problem slides</b></p>
+            <p>Banking onboarding usually breaks on identity verification, document capture or a regulatory step — but use what the deck says, not what is typical. Any drop-off or support-volume figure it records is the strongest sentence on this page.</p>
+          </div>
+
+          <div class="b-sol b-reveal">
+            <div class="b-sol-list">
+              <div class="b-sol-card">
+                <p class="b-sol-n">Solution: 01</p>
+                <p class="b-p">First design response, and what it changed for the person filling the form.</p>
+              </div>
+              <div class="b-sol-card">
+                <p class="b-sol-n">Solution: 02</p>
+                <p class="b-p">Second design response.</p>
+              </div>
+              <div class="b-sol-card">
+                <p class="b-sol-n">Solution: 03</p>
+                <p class="b-p">Third design response.</p>
+              </div>
+            </div>
+
+            <figure class="b-sol-fig">
+              <img src="../public/Banking/bankingOnboarding.png" alt="The QIIB app home screen in use." width="1314" height="580" loading="lazy" decoding="async">
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- RESEARCH + STATS ---------- -->
+      <section class="b-sec" id="research">
+        <p class="b-tag b-reveal">Research</p>
+        <h2 class="b-h2 b-reveal">What the work was grounded in</h2>
+
+        <div class="b-pending b-reveal">
+          <p><b>Research — from the research slides, if any exist</b></p>
+          <p>Method and sample size, stated plainly. If no research was run on this project, delete this section and the stats below rather than filling them: an absent research section reads as scope, an invented one collapses the first time anyone asks.</p>
+        </div>
+
+        <!-- The dot matrix reads its proportion from --b-fill, so changing a
+             number never means touching the markup. Left at 0 with an em dash
+             because no figures exist for this project yet. -->
+        <div class="b-stats b-reveal">
+          <div class="b-stat">
+            <p class="b-stat-n">—</p>
+            <p class="b-stat-l">Metric name</p>
+            <div class="b-dots" style="--b-fill: 0"></div>
+          </div>
+          <div class="b-stat">
+            <p class="b-stat-n">—</p>
+            <p class="b-stat-l">Metric name</p>
+            <div class="b-dots" style="--b-fill: 0"></div>
+          </div>
+          <div class="b-stat">
+            <p class="b-stat-n">—</p>
+            <p class="b-stat-l">Metric name</p>
+            <div class="b-dots" style="--b-fill: 0"></div>
+          </div>
+        </div>
+
+        <div class="b-pending b-reveal" style="margin-top:24px">
+          <p><b>Stats — do not invent these</b></p>
+          <p>Set each figure and its <code>--b-fill</code> (0–100) from the deck. If the deck has no numbers, delete the three stats entirely — the page is stronger with scope claims than with figures nobody can source.</p>
+        </div>
+      </section>
+
+      <!-- ---------- DESIGN PROCESS ---------- -->
+      <section class="b-sec" id="process">
+        <div class="b-panel b-panel--soft">
+          <div class="b-panel-head">
+            <p class="b-tag b-tag--center b-reveal">Design process</p>
+            <h2 class="b-h2 b-reveal">How the work ran</h2>
+            <p class="b-reveal">Adjust the phases, durations and tags to match what actually happened on this project.</p>
+          </div>
+
+          <div class="b-proc b-reveal">
+            <div class="b-proc-card">
+              <div class="b-proc-head">
+                <span class="b-proc-icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.8"/><path d="m13.5 13.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <h3>Research</h3>
+                <span class="b-proc-dur">—</span>
+              </div>
+              <div class="b-proc-tags">
+                <span class="b-proc-tag">Discovery</span>
+                <span class="b-proc-tag">Benchmarking</span>
+                <span class="b-proc-tag">Flows</span>
+              </div>
+            </div>
+
+            <div class="b-proc-card">
+              <div class="b-proc-head">
+                <span class="b-proc-icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3 8h14" stroke="currentColor" stroke-width="1.8"/></svg>
+                </span>
+                <h3>Design</h3>
+                <span class="b-proc-dur">—</span>
+              </div>
+              <div class="b-proc-tags">
+                <span class="b-proc-tag">Wireframing</span>
+                <span class="b-proc-tag">Design system</span>
+                <span class="b-proc-tag">Final UI</span>
+              </div>
+            </div>
+
+            <div class="b-proc-card">
+              <div class="b-proc-head">
+                <span class="b-proc-icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5 8 14l8-8.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <h3>Delivery</h3>
+                <span class="b-proc-dur">—</span>
+              </div>
+              <div class="b-proc-tags">
+                <span class="b-proc-tag">Prototyping</span>
+                <span class="b-proc-tag">Handoff</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- VISUAL LANGUAGE: TYPE + PALETTE ---------- -->
+      <section class="b-sec" id="visual">
+        <p class="b-tag b-reveal">Visual language</p>
+        <h2 class="b-h2 b-reveal">Type and colour</h2>
+
+        <div class="b-type b-reveal">
+          <div>
+            <p class="b-type-name">Bricolage<br>Grotesque</p>
+            <div class="b-type-meta">
+              <span>Variable grotesque</span>
+              <span>2022</span>
+              <span>Optical sizing 12–96</span>
+            </div>
+            <p class="b-type-glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 ﷼ £ $ &amp;</p>
+          </div>
+
+          <div class="b-weights">
+            <div class="b-weight"><span>Light 300</span><p style="font-weight:300">Aa</p></div>
+            <div class="b-weight"><span>Regular 400</span><p style="font-weight:400">Aa</p></div>
+            <div class="b-weight"><span>Medium 500</span><p style="font-weight:500">Aa</p></div>
+          </div>
+        </div>
+
+        <div class="b-pending b-reveal" style="margin-top:26px">
+          <p><b>Typeface — this is the case study page's face, not the app's</b></p>
+          <p>Bricolage Grotesque is what this site is set in. If the deck names the typeface the QIIB app actually uses, swap this specimen for that one.</p>
+        </div>
+
+        <h3 class="b-h3 b-reveal" style="margin-top:36px">Colour</h3>
+        <p class="b-p b-reveal">Sampled from the project's own artwork rather than chosen — the percentages are that image's measured composition.</p>
+
+        <div class="b-palette b-reveal">
+          <div class="b-swatch">
+            <i style="background:#d30222"></i>
+            <b>QIIB Red</b><code>#D30222</code><em>6.9% of the artwork</em>
+          </div>
+          <div class="b-swatch">
+            <i style="background:#c00320"></i>
+            <b>Deep Red</b><code>#C00320</code><em>0.9%</em>
+          </div>
+          <div class="b-swatch">
+            <i style="background:#ffe9d1"></i>
+            <b>Cream</b><code>#FFE9D1</code><em>62.3% — the dominant ground</em>
+          </div>
+          <div class="b-swatch">
+            <i style="background:#ffffff"></i>
+            <b>White</b><code>#FFFFFF</code><em>12.5%</em>
+          </div>
+          <div class="b-swatch">
+            <i style="background:#010101"></i>
+            <b>Ink</b><code>#010101</code><em>1.8%</em>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- THE FLOW ---------- -->
+      <section class="b-sec" id="flow">
+        <p class="b-tag b-reveal">The flow</p>
+        <h2 class="b-h2 b-reveal">Three screens before the first tap</h2>
+        <p class="b-p b-reveal">Onboarding runs three screens deep and never traps anyone in it: <b>Skip</b> sits under every step, <b>Back</b> replaces it once you have moved, and the third screen swaps Continue for <b>Get Started</b>. Every headline and line of body copy below is the app's own.</p>
+
+        <div class="b-flow" id="bFlow">
+          <div class="b-flow-pin">
+            <div class="b-device-frame">
+              <div class="b-device-screen">
+                <img src="../public/MobileBanking/qiib-onboarding-1.png"
+                     data-fallback="../public/MobileBanking/qiib-devices.png"
+                     alt="" width="900" height="1950" loading="lazy" decoding="async" data-flow-shot>
+              </div>
+            </div>
+          </div>
+
+          <ol class="b-flow-steps b-plain">
+            <li class="b-step" data-shot="../public/MobileBanking/qiib-onboarding-1.png">
+              <p class="b-step-n">Step 01 · Continue / Skip</p>
+              <h3 class="b-h3">Welcome to QIIB Mobile Banking App</h3>
+              <p class="b-p">"Experience secure and convenient banking designed for your everyday needs in Qatar."</p>
+              <p class="b-p">The opening screen names the bank and the country and asks for nothing. Skip is offered immediately — an existing customer reinstalling the app should not have to read an introduction to it.</p>
+            </li>
+
+            <li class="b-step" data-shot="../public/MobileBanking/qiib-onboarding-2.png">
+              <p class="b-step-n">Step 02 · Get Started / Back</p>
+              <h3 class="b-h3">Bank Anytime, Anywhere with Confidence</h3>
+              <p class="b-p">"Manage accounts, locate ATMs, and explore partner services across Qatar right from your mobile."</p>
+              <p class="b-p">The middle screen is where the app's four destinations are introduced — accounts, ATM locator and partner services are three of the four tabs the person will land on. Skip has become Back, because there is now somewhere to go back to.</p>
+            </li>
+
+            <li class="b-step" data-shot="../public/MobileBanking/qiib-onboarding-3.png">
+              <p class="b-step-n">Step 03 · Continue / Skip</p>
+              <h3 class="b-h3">Fast &amp; Easy Everyday Secure Payments</h3>
+              <p class="b-p">"…money, pay merchants, and complete transactions instantly with secure digital banking."</p>
+              <p class="b-p">The last screen is about doing rather than seeing — sending, paying, completing. It is the closest of the three to the home screen that follows it.</p>
+            </li>
+          </ol>
+        </div>
+
+        <div class="b-pending b-reveal" style="margin-top:26px">
+          <p><b>Two gaps in this section</b></p>
+          <p>Screen 03's body copy is clipped in the artwork I have — the first few words are behind the middle device. And the deck's own reasoning for a three-screen introduction is not in any slide I have seen. Both are one sentence each from the deck.</p>
+        </div>
+      </section>
+
+      <!-- ---------- OUTCOME ---------- -->
+      <section class="b-sec" id="outcome">
+        <p class="b-tag b-reveal">Outcome</p>
+        <h2 class="b-h2 b-reveal">What shipped, and what it changed</h2>
+        <div class="b-pending b-reveal">
+          <p><b>Outcome — from the closing slides</b></p>
+          <p>What was delivered and at what scale. The works card in <code>js/data.js</code> still carries a TODO for the same figure: how many components, screens or products the QIIB system covered. One number completes both.</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ===================== ONBOARDING BAND =====================
+       The reference gives its high-fidelity screens a full-width tinted band
+       of their own, away from the reading column. The onboarding trio is the
+       one artwork that shows a whole flow at once, so it earns that band. -->
+  <section class="b-band b-reveal">
+    <div class="b-shell">
+      <p class="b-tag">High-fidelity designs</p>
+      <h2 class="b-h2">Onboarding, end to end</h2>
+      <figure class="b-artwork">
+        <img src="../public/MobileBanking/qiib-onboarding.png"
+             data-fallback="../public/MobileBanking/qiib-devices.png"
+             alt="The three QIIB onboarding screens side by side: Welcome to QIIB Mobile Banking App, Bank Anytime Anywhere with Confidence, and Fast and Easy Everyday Secure Payments — each in the bank's red with the QIIB logo, a Continue or Get Started button and a Skip or Back link."
+             width="3224" height="2086" loading="lazy" decoding="async">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===================== SCREENS BAND ===================== -->
+  <section class="b-sec b-shell" id="screens">
+    <p class="b-tag b-reveal">Screens</p>
+    <h2 class="b-h2 b-reveal">The work</h2>
+
+    <div class="b-pending b-reveal">
+      <p><b>Screens — two named, the rest still to export</b></p>
+      <p>The two below are the screens visible in the slides. Save the exports into <code>public/Banking/</code> as <code>qiib-home.png</code> and <code>qiib-converter.png</code> and they appear automatically; until then each falls back to the works-grid artwork. The number in each note is load-bearing — it lets the writing refer to "screen 02" and be followed.</p>
+    </div>
+
+    <figure class="b-artwork b-reveal">
+      <img src="../public/MobileBanking/qiib-devices.png"
+           alt="The QIIB currency converter and home screen side by side."
+           width="2680" height="2160" loading="lazy" decoding="async">
+      <figcaption>
+        <b>01. Home · 02. Currency converter</b> — Home leads with the balance and card, then Request and Transfer as the two primary actions, then a transaction list where credits and debits are separated by arrow direction as well as by sign. The converter carries a live USD–QAR rate with its trend and last-updated time, transfer and cash rates split into tabs, and a searchable list beneath.
+      </figcaption>
+    </figure>
+
+    <div class="b-pending b-reveal" style="margin-top:22px">
+      <p><b>The app's four destinations</b></p>
+      <p>The tab bar in the slides names them: Home, Partners, Locate and Converter. Partners and Locate are not shown in any slide I have — export those two screens and this section becomes the whole app rather than half of it.</p>
+    </div>
+  </section>
+
+  <section class="b-shell b-end">
+    <figure class="b-artwork b-reveal" style="margin-bottom:clamp(28px,3.4vw,52px)">
+      <img src="../public/MobileBanking/qiib-cover.jpg"
+           data-fallback="../public/MobileBanking/qiib-devices.png"
+           alt="QIIB closing slide: the bank's logo beside the line Redefining Digital Banking Experience, with the home and currency converter screens on two devices."
+           width="3840" height="2160" loading="lazy" decoding="async">
+    </figure>
+
+    <h2 class="b-h2 b-reveal">Thank you for reading.</h2>
+    <p class="b-p b-reveal">Interested in the thinking behind this project? I'd be glad to walk through it.</p>
+    <div class="b-end-actions b-reveal">
+      <a class="btn btn-primary" href="../index.html#works">
+        <span>Back to all work</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-outline" href="suraksha_case_study.html">
+        <span>Next: Suraksha</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER =====================
+     Same component as the portfolio and the other two case studies
+     (styles.css owns every class here). Written inline rather than rendered
+     from data.js, because script.js is a single pass that expects the full
+     home-page DOM and would throw on this page's missing elements. -->
+<footer class="site-footer" id="footer">
+  <div class="container footer-inner">
+    <p class="footer-watermark" aria-hidden="true">Rakhi.UX</p>
+
+    <div class="footer-intro">
+      <div class="footer-avatar">
+        <img src="../public/footer/footer-image.png" alt="Rakhi Das" width="82" height="82" loading="lazy" decoding="async">
+      </div>
+      <div class="footer-intro-text">
+        <p class="footer-heading">Want to get in touch? I'd love to connect with you!</p>
+        <p class="footer-tagline">I'm currently open to full-time opportunities! Let's create something amazing together! ✨</p>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <a href="mailto:dasrakhi303@gmail.com" class="btn btn-dark">
+        <span>dasrakhi303@gmail.com</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="../public/works/Rakhi_Das_UIUX_Designer_Resume.pdf" class="btn btn-outline-light" download="Rakhi_Das_UIUX_Designer_Resume.pdf" target="_blank" rel="noopener">
+        <span>Download CV</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="footer-social">
+      <a href="https://www.behance.net/rakhidas1" target="_blank" rel="noopener noreferrer" class="footer-social-link is-behance" aria-label="Behance profile">
+        <span aria-hidden="true">Bē</span>
+      </a>
+      <a href="https://www.linkedin.com/in/rakhi-das-19a03b1b4/" target="_blank" rel="noopener noreferrer" class="footer-social-link is-linkedin" aria-label="LinkedIn profile">
+        <span aria-hidden="true">in</span>
+      </a>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 · Rakhi Das · Built with pixels, prototypes, and plenty of late-night ideas.</p>
+    </div>
+  </div>
+</footer>
+
+<button type="button" class="to-top" id="toTop" aria-label="Back to top">
+  <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 12V2M2.5 6.5 7 2l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<!-- motion.js first: everything below reads window.SiteMotion. -->
+<script src="../js/motion.js"></script>
+<script src="../js/reveal.js"></script>
+<script src="../js/to-top.js"></script>
+<script src="../js/banking-nav.js"></script>
+</body>
+</html>

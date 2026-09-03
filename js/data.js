@@ -210,16 +210,18 @@ var PORTFOLIO_DATA = {
       {
         heading: 'Mobile Banking Onboarding',
         dateRange: 'Nov 2025 - Nov 2025',
-        /* TODO (needs a real figure — do not guess): this line is the one
-           card without a count, because nothing in this repo or its case
-           studies records how many components, screens or products the
-           QIIB system covered. Supply the number and it slots straight in:
-           'Rebuilt QIIB's onboarding on a design system of N components,
-           aligning M products.' */
-        description: 'Rebuilt QIIB’s digital banking onboarding on a shared design system, aligning components across the bank’s mobile products.',
+        /* The counts here are read off the app's own screens: three
+           onboarding steps, and four tab-bar destinations (Home, Partners,
+           Locate, Converter). Still missing, and still not to be guessed:
+           how many components the design system covered. */
+        description: 'A three-screen onboarding into QIIB’s mobile banking app, opening onto four destinations — accounts, partner services, ATM locator and a live currency converter.',
         color: '#ffe9d1',
         image: 'public/Banking/bankingOnboarding.png',
-        href: 'https://www.figma.com/deck/H9bCGMIJ1tQf27i2qyglc7/Mobile-Banking-Onboarding?node-id=1-152&t=J5FDokLa6WodmhZT-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
+        /* Points at the case study now, not the Figma deck. The deck is
+           still reachable from the top bar of that page. NOTE: the page's
+           content slots are still empty and it carries `noindex` — remove
+           both when the deck is exported and written up. */
+        href: 'case-studies/banking_case_study.html'
       }
     ]
   },
