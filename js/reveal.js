@@ -64,6 +64,14 @@
     /* --- banking case study --- */
     '.b-reveal',
 
+    /* --- malta taxi case study ---
+       That page's *other* entry mechanism is `animation-timeline: view()`
+       under `.m-rise`, which needs no observer at all. `.m-reveal` is for
+       the blocks that must still arrive in browsers without it, and the two
+       classes are never on the same element — one would animate opacity
+       from a scroll timeline while the other transitioned it from here. */
+    '.m-reveal',
+
     /* --- footer, on both pages --- */
     '.footer-intro',
     '.footer-actions',

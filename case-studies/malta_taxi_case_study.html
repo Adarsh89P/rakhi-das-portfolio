@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08080b">
+<title>Malta Taxi App | Rakhi Das</title>
+<meta name="description" content="UX case study: a taxi booking app for Malta, designed around clear pricing, real-time tracking and a guided booking flow.">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rakhi Das">
+<meta property="og:title" content="Malta Taxi App — UX Case Study">
+<meta property="og:description" content="UX case study: a taxi booking app for Malta, designed around clear pricing, real-time tracking and a guided booking flow.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Malta Taxi App — UX Case Study">
+<meta name="twitter:description" content="UX case study: a taxi booking app for Malta, designed around clear pricing, real-time tracking and a guided booking flow.">
+
+<!-- noindex until the .m-pending blocks are filled. The deck's slide 01 is
+     written up in full below; slides 02+ could not be exported (the Figma
+     account hit its Starter-plan MCP quota), so the research, process and
+     outcome sections are still empty slots rather than invented content.
+     Delete this line in the same commit that removes the last one. -->
+<meta name="robots" content="noindex">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23fff' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
+
+<!-- three.js is fetched by js/malta-3d.js as an ES module. Warming the
+     connection here saves a full TLS handshake off the hero's first frame;
+     if the module never runs, an unused preconnect costs nothing. -->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/malta-case.css">
+
+</head>
+<body class="m-doc">
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- The two fixed backdrop layers. Both are decorative and both are
+     aria-hidden; neither is ever a scroll or tab target. -->
+<div class="m-ground" aria-hidden="true"></div>
+<div class="m-grain" aria-hidden="true"></div>
+
+<div class="m-top">
+  <div class="m-shell m-top-inner">
+    <a class="m-back" href="../index.html#works">
+      <svg viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M14 5.5H2M7 1 2 5.5 7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Rakhi.UX
+    </a>
+    <span class="m-top-sep" aria-hidden="true"></span>
+    <span class="m-top-title">Malta Taxi — UX case study</span>
+
+    <a class="m-top-cta" href="https://www.figma.com/slides/nhf3bX4IaSVZzYAABourZV/Malta-Taxi-App-%F0%9F%9A%96--Copy-?node-id=0-1" target="_blank" rel="noopener" aria-label="View the original deck on Figma (opens in a new tab)">
+      <span>View the deck</span>
+      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9 9 3M9 3H4M9 3v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+  <div class="m-progress" id="mProgress" aria-hidden="true"></div>
+</div>
+
+<!-- Two navs, one visible at a time (the CSS swaps them at 1100px), so the
+     same eight destinations are never two sets of tab stops. -->
+<nav class="m-chips" id="mChips" aria-label="Sections">
+  <div class="m-chips-scroll">
+    <a class="m-chip" href="#overview">Overview</a>
+    <a class="m-chip" href="#problem">Problem</a>
+    <a class="m-chip" href="#needs">User needs</a>
+    <a class="m-chip" href="#solution">Solution</a>
+    <a class="m-chip" href="#palette">Palette</a>
+    <a class="m-chip" href="#screens">Screens</a>
+    <a class="m-chip" href="#outcome">Outcome</a>
+  </div>
+</nav>
+
+<nav class="m-rail" id="mRail" aria-label="Sections">
+  <ol>
+    <li><a class="m-rail-link" href="#overview">Overview</a></li>
+    <li><a class="m-rail-link" href="#problem">Problem</a></li>
+    <li><a class="m-rail-link" href="#needs">Needs</a></li>
+    <li><a class="m-rail-link" href="#solution">Solution</a></li>
+    <li><a class="m-rail-link" href="#palette">Palette</a></li>
+    <li><a class="m-rail-link" href="#screens">Screens</a></li>
+    <li><a class="m-rail-link" href="#outcome">Outcome</a></li>
+  </ol>
+</nav>
+
+<main id="main">
+
+  <!-- =====================================================================
+       HERO
+       =====================================================================
+       Three depth layers, marked with `--m-d` and moved by one pointer
+       listener in malta-3d.js. The copy sits nearest (smallest offset), the
+       geometry furthest.
+
+       The stage holds the finished static composition; #mCanvas is empty
+       until the WebGL scene has drawn a frame, and invisible until then.
+       ===================================================================== -->
+  <header class="m-hero">
+
+    <!-- Outside .m-hero-inner, and that is the point. As children of it they
+         inherited its `z-index: 2` and painted OVER the headline, where their
+         backdrop-filter blurred the type behind them into a ghost. Out here
+         they stack below it, so the blur samples the background wash — which
+         is what a piece of floating glass is supposed to be showing. They are
+         also positioned into the page margins rather than across the text
+         column, so even at their nearest depth they never cross a word. -->
+    <div class="m-float m-float-1 m-layer" style="--m-d: 2.4;" aria-hidden="true"></div>
+    <div class="m-float m-float-2 m-layer" style="--m-d: 3.1;" aria-hidden="true"></div>
+    <div class="m-float m-float-3 m-layer" style="--m-d: 1.8;" aria-hidden="true"></div>
+
+    <div class="m-hero-inner">
+
+      <div class="m-layer" style="--m-d: 0.35;">
+        <div class="m-tagrow">
+          <span class="m-tag">UX case study</span>
+          <span class="m-tag">Mobile app design</span>
+          <span class="m-tag">Malta · 2024</span>
+        </div>
+
+        <h1 class="m-h1">Malta<br><em>Taxi App</em></h1>
+
+        <p class="m-hero-sub">
+          A taxi booking app for a country most of its riders are visiting for
+          the first time — built around knowing the price before you commit,
+          watching the car actually arrive, and a booking flow short enough to
+          finish on a kerb.
+        </p>
+
+        <div class="m-cta-row">
+          <a class="m-btn m-btn-primary" href="#problem">
+            <span>Read the case study</span>
+            <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="m-btn m-btn-ghost" href="#screens">
+            <span>See the screens</span>
+            <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="m-layer" style="--m-d: 1;">
+        <div class="m-stage" id="mStage">
+          <div class="m-stage-glow" aria-hidden="true"></div>
+
+          <!-- fetchpriority high: this is the LCP element on every viewport
+               where the hero fits, and it is the one thing on the page whose
+               late arrival would be felt. -->
+          <img class="m-stage-img"
+               src="../public/MaltaTaxi/malta-devices.png"
+               alt="Two iPhones showing the Malta Taxi app: the onboarding screen reading Start Your Journey Right with Malta Taxi, and the location permission screen."
+               width="1600" height="1200"
+               fetchpriority="high" decoding="async">
+
+          <canvas class="m-canvas" id="mCanvas" aria-hidden="true"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       OVERVIEW
+       ===================================================================== -->
+  <section class="m-sec" id="overview">
+    <div class="m-shell">
+
+      <dl class="m-meta m-reveal">
+        <div>
+          <dt>Role</dt>
+          <dd>UI/UX Designer</dd>
+        </div>
+        <div>
+          <dt>Timeline</dt>
+          <dd>Jan – Jul 2024</dd>
+        </div>
+        <div>
+          <dt>Platform</dt>
+          <dd>iOS &amp; Android</dd>
+        </div>
+        <div>
+          <dt>Deliverable</dt>
+          <dd>Mobile app design</dd>
+        </div>
+      </dl>
+
+      <div class="m-head" style="margin-top: clamp(48px, 7vw, 84px);">
+        <p class="m-eyebrow m-reveal">Overview</p>
+        <h2 class="m-h2 m-reveal">Booking a taxi in a place you don&rsquo;t know</h2>
+        <p class="m-lede m-reveal">
+          Malta&rsquo;s riders are disproportionately tourists: people who
+          don&rsquo;t know the street names, don&rsquo;t know what a fair fare
+          looks like, and have no way to tell a reliable driver from a
+          chancer. Every one of the design decisions below comes back to that
+          — the app has to earn trust from someone with no local knowledge to
+          check it against.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PROBLEM
+       =====================================================================
+       The first panel is the deck's own words, emphasis included. The second
+       is the reading of them, kept visibly separate from the quote.
+
+       Problem, needs and solution are three sections in that order, each
+       with its own id. They were briefly one section with the solution
+       nested inside it as a side-by-side panel, which looked fine and broke
+       the scrollspy: the rail advertised Solution as sitting between Needs
+       and Palette while its box was actually 700px ABOVE Needs, so the
+       "last section whose top has passed" loop in malta-nav.js resolved to
+       Solution for the whole middle of the page. Narrative order and
+       document order have to agree.
+       ===================================================================== -->
+  <section class="m-sec" id="problem">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">The problem</p>
+        <h2 class="m-h2 m-reveal">Three gaps, one broken first ride</h2>
+      </div>
+
+      <div class="m-split">
+        <div class="m-panel m-panel-problem m-rise">
+          <h3>What was going wrong</h3>
+          <p>
+            Users in Malta, especially tourists,
+            <strong>face difficulty booking reliable taxis quickly</strong>.
+            The lack of <strong>clear pricing</strong>,
+            <strong>real-time tracking</strong>, and a simple booking flow
+            creates confusion and reduces trust.
+          </p>
+        </div>
+
+        <div class="m-panel m-rise">
+          <h3>Why the three compound</h3>
+          <p>
+            They are not three separate complaints. Not knowing the price is
+            what makes the wait feel risky; not being able to see the car is
+            what makes the price feel like a gamble; and a booking flow that
+            takes too long gives both of them the time they need to turn into
+            a cancelled ride.
+          </p>
+          <p>
+            So the fix could not be three features bolted on separately. It
+            had to be one sequence in which each answer arrives before the
+            doubt it settles.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       USER NEEDS — the five from the deck, one card each
+       =====================================================================
+       Five cards, not six: the deck lists five needs and a sixth would be
+       invented. The grid is auto-fit, so five cards is a layout it already
+       handles rather than a hole to fill.
+       ===================================================================== -->
+  <section class="m-sec" id="needs">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">User needs</p>
+        <h2 class="m-h2 m-reveal">What riders actually asked for</h2>
+        <p class="m-lede m-reveal">
+          The five needs the design was held against. Each card below is one
+          of them, in the deck&rsquo;s own words, with the design consequence
+          underneath it.
+        </p>
+      </div>
+
+      <div class="m-grid m-grid-5">
+        <article class="m-card m-rise">
+          <span class="m-card-n">NEED 01</span>
+          <h3>Quick and hassle-free taxi booking</h3>
+          <p>The booking flow is the product. Anything that isn&rsquo;t needed to get a car moving was pushed out of it.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">NEED 02</span>
+          <h3>Clear pricing before confirming rides</h3>
+          <p>The fare is shown while the ride is still cancellable, not after. Trust is decided in that gap.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">NEED 03</span>
+          <h3>Real-time tracking for safety and reliability</h3>
+          <p>A live map with the nearby taxis on it, so the wait is something you can watch rather than something you endure.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">NEED 04</span>
+          <h3>Easy navigation for unfamiliar locations</h3>
+          <p>Destination search that works for someone who can&rsquo;t spell the street they want — the tourist case, treated as the default.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">NEED 05</span>
+          <h3>Simple and guided user experience</h3>
+          <p>Onboarding sets location up front, so the first screen after it is already useful instead of asking for a permission mid-task.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       SOLUTION — the deck's four moves, in booking order
+       =====================================================================
+       Four cards rather than a bulleted list, so the answers carry the same
+       weight on the page as the five needs they answer.
+       ===================================================================== -->
+  <section class="m-sec" id="solution">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">The solution</p>
+        <h2 class="m-h2 m-reveal">Four moves, in the order you meet them</h2>
+        <p class="m-lede m-reveal">
+          A taxi booking app that takes the guesswork out of the ride. These
+          are the deck&rsquo;s four, sequenced the way a rider actually hits
+          them rather than listed by feature.
+        </p>
+      </div>
+
+      <div class="m-grid">
+        <article class="m-card m-rise">
+          <span class="m-card-n">MOVE 01</span>
+          <h3>Quick onboarding and location setup</h3>
+          <p>Location is asked for once, up front, with the reason attached — so no later screen has to stop and ask mid-task.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">MOVE 02</span>
+          <h3>Real-time map with nearby taxis</h3>
+          <p>The wait becomes visible. Cars on a map answer &ldquo;is one actually coming?&rdquo; before the question is asked.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">MOVE 03</span>
+          <h3>Easy destination search and booking flow</h3>
+          <p>Search built for someone who can&rsquo;t spell the street, and a confirmation step that shows the fare while cancelling is still free.</p>
+        </article>
+
+        <article class="m-card m-rise">
+          <span class="m-card-n">MOVE 04</span>
+          <h3>Tour exploration for travellers</h3>
+          <p>The feature that treats a tourist as a tourist rather than a commuter who happens to be lost — places to go, not just a field to fill.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       RESEARCH / PROCESS — deliberately empty
+       ===================================================================== -->
+  <section class="m-sec">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">Research &amp; process</p>
+        <h2 class="m-h2 m-reveal">How the five needs were found</h2>
+      </div>
+
+      <p class="m-pending m-reveal">
+        <b>Empty on purpose.</b> This is where the research method belongs —
+        who was spoken to, how many, and what was tested. Slide 01 of the deck
+        states the five needs but not where they came from, and the remaining
+        slides could not be exported (the Figma account hit its Starter-plan
+        MCP quota mid-read). Numbers here would have to be invented, and a
+        hiring manager will ask. Fill it from the deck, or delete the section.
+      </p>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PALETTE
+       =====================================================================
+       Every hex below was counted, not picked: the app render was decoded to
+       a canvas and its opaque pixels tallied, so these are the five most
+       common colours in the artwork the page is sitting on. That is also why
+       the page's own accent is #fa0501 exactly.
+       ===================================================================== -->
+  <section class="m-sec" id="palette">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">Colour</p>
+        <h2 class="m-h2 m-reveal">The project palette</h2>
+        <p class="m-lede m-reveal">
+          Read off the screens rather than chosen next to them: the app render
+          was decoded and its opaque pixels counted, so these five are the
+          artwork&rsquo;s actual palette in order of area.
+        </p>
+      </div>
+
+      <div class="m-swatches">
+        <div class="m-swatch m-rise">
+          <div class="m-swatch-chip" style="--m-swatch: #fa0501;"></div>
+          <div class="m-swatch-meta">
+            <b>Malta red</b>
+            <code>#fa0501</code>
+            <span>The brand. Carries the onboarding screen, the primary action and the map pin.</span>
+          </div>
+        </div>
+
+        <div class="m-swatch m-rise">
+          <div class="m-swatch-chip" style="--m-swatch: #ffffff;"></div>
+          <div class="m-swatch-meta">
+            <b>Paper</b>
+            <code>#ffffff</code>
+            <span>The larger half of the app. Red is the accent; white is the room it works in.</span>
+          </div>
+        </div>
+
+        <div class="m-swatch m-rise">
+          <div class="m-swatch-chip" style="--m-swatch: #ff5c51;"></div>
+          <div class="m-swatch-meta">
+            <b>Red tint</b>
+            <code>#ff5c51</code>
+            <span>The soft halo behind the map card — the brand red at lower weight, for depth rather than emphasis.</span>
+          </div>
+        </div>
+
+        <div class="m-swatch m-rise">
+          <div class="m-swatch-chip" style="--m-swatch: #b9f4c8;"></div>
+          <div class="m-swatch-meta">
+            <b>Map mint</b>
+            <code>#b9f4c8</code>
+            <span>The only cool colour in the app, and it does one job: it is the map, so the map can never be mistaken for a card.</span>
+          </div>
+        </div>
+
+        <div class="m-swatch m-rise">
+          <div class="m-swatch-chip" style="--m-swatch: #000000;"></div>
+          <div class="m-swatch-meta">
+            <b>Ink</b>
+            <code>#000000</code>
+            <span>Type and iconography. Pure black, because everything it sits on is white or mint.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       SCREENS
+       ===================================================================== -->
+  <section class="m-sec" id="screens">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">Screens</p>
+        <h2 class="m-h2 m-reveal">Two screens before the first ride</h2>
+        <p class="m-lede m-reveal">
+          Both of these come before anything is booked, and both exist to
+          answer the fifth need: the app should be useful the moment onboarding
+          ends, not ask for a permission in the middle of a booking.
+        </p>
+      </div>
+
+      <figure class="m-screens m-reveal">
+        <img src="../public/MaltaTaxi/malta-devices.png"
+             alt="Left: the location permission screen, headed We don't have your location yet, with an Enable device location button. Right: the onboarding screen, a car on a map above the line Start Your Journey Right with Malta Taxi and a Get Started button."
+             width="1600" height="1200" loading="lazy" decoding="async">
+        <figcaption class="m-figcap">
+          <strong>Onboarding</strong> states the promise and offers one action.
+          <strong>Location setup</strong> asks for the permission with the
+          reason attached — &ldquo;set your location to start exploring&rdquo; —
+          rather than as a bare system prompt.
+        </figcaption>
+      </figure>
+
+      <p class="m-pending m-reveal">
+        <b>Two screens, not the flow.</b> The map, the fare confirmation and
+        the tour exploration feature are all named in the solution above but
+        aren&rsquo;t in the exported artwork. Export them from the deck into
+        <code>public/MaltaTaxi/</code> and they belong here, in booking order.
+      </p>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       OUTCOME — no invented numbers
+       ===================================================================== -->
+  <section class="m-sec" id="outcome">
+    <div class="m-shell">
+      <div class="m-head">
+        <p class="m-eyebrow m-reveal">Outcome</p>
+        <h2 class="m-h2 m-reveal">What shipped</h2>
+      </div>
+
+      <div class="m-split">
+        <div class="m-panel m-rise">
+          <h3>Design delivered</h3>
+          <p>
+            A complete mobile app design for iOS and Android covering
+            onboarding, location setup, the live map, destination search and
+            booking, and a tour exploration feature for travellers — with the
+            brand&rsquo;s Maltese cross and its single red carried through all
+            of it.
+          </p>
+        </div>
+
+        <p class="m-pending m-rise">
+          <b>No results numbers here, and that is deliberate.</b> Booking
+          completion, time-to-book, drop-off at the permission screen — any of
+          those would make this section, and I don&rsquo;t have them. If they
+          were measured, they go here; if they were never measured, saying
+          &ldquo;design delivered&rdquo; and stopping is the stronger move.
+          Invented metrics are the ones you get asked about.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="m-sec m-end">
+    <div class="m-shell">
+      <h2 class="m-h2 m-reveal">Want the full deck?</h2>
+      <p class="m-lede m-reveal">
+        The original slides carry the screens this page is still missing.
+      </p>
+      <div class="m-cta-row m-reveal">
+        <a class="m-btn m-btn-primary" href="https://www.figma.com/slides/nhf3bX4IaSVZzYAABourZV/Malta-Taxi-App-%F0%9F%9A%96--Copy-?node-id=0-1" target="_blank" rel="noopener">
+          <span>Open in Figma</span>
+          <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="m-btn m-btn-ghost" href="../index.html#works">
+          <span>More projects</span>
+          <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="footer">
+  <div class="container footer-inner">
+    <p class="footer-watermark" aria-hidden="true">Rakhi.UX</p>
+
+    <div class="footer-intro">
+      <div class="footer-avatar">
+        <img src="../public/footer/footer-image.png" alt="Rakhi Das" width="82" height="82" loading="lazy" decoding="async">
+      </div>
+      <div class="footer-intro-text">
+        <p class="footer-heading">Want to get in touch? I'd love to connect with you!</p>
+        <p class="footer-tagline">I'm currently open to full-time opportunities! Let's create something amazing together! ✨</p>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <a href="mailto:dasrakhi303@gmail.com" class="btn btn-dark">
+        <span>dasrakhi303@gmail.com</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="../public/works/Rakhi_Das_UIUX_Designer_Resume.pdf" class="btn btn-outline-light" download="Rakhi_Das_UIUX_Designer_Resume.pdf" target="_blank" rel="noopener">
+        <span>Download CV</span>
+        <svg viewBox="0 0 14 10" fill="none" aria-hidden="true"><path d="M0 5h12M7 1l5 4-5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="footer-social">
+      <a href="https://www.behance.net/rakhidas1" target="_blank" rel="noopener noreferrer" class="footer-social-link is-behance" aria-label="Behance profile">
+        <span aria-hidden="true">Bē</span>
+      </a>
+      <a href="https://www.linkedin.com/in/rakhi-das-19a03b1b4/" target="_blank" rel="noopener noreferrer" class="footer-social-link is-linkedin" aria-label="LinkedIn profile">
+        <span aria-hidden="true">in</span>
+      </a>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 · Rakhi Das · Built with pixels, prototypes, and plenty of late-night ideas.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Load order matters and matches every other page: motion.js first (it
+     defines window.SiteMotion, which the two below both require), then the
+     page script, then reveal.js last so it sees the final markup.
+
+     malta-3d.js is separate and `type="module"` — it is deferred by
+     definition, may import from a CDN, and is allowed to never run at all. -->
+<script src="../js/motion.js"></script>
+<script src="../js/malta-nav.js"></script>
+<script src="../js/to-top.js"></script>
+<script src="../js/reveal.js"></script>
+<script type="module" src="../js/malta-3d.js"></script>
+
+</body>
+</html>

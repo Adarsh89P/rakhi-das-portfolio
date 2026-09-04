@@ -202,10 +202,19 @@ var PORTFOLIO_DATA = {
       {
         heading: 'Malta Taxi App 🚖 ',
         dateRange: 'Jan 2024 - July 2024',
-        description: 'Reduced UI inconsistencies, aligned four product teams, and accelerated product delivery through a scalable design system.',
+        /* Was "reduced UI inconsistencies, aligned four product teams,
+           accelerated delivery through a scalable design system" — a design
+           system blurb on a taxi booking app. Nothing in the deck supports
+           it. Replaced with the deck's own three gaps, which are the actual
+           subject of the case study. */
+        description: 'A taxi booking app for Malta, where most riders are tourists: clear pricing before the ride is confirmed, a live map of nearby taxis, and a booking flow short enough to finish at the kerb.',
         color: '#c4e8ff',
         image: 'public/E-Commerce/maltaapp.png',
-        href: 'https://www.figma.com/deck/G1rWYCuzvK9zAcaNAPnUlp/Malta-Taxi-App-%F0%9F%9A%96?node-id=3-135&t=P6Jhoz7hQMnUGJhQ-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
+        /* Points at the case study now, not the Figma deck. The deck is still
+           reachable from that page's top bar. NOTE: the research, process and
+           outcome slots are still empty and it carries `noindex` — remove
+           both when the remaining slides are exported. */
+        href: 'case-studies/malta_taxi_case_study.html'
       },
       {
         heading: 'Mobile Banking Onboarding',

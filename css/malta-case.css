@@ -1,0 +1,970 @@
+/* ==========================================================================
+   MALTA TAXI — case study
+   ==========================================================================
+   The one dark page on the site. Everything is namespaced `m-` and scoped
+   under `.m-doc`, so it can hold a palette the rest of the site never sees
+   without a single global token being touched. The shared footer is already
+   black, so the page ends by simply running into it.
+
+   THREE COLOURS, MEASURED NOT PICKED
+   The brand red is `#fa0501` — the modal opaque pixel of the app render in
+   public/MaltaTaxi/malta-devices.png, not a red chosen by eye. The mint
+   (#b9f4c8) is the map fill from the same image. Both were counted, so the
+   page and the artwork sitting on it are the same red.
+
+   White on #fa0501 measures 4.09:1 and fails AA at button sizes, so anything
+   carrying text uses `--m-red-deep` instead; pure brand red is reserved for
+   fills and glows that never hold a glyph.
+
+   THE 3D IS FOUR MECHANISMS, NOT AN EFFECT PER SECTION
+     1. `--mx` / `--my`  — pointer position, 0..1, set on <body> by malta-3d.js.
+        Feeds the hero's camera and every card's tilt from ONE listener.
+     2. `--m-d`          — per-layer depth, authored in the markup, read here.
+        Multiplies the pointer offset, so one variable produces a whole
+        parallax stack.
+     3. `animation-timeline: view()` — section entry in perspective. Native,
+        so it costs no JavaScript and no observer.
+     4. A WebGL scene    — hero only, and strictly an upgrade: the static
+        composition below it is the finished state, and the canvas fades in
+        on top of it once three.js has actually initialised.
+
+   Every one of them is inert under `prefers-reduced-motion`, and the page is
+   fully readable with JavaScript off.
+   ========================================================================== */
+
+.m-doc {
+  /* ---- Sampled from public/MaltaTaxi/malta-devices.png ------------------ */
+  --m-red: #fa0501;          /* fills and glows only — never behind text */
+  --m-red-deep: #e00500;     /* 5.04:1 with white; the button red */
+  --m-red-soft: #ff6b60;     /* 6.85:1 on --m-base; the accent-text red */
+  /* The app's fourth colour, the map mint #b9f4c8, is deliberately not a
+     token here: it appears exactly once, as its own literal in the palette
+     specimen, where showing the value IS the content. */
+
+  /* ---- The dark ground -------------------------------------------------
+     Three steps, not two: a page this dark needs a distinct elevation for
+     glass to read as sitting above something. */
+  --m-base: #08080b;
+  --m-elev: #101017;
+  --m-elev-2: #16161f;
+
+  /* ---- Ink. Ratios below are against --m-base. ------------------------- */
+  --m-ink: #f4f6fa;          /* 18.9:1 */
+  --m-ink-2: #b6bcc8;        /*  9.5:1 — body copy */
+  --m-ink-3: #8b93a3;        /*  5.6:1 — labels, meta; the floor for text */
+
+  /* ---- Lines and glass ------------------------------------------------- */
+  --m-line: rgba(244, 246, 250, 0.09);
+  --m-line-2: rgba(244, 246, 250, 0.16);
+  --m-glass: rgba(255, 255, 255, 0.045);
+  --m-glass-2: rgba(255, 255, 255, 0.07);
+
+  /* The two cool accents the brief asks for. Used as light, not as text:
+     they appear in gradients, glows and rules, never as a foreground
+     colour, so neither has to clear a contrast bar. */
+  --m-cyan: #4fd8ff;
+  --m-violet: #8b6bff;
+
+  --m-shell: min(1240px, 100% - 2 * clamp(20px, 5vw, 56px));
+  --m-pad: clamp(72px, 11vw, 148px);
+
+  /* Pointer, in 0..1, with the neutral centre as the pre-JS value. Every
+     tilt and parallax below resolves to zero offset at 0.5/0.5, which is
+     why the page composes correctly before malta-3d.js runs at all. */
+  --mx: 0.5;
+  --my: 0.5;
+
+  background-color: var(--m-base);
+  color: var(--m-ink);
+  color-scheme: dark;
+}
+
+/* The shared stylesheet paints <body> from its own light tokens. */
+body.m-doc { background-color: var(--m-base); }
+
+.m-doc ::selection { background: var(--m-red); color: #ffffff; }
+
+.m-shell { width: var(--m-shell); margin-inline: auto; }
+
+/* ==========================================================================
+   THE GROUND — one fixed layer, three drifting washes
+   ==========================================================================
+   Fixed rather than scrolled: the page is the thing that moves through the
+   light, which is what sells depth on a dark ground. It is a single
+   composited layer with no children, so the drift is free. */
+.m-ground {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 46% at 18% 12%, rgba(250, 5, 1, 0.24), transparent 62%),
+    radial-gradient(52% 42% at 86% 26%, rgba(139, 107, 255, 0.20), transparent 64%),
+    radial-gradient(70% 50% at 50% 96%, rgba(79, 216, 255, 0.14), transparent 66%),
+    var(--m-base);
+  filter: blur(28px) saturate(118%);
+  transform: scale(1.12); /* hides the blur's soft edge at the viewport rim */
+  animation: m-drift 38s ease-in-out infinite alternate;
+}
+
+@keyframes m-drift {
+  from { transform: scale(1.12) translate3d(-1.4%, -1%, 0); }
+  to   { transform: scale(1.18) translate3d(1.6%, 1.2%, 0); }
+}
+
+/* Film grain over the whole thing. Without it, wide dark gradients band
+   badly on 8-bit panels — the noise is dithering, not decoration. */
+.m-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================================
+   TOP BAR
+   ========================================================================== */
+.m-top {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--m-base) 78%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid var(--m-line);
+}
+
+.m-top-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 62px;
+}
+
+.m-back,
+.m-top-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--m-ink);
+  transition: color 200ms ease;
+}
+
+.m-back svg { width: 15px; height: 11px; transition: transform 200ms ease; }
+.m-back:hover { color: var(--m-red-soft); }
+.m-back:hover svg { transform: translateX(-3px); }
+
+.m-top-sep { width: 1px; height: 18px; background: var(--m-line-2); }
+
+.m-top-title {
+  font-size: 0.85rem;
+  color: var(--m-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m-top-cta {
+  margin-left: auto;
+  padding: 7px 14px;
+  border: 1px solid var(--m-line-2);
+  border-radius: 999px;
+  color: var(--m-ink-2);
+  white-space: nowrap;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.m-top-cta svg { width: 12px; height: 12px; }
+.m-top-cta:hover { color: var(--m-ink); border-color: var(--m-red-soft); }
+
+/* The reading hairline. `--m-read` is 0..1 from malta-nav.js. */
+.m-progress {
+  height: 2px;
+  background: linear-gradient(90deg, var(--m-red), var(--m-violet), var(--m-cyan));
+  transform-origin: 0 50%;
+  transform: scaleX(var(--m-read, 0));
+  transition: transform 90ms linear;
+}
+
+/* ==========================================================================
+   CHIPS (mobile section nav) and RAIL (desktop)
+   ==========================================================================
+   Only one of the two is ever displayed, so a keyboard user never tabs
+   through the same eight links twice. */
+.m-chips {
+  position: sticky;
+  top: 61px; /* the top bar's 62px box less its 1px bottom border */
+  z-index: 55;
+  background: color-mix(in srgb, var(--m-base) 84%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--m-line);
+}
+
+.m-chips-scroll {
+  display: flex;
+  gap: 8px;
+  padding: 10px clamp(20px, 5vw, 56px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.m-chips-scroll::-webkit-scrollbar { display: none; }
+
+.m-chip {
+  flex: none;
+  padding: 6px 13px;
+  border: 1px solid var(--m-line);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--m-ink-3);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.m-chip.is-active {
+  color: #ffffff;
+  border-color: transparent;
+  background: var(--m-red-deep);
+}
+
+/* ---- Where the swap happens, and why it is 1600px ----------------------
+   The rail is fixed, so it does not participate in layout and cannot push
+   anything aside — it can only sit in the gutter beside the content, or on
+   top of it. Measured: the rail is 112px wide with its left edge at 40px,
+   so its right edge lands at 152px and it needs a gutter of ~176px to clear
+   the text. `--m-shell` caps at 1240px, so that gutter only exists from
+   1240 + 2 x 176 = 1592px up.
+
+   This was 1100px first, and at 1100–1590px the rail printed straight
+   through the headings and body copy of every section — the gutter there is
+   56–150px against the 152px it needs. A breakpoint has to be derived from
+   the widths involved, not from where a rail feels like it belongs. Below
+   1600px the chip strip does the job, at every width, with no overlap
+   possible. */
+@media (min-width: 1600px) { .m-chips { display: none; } }
+
+.m-rail {
+  display: none;
+  position: fixed;
+  left: clamp(20px, 3vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+}
+
+@media (min-width: 1600px) { .m-rail { display: block; } }
+
+.m-rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+
+.m-rail-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--m-ink-3);
+  text-decoration: none;
+  transition: color 220ms ease;
+}
+
+/* The dash is always laid out at its full 34px and SCALED down to its
+   resting length, rather than being 16px and grown. Two reasons, and the
+   second is the one that matters:
+
+     - `width` is a layout property. Animating it relayouts the flex row on
+       every frame of the transition; a scaleX runs on the compositor.
+     - A growing dash also pushes the label along with it, so every label in
+       the rail jumped 18px sideways as you scrolled past its section. With
+       the box a fixed width the labels hold still and only the rule moves,
+       which is what the indicator was supposed to be saying anyway. */
+.m-rail-link::before {
+  content: '';
+  width: 34px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.47); /* 16/34 — the resting length, to the pixel */
+  transform-origin: 0 50%;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 220ms ease;
+}
+
+.m-rail-link:hover { color: var(--m-ink-2); }
+
+.m-rail-link.is-active { color: var(--m-ink); }
+
+.m-rail-link.is-active::before { transform: scaleX(1); background: var(--m-red); }
+
+@media (prefers-reduced-motion: reduce) {
+  .m-rail-link::before { transition: background-color 220ms ease; }
+}
+
+/* ==========================================================================
+   SECTION FURNITURE
+   ==========================================================================
+   Every section is a perspective root. The children below tilt in that
+   space, which is the difference between a card that rotates and a card that
+   rotates *within a scene* — with one origin they share a vanishing point
+   and read as one room. */
+.m-sec {
+  position: relative;
+  padding-block: var(--m-pad);
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+.m-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-ink-3);
+}
+
+.m-eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--m-red);
+  box-shadow: 0 0 12px 2px rgba(250, 5, 1, 0.65);
+}
+
+.m-h2 {
+  margin: 0 0 18px;
+  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--m-ink);
+}
+
+.m-lede {
+  margin: 0;
+  max-width: 62ch;
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+  line-height: 1.65;
+  color: var(--m-ink-2);
+}
+
+.m-head { margin-bottom: clamp(40px, 6vw, 68px); }
+
+/* ==========================================================================
+   HERO
+   ==========================================================================
+   Layered, and the layers are real: the copy, the device and the floating
+   geometry each sit at their own `--m-d`, so the pointer moves them by
+   different amounts. That difference IS the depth — one layer moving is a
+   slide; three layers moving at different rates is parallax. */
+.m-hero {
+  position: relative;
+  min-height: min(100svh, 900px);
+  display: flex;
+  align-items: center;
+  padding-block: clamp(56px, 9vw, 96px);
+  perspective: 1200px;
+  overflow: hidden;
+}
+
+.m-hero-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: clamp(36px, 6vw, 64px);
+  align-items: center;
+  width: var(--m-shell);
+  margin-inline: auto;
+}
+
+@media (min-width: 940px) {
+  .m-hero-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); }
+}
+
+/* Any element with `--m-d` follows the pointer by that fraction. One rule,
+   applied to whatever the markup marks as a layer. */
+.m-layer {
+  --m-px: calc((var(--mx) - 0.5) * var(--m-d, 1) * 26px);
+  --m-py: calc((var(--my) - 0.5) * var(--m-d, 1) * 20px);
+  transform: translate3d(var(--m-px), var(--m-py), 0);
+  transition: transform 460ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.m-tagrow { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+
+.m-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border: 1px solid var(--m-line-2);
+  border-radius: 999px;
+  background: var(--m-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--m-ink-2);
+}
+
+.m-tag::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--m-red);
+}
+
+.m-h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2.7rem, 7.6vw, 5.2rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+/* The second line lifts off the first on colour alone, at one type size.
+   This was a red-to-white gradient first; it went for two reasons. It is the
+   stock "premium" heading treatment and reads as one, and — the reason it
+   could not stay — a gradient has no single contrast ratio, so part of the
+   headline is always unmeasurable against the ground. A solid accent is one
+   colour, 6.85:1, and says the same thing. */
+.m-h1 em {
+  font-style: normal;
+  color: var(--m-red-soft);
+}
+
+.m-hero-sub {
+  margin: 0 0 30px;
+  max-width: 46ch;
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  line-height: 1.65;
+  color: var(--m-ink-2);
+}
+
+.m-cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.m-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 240ms ease,
+              border-color 200ms ease,
+              background-color 200ms ease;
+}
+
+.m-btn svg { width: 14px; height: 10px; transition: transform 200ms ease; }
+.m-btn:hover svg { transform: translateX(4px); }
+
+.m-btn-primary {
+  background: var(--m-red-deep);
+  color: #ffffff;
+  box-shadow: 0 10px 34px -12px rgba(250, 5, 1, 0.9);
+}
+
+.m-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 44px -12px rgba(250, 5, 1, 1);
+}
+
+.m-btn-ghost {
+  background: var(--m-glass);
+  border-color: var(--m-line-2);
+  color: var(--m-ink);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.m-btn-ghost:hover { transform: translateY(-2px); border-color: var(--m-ink-3); }
+
+/* ---- The stage ----------------------------------------------------------
+   The static composition IS the finished hero. The canvas is absolutely
+   positioned over it and starts at opacity 0; malta-3d.js only reveals it
+   after a context exists and the texture has decoded. If WebGL is missing,
+   the module fails, or the file never loads, what stays on screen is this. */
+.m-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(300px, 46vw, 520px);
+}
+
+.m-stage-glow {
+  position: absolute;
+  inset: 6% 2%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(250, 5, 1, 0.42), transparent 72%);
+  filter: blur(42px);
+  animation: m-pulse 7s ease-in-out infinite alternate;
+}
+
+@keyframes m-pulse {
+  from { opacity: 0.55; transform: scale(0.94); }
+  to   { opacity: 1;    transform: scale(1.06); }
+}
+
+.m-stage-img {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 620px);
+  height: auto;
+  filter: drop-shadow(0 42px 64px rgba(0, 0, 0, 0.72));
+  transition: opacity 700ms ease;
+}
+
+.m-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 700ms ease;
+  pointer-events: none;
+}
+
+/* Set by malta-3d.js once, and only once, the scene is actually drawing. */
+.m-stage.is-live .m-canvas { opacity: 1; }
+.m-stage.is-live .m-stage-img { opacity: 0; }
+
+/* Floating geometry — CSS, because three cheap composited boxes do not
+   deserve a renderer. */
+.m-float {
+  position: absolute;
+  border: 1px solid var(--m-line-2);
+  border-radius: 14px;
+  background: var(--m-glass);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: m-bob 9s ease-in-out infinite alternate;
+}
+
+/* Placed in the page margins, never across the text column. The shell caps
+   at 1240px, so on a wide viewport the outer few percent on each side is
+   empty by construction — that is where these live. */
+.m-float-1 { width: 66px; height: 66px; left: 1.5%; bottom: 16%; animation-duration: 8s; }
+.m-float-2 { width: 40px; height: 40px; left: 3%;   top: 18%;    animation-duration: 11s; border-radius: 50%; }
+.m-float-3 { width: 92px; height: 52px; right: 1.5%; bottom: 20%; animation-duration: 13s; }
+
+/* Below the shell's max width there are no spare margins to sit in, so they
+   would be back over the copy. Hidden rather than repositioned. */
+@media (max-width: 1360px) { .m-float { display: none; } }
+
+@keyframes m-bob {
+  from { transform: translate3d(0, -10px, 0) rotate(-4deg); }
+  to   { transform: translate3d(0, 12px, 0) rotate(5deg); }
+}
+
+/* ==========================================================================
+   META STRIP
+   ========================================================================== */
+.m-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  margin: 0;
+  background: var(--m-line);
+  border-block: 1px solid var(--m-line);
+}
+
+.m-meta > div { background: var(--m-base); padding: 26px clamp(18px, 3vw, 30px); }
+
+.m-meta dt {
+  margin: 0 0 7px;
+  font-size: 0.71rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--m-ink-3);
+}
+
+.m-meta dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--m-ink);
+}
+
+/* ==========================================================================
+   TILT CARDS
+   ==========================================================================
+   The tilt resolves the pointer against the card's own centre (`--cx`/`--cy`,
+   written by malta-nav.js only for the card under the pointer). A card that
+   has never been hovered keeps 0.5/0.5 and therefore sits perfectly flat —
+   no reset animation is needed, and none is written.
+
+   `translateZ` on hover rather than `translateY`: inside a perspective root
+   the card genuinely comes toward the reader, so it grows from its own
+   centre instead of sliding up the page. */
+.m-grid {
+  display: grid;
+  gap: clamp(14px, 2vw, 20px);
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+}
+
+/* The needs are five, and five in a 258px auto-fit grid resolves to four
+   across with one stranded on its own row — a layout that reads as a
+   mistake. A wider track gives three columns at the shell's full width, so
+   five lands as 3 + 2 and looks deliberate, which it is. The solution grid
+   has four items and is left on the default, where four across is exactly
+   what it wants. */
+.m-grid-5 { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+
+.m-card {
+  --cx: 0.5;
+  --cy: 0.5;
+  --m-lift: 0px;
+  position: relative;
+  padding: clamp(24px, 3vw, 32px);
+  border: 1px solid var(--m-line);
+  border-radius: 18px;
+  background: var(--m-glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  transform:
+    perspective(900px)
+    rotateX(calc((0.5 - var(--cy)) * 7deg))
+    rotateY(calc((var(--cx) - 0.5) * 9deg))
+    translateZ(var(--m-lift));
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 260ms ease,
+              background-color 260ms ease,
+              box-shadow 320ms ease;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* The specular sweep: a soft light tracking the pointer across the card's
+   own surface. `z-index: -1` under `isolation: isolate` keeps it beneath the
+   text without escaping the stacking context. */
+.m-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    170px circle at calc(var(--cx) * 100%) calc(var(--cy) * 100%),
+    rgba(255, 255, 255, 0.11),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.m-card:hover,
+.m-card:focus-within {
+  --m-lift: 22px;
+  border-color: var(--m-line-2);
+  background: var(--m-glass-2);
+  box-shadow: 0 26px 60px -30px rgba(0, 0, 0, 0.95);
+}
+
+.m-card:hover::before,
+.m-card:focus-within::before { opacity: 1; }
+
+.m-card-n {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--m-red-soft);
+}
+
+.m-card h3 {
+  margin: 0 0 9px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--m-ink);
+}
+
+.m-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.62;
+  color: var(--m-ink-2);
+}
+
+/* ==========================================================================
+   PROBLEM / SOLUTION SPLIT
+   ========================================================================== */
+.m-split {
+  display: grid;
+  gap: clamp(20px, 3vw, 28px);
+}
+
+@media (min-width: 900px) { .m-split { grid-template-columns: 1fr 1fr; } }
+
+.m-panel {
+  position: relative;
+  padding: clamp(28px, 4vw, 44px);
+  border: 1px solid var(--m-line);
+  border-radius: 22px;
+  background: linear-gradient(160deg, var(--m-elev), var(--m-base));
+  overflow: hidden;
+}
+
+.m-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(80% 60% at 100% 0%, var(--m-panel-tint, transparent), transparent 70%);
+}
+
+.m-panel > * { position: relative; z-index: 1; }
+
+/* Only the quoted-problem panel is tinted. The panel beside it is the
+   reading of that quote, and leaving it untinted is what separates the two —
+   a second tint would make them look like a matched pair of features. */
+.m-panel-problem { --m-panel-tint: rgba(250, 5, 1, 0.16); }
+
+.m-panel h3 {
+  margin: 0 0 14px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.m-panel p { margin: 0 0 18px; font-size: 0.98rem; line-height: 1.68; color: var(--m-ink-2); }
+.m-panel p strong { color: var(--m-ink); font-weight: 600; }
+.m-panel p:last-child { margin-bottom: 0; }
+
+/* ==========================================================================
+   PALETTE
+   ========================================================================== */
+.m-swatches {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.m-swatch {
+  border: 1px solid var(--m-line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--m-elev);
+}
+
+.m-swatch-chip { height: 92px; background: var(--m-swatch, #000); }
+
+.m-swatch-meta { padding: 14px 16px 16px; }
+
+.m-swatch-meta b {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.m-swatch-meta code {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.78rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--m-ink-3);
+}
+
+.m-swatch-meta span {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--m-ink-3);
+}
+
+/* ==========================================================================
+   SCREENS
+   ========================================================================== */
+.m-screens {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding-block: clamp(28px, 5vw, 56px);
+}
+
+.m-screens img {
+  width: min(100%, 860px);
+  height: auto;
+  filter: drop-shadow(0 50px 80px rgba(0, 0, 0, 0.8));
+}
+
+.m-figcap {
+  margin: 22px auto 0;
+  max-width: 58ch;
+  text-align: center;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--m-ink-3);
+}
+
+/* ==========================================================================
+   PENDING — the honest placeholder
+   ==========================================================================
+   Used wherever the deck has content that could not be read (Figma's Starter
+   plan cut the export off after slide 01) or a number that would have to be
+   invented. Deliberately conspicuous so it cannot ship by accident. */
+.m-pending {
+  padding: 18px 20px;
+  border: 1px dashed var(--m-line-2);
+  border-radius: 12px;
+  background: rgba(255, 107, 96, 0.05);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--m-ink-3);
+}
+
+.m-pending b { color: var(--m-red-soft); font-weight: 600; }
+
+/* ==========================================================================
+   END CAP
+   ========================================================================== */
+.m-end {
+  text-align: center;
+  padding-block: var(--m-pad);
+  border-top: 1px solid var(--m-line);
+}
+
+.m-end .m-cta-row { justify-content: center; margin-top: 28px; }
+.m-end .m-lede { margin-inline: auto; }
+
+/* ==========================================================================
+   ENTRY IN PERSPECTIVE
+   ==========================================================================
+   Scroll-driven and native where supported. Blocks arrive by rotating up out
+   of the page plane rather than sliding — inside `.m-sec`'s perspective that
+   reads as the section swinging into view.
+
+   `animation-range` does the staggering, not `animation-delay`: a delay in
+   milliseconds is meaningless on a timeline measured in scroll distance.
+
+   THE KEYFRAMES ANIMATE `translate` AND `rotate`, NOT `transform`, AND THAT
+   IS LOAD-BEARING. `.m-rise` and `.m-card` are on the same elements, and a
+   running animation beats a normal declaration in the cascade — an entry
+   that animated `transform` would win it outright and hold every card at the
+   identity matrix for good, killing the tilt. (Measured, not theorised: the
+   first version of this did exactly that, and a hovered card's computed
+   transform came back as `matrix(1, 0, 0, 1, 0, 0)`.)
+
+   `translate` and `rotate` are separate properties that compose with
+   `transform` rather than replacing it, so the entry and the tilt can both
+   own their half. Both are older than `animation-timeline: view()`, so the
+   @supports test below already covers them. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .m-rise {
+      animation: m-rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 8% entry 52%;
+      transform-origin: 50% 100%;
+    }
+
+    /* Later siblings start later in the same range, so a grid falls into
+       sequence as the reader scrolls rather than firing all at once. */
+    .m-rise:nth-child(2) { animation-range: entry 14% entry 58%; }
+    .m-rise:nth-child(3) { animation-range: entry 20% entry 64%; }
+    .m-rise:nth-child(4) { animation-range: entry 26% entry 70%; }
+    .m-rise:nth-child(5) { animation-range: entry 32% entry 76%; }
+  }
+}
+
+@keyframes m-rise-in {
+  from { opacity: 0; translate: 0 34px -70px; rotate: x 9deg; }
+  to   { opacity: 1; translate: none; rotate: none; }
+}
+
+/* Browsers without view() fall back to reveal.js, which already ships and
+   already staggers siblings; `.m-reveal` is registered in its selector list.
+   The two classes are never on the same element — see the markup. */
+
+/* ==========================================================================
+   FOCUS — one visible ring, tuned for the dark ground
+   ========================================================================== */
+.m-doc :focus-visible {
+  outline: 2px solid var(--m-red-soft);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   REDUCED MOTION / TRANSPARENCY / CONTRAST
+   ==========================================================================
+   Reduced motion removes the *movement*, not the composition: the pointer
+   offsets resolve to zero, the drifts stop, and every card sits flat. */
+@media (prefers-reduced-motion: reduce) {
+  .m-ground,
+  .m-stage-glow,
+  .m-float { animation: none; }
+
+  .m-layer { transform: none; transition: none; }
+
+  .m-card {
+    transform: none;
+    transition: border-color 200ms ease, background-color 200ms ease;
+  }
+
+  .m-card:hover, .m-card:focus-within { --m-lift: 0px; }
+
+  .m-btn:hover { transform: none; }
+  .m-btn:hover svg { transform: none; }
+  .m-progress { transition: none; }
+}
+
+/* Backdrop blur is the most expensive thing on this page and the one users
+   most often ask to be rid of. Swap glass for a solid fill. */
+@media (prefers-reduced-transparency: reduce) {
+  .m-top,
+  .m-chips,
+  .m-tag,
+  .m-card,
+  .m-btn-ghost,
+  .m-float {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: var(--m-elev-2);
+  }
+}
+
+/* At `more`, glass goes, hairlines become real lines, and the two lower ink
+   steps collapse toward the top one. */
+@media (prefers-contrast: more) {
+  .m-doc {
+    --m-ink-2: #e4e8ef;
+    --m-ink-3: #c3cad6;
+    --m-line: rgba(244, 246, 250, 0.34);
+    --m-line-2: rgba(244, 246, 250, 0.52);
+    --m-glass: #14141c;
+    --m-glass-2: #1b1b25;
+  }
+
+  .m-ground,
+  .m-grain { display: none; }
+
+  .m-card,
+  .m-top,
+  .m-chips,
+  .m-tag,
+  .m-btn-ghost {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
