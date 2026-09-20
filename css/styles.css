@@ -3332,11 +3332,12 @@ a.work-image .work-image-arrow:hover svg {
   overflow: hidden;
   display: inline-flex;
   align-items: center;
-  /* Smaller than the component's 1.25rem/2.5rem, which is sized for a
-     standalone button on a black page. This one follows a paragraph, so it
-     sits at the scale of the rest of the site's buttons. */
-  padding: 11px 22px;
-  font-size: 0.92rem;
+  /* Between the component's 1.25rem/2.5rem — sized for a standalone button
+     on a black page — and the site's ordinary button scale. This one follows
+     a paragraph, so it should not shout, but it is the hero's only call to
+     action, so it should not read as a secondary control either. */
+  padding: 13px 26px;
+  font-size: 0.98rem;
   line-height: 1.2;
   font-weight: 600;
   letter-spacing: -0.01em;
