@@ -30,7 +30,6 @@ var PORTFOLIO_DATA = {
   nav: {
     left: [
       { label: 'Home', href: '#home' },
-      { label: 'About', href: '#about' },
       { label: 'Work', href: '#works' }
     ],
     right: [
@@ -53,46 +52,6 @@ var PORTFOLIO_DATA = {
     photoAlt: 'Rakhi Das, UI/UX Designer',
     /* The splash uses its own square, closer crop; falls back to `photo`. */
     introPhoto: 'public/hero/rakhi-portrait-cutout.png'
-  },
-
-  /* A short introduction between the hero and the work, and where the nav's
-     "About" link lands. The first paragraph is set larger than the rest — it
-     is the one line a visitor who reads nothing else should still come away
-     with. Every word fades in as the section scrolls up. */
-  about: {
-    eyebrow: 'About Me',
-    /* `{...}` marks an accented run. Plain text rather than HTML so the copy
-       stays editable here without markup in it — fadeParagraph in script.js
-       turns each word into its own span either way, which is what the
-       scroll-driven word fade needs. */
-    lead: 'I turn complex workflows into calm, clear products that scale with {intention}.',
-    /* Renders under the lead in smaller, lighter type. */
-    paragraphs: [
-      '4 years designing research-led experiences — sweating the quiet details, from empty states to {design systems}, that make a product feel effortless.'
-    ],
-    /* Capability pills under the copy. Order is deliberate: tools first, then
-       research, then the craft — it reads as a working sequence rather than
-       an alphabetised dump. */
-    /* Grouped rather than a flat list: eight equal pills said "here are eight
-       words"; three named groups say what kind of designer this is. The group
-       name is the claim, the items under it are the evidence.
-
-       `skills` (the old flat array) is gone — script.js renders from
-       skillGroups now, and a leftover array would silently diverge. */
-    skillGroups: [
-      {
-        label: 'Research',
-        items: ['User research', 'Usability testing', 'Personas', 'Accessibility']
-      },
-      {
-        label: 'Craft',
-        items: ['Figma', 'Wireframing', 'Prototyping', 'HTML/CSS']
-      },
-      {
-        label: 'Systems',
-        items: ['Design systems', 'Product strategy']
-      }
-    ]
   },
 
   works: {
