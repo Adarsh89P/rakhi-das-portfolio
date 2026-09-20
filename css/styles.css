@@ -3155,3 +3155,61 @@ a.work-image .work-image-arrow:hover svg {
     --media-scale: 1.08;
   }
 }
+
+/* ==========================================================================
+   Inverted cursor
+   ==========================================================================
+   A white disc in `mix-blend-mode: difference`, so it inverts whatever is
+   underneath it: black over the pale page, white over the black footer, and
+   text reading in reverse as it passes across a line. Driven by js/cursor.js.
+
+   THE BLEND ONLY WORKS FROM HERE.
+   `mix-blend-mode` composites against the backdrop *within its own stacking
+   context*, so this element has to be a direct child of <body>, and neither
+   <html> nor <body> may carry `isolation: isolate`, a `filter`, an `opacity`
+   below 1 or a `transform` — any one of those would isolate the root group
+   and leave the disc blending against nothing but the page background.
+   Checked before this was written; if the disc ever goes flat white, that is
+   the first thing to look at.
+
+   THE SYSTEM CURSOR IS HIDDEN HERE AND NOWHERE ELSE.
+   `cursor: none` hangs off `html.has-cursor`, which js/cursor.js adds only
+   once the disc is on screen. No JavaScript, a coarse pointer, a blocked
+   script — every one of them leaves this rule unmatched and the real pointer
+   in place. The `*` matters: links and buttons set `cursor: pointer`
+   themselves, so hiding it on <body> alone brings the arrow back over
+   exactly the things the disc is usually sitting on.
+   ========================================================================== */
+.has-cursor,
+.has-cursor * { cursor: none !important; }
+
+.cursor {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  /* One number, in one place: js/cursor.js reads the rendered width back to
+     work out the offset that keeps the disc centred on the pointer. */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #fff;
+  mix-blend-mode: difference;
+  z-index: 9999;
+  /* It is drawn over everything and must never be what a click lands on —
+     without this it would hit-test itself and nothing could be hovered. */
+  pointer-events: none;
+  opacity: 0;
+  /* Only `.is-live` reveals it, so it cannot sit at 0,0 before the first
+     pointermove has said where the pointer actually is. */
+  transition: opacity 300ms ease;
+  will-change: transform;
+}
+
+.cursor.is-live { opacity: 1; }
+
+/* Reduced motion keeps the disc and loses the lag: js/cursor.js drops the
+   easing to 1 so it tracks exactly, and the fade goes too. A visitor who
+   asked for less movement still needs to see where they are pointing. */
+@media (prefers-reduced-motion: reduce) {
+  .cursor { transition: none; }
+}

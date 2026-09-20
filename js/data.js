@@ -18,15 +18,15 @@ var PORTFOLIO_DATA = {
     email: 'dasrakhi303@gmail.com'
   },
 
-  /* Nav links either side of the centered logo, left-to-right. Two a side, so
-     the groups stay balanced around the wordmark.
+  /* Nav links either side of the centered logo, left-to-right. Kept to three
+     a side so the two groups balance around the wordmark.
 
-     What is deliberately NOT here: Behance, which is reachable from the footer
-     icons and from 'View more projects' at the end of the work list — an
-     outbound link is the one thing a site nav should not spend a slot on — and
-     Contact, which pointed at the footer the page already ends on. The footer
-     carries the email, the CV and the social links, so a nav slot was sending
-     people somewhere they arrive at anyway. */
+     The page has six destinations and the nav used to name two of them, so
+     Work, Experience and Contact were the sections a visitor had to find by
+     scrolling. Behance came out to make room: it is still reachable from the
+     footer icons and from 'View more projects' at the end of the work list,
+     and an outbound link is the one thing a site nav should not spend a slot
+     on. Contact points at the footer, which is where the email and CV live. */
   nav: {
     left: [
       { label: 'Home', href: '#home' },
@@ -34,6 +34,7 @@ var PORTFOLIO_DATA = {
     ],
     right: [
       { label: 'Experience', href: '#experience' },
+      { label: 'Contact', href: '#footer' },
       { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume.pdf' }
     ]
   },
