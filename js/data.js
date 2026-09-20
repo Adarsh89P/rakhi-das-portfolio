@@ -18,15 +18,16 @@ var PORTFOLIO_DATA = {
     email: 'dasrakhi303@gmail.com'
   },
 
-  /* Nav links either side of the centered logo, left-to-right. Kept to three
-     a side so the two groups balance around the wordmark.
+  /* Nav links either side of the centered logo, left-to-right. Two a side, so
+     the groups stay balanced around the wordmark.
 
-     The page has six destinations and the nav used to name two of them, so
-     Work, Experience and Contact were the sections a visitor had to find by
-     scrolling. Behance came out to make room: it is still reachable from the
-     footer icons and from 'View more projects' at the end of the work list,
-     and an outbound link is the one thing a site nav should not spend a slot
-     on. Contact points at the footer, which is where the email and CV live. */
+     What is deliberately NOT here: Behance, which is reachable from the footer
+     icons and from 'View more projects' at the end of the work list — an
+     outbound link is the one thing a site nav should not spend a slot on — and
+     Contact, which pointed at the footer the page already ends on. The footer
+     carries the email, the CV and the social links, so that slot was sending
+     people somewhere they arrive at anyway. The hero's "Say hi" button is
+     where contact is actually offered now. */
   nav: {
     left: [
       { label: 'Home', href: '#home' },
@@ -34,7 +35,6 @@ var PORTFOLIO_DATA = {
     ],
     right: [
       { label: 'Experience', href: '#experience' },
-      { label: 'Contact', href: '#footer' },
       { label: 'Resume', href: 'public/works/Rakhi_Das_UIUX_Designer_Resume.pdf' }
     ]
   },
@@ -48,6 +48,45 @@ var PORTFOLIO_DATA = {
     headlinePre: 'I design products that feels ',
     headlineHighlight: 'simple',
     headlinePost: ', even when they are not.',
+
+    /* The hero's one call to action. The greeting inside it cycles through
+       languages; everything else about the button holds still, including its
+       width — see renderSayHi in script.js, which measures the widest word
+       here and reserves that much room before anything is painted. A call to
+       action that resizes while the pointer is travelling toward it is a
+       target that moves. */
+    cta: {
+      href: 'mailto:dasrakhi303@gmail.com',
+      verb: 'Say',
+      wave: '👋',
+      /* The accessible name. The cycling word is hidden from assistive tech —
+         a label that rewrites itself every couple of seconds would be
+         announced every couple of seconds — so this is what a screen reader
+         reads, once. */
+      label: 'Say hi — email Rakhi Das',
+
+      /* `lang` is not decoration: it picks the right font and shaping for the
+         script and tells a screen reader how to pronounce it. `dir` is
+         carried where the script runs right to left. Short words only — the
+         button reserves the width of the longest, so a long greeting would
+         leave "hi" swimming in empty space. */
+      greetings: [
+        { word: 'hi', lang: 'en' },
+        { word: 'hola', lang: 'es' },
+        { word: 'नमस्ते', lang: 'hi' },
+        { word: 'হ্যালো', lang: 'bn' },
+        { word: 'bonjour', lang: 'fr' },
+        { word: 'ciao', lang: 'it' },
+        { word: 'hallo', lang: 'de' },
+        { word: 'olá', lang: 'pt' },
+        { word: 'привет', lang: 'ru' },
+        { word: 'こんにちは', lang: 'ja' },
+        { word: '안녕하세요', lang: 'ko' },
+        { word: '你好', lang: 'zh' },
+        { word: 'مرحبا', lang: 'ar', dir: 'rtl' }
+      ]
+    },
+
     photo: 'public/hero/rakhi-portrait-cutout.png',
     photoAlt: 'Rakhi Das, UI/UX Designer',
     /* The splash uses its own square, closer crop; falls back to `photo`. */

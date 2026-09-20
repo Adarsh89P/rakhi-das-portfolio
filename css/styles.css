@@ -3213,3 +3213,344 @@ a.work-image .work-image-arrow:hover svg {
 @media (prefers-reduced-motion: reduce) {
   .cursor { transition: none; }
 }
+
+/* ==========================================================================
+   Shiny button — the hero's "Say hi" CTA
+   ==========================================================================
+   A port of the `shiny-button` React component. The effect is unchanged: a
+   conic-gradient arc travelling around the border, a speckle field masked to
+   that arc, a rotating sheen, and a warm inner glow that lifts on hover.
+
+   WHY IT IS NOT THE REACT COMPONENT
+   That component is React + Tailwind + TypeScript on a shadcn layout, and it
+   builds its CSS as a template string injected through a <style> tag, every
+   custom property suffixed with a `useId()` so two instances on a page cannot
+   collide. This site is static HTML with plain <script> tags and no build
+   step. There is one of these buttons, in one place, so the id-suffix
+   machinery has nothing to solve here — the properties are plain names in a
+   normal stylesheet, which is also how they stay inspectable in devtools.
+
+   THE @property BLOCK IS WHAT MAKES THE ARC MOVE.
+   A custom property is an unparsed string to the animation engine unless it
+   has been registered with a syntax, so `--gradient-angle` would jump from
+   0deg to 360deg in a single step rather than sweeping. Registering it as an
+   <angle> is what lets it interpolate.
+
+   Note the duplicate declarations inside `.shiny-btn` itself. The React
+   version leans on @property's `initial-value` alone, which means that in a
+   browser without @property support those properties resolve to nothing, the
+   conic-gradient becomes invalid, and the whole `background` shorthand is
+   dropped — the button loses its fill and the white label goes with it, onto
+   a white page. Declaring them locally as well keeps the gradient valid
+   everywhere; the @property block then only adds the ability to animate it.
+   ========================================================================== */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-percent {
+  syntax: "<percentage>";
+  initial-value: 5%;
+  inherits: false;
+}
+
+@property --gradient-shine {
+  syntax: "<color>";
+  initial-value: #ffffff;
+  inherits: false;
+}
+
+/* The fill, the label and the inset hairline are registered too, because the
+   button inverts on hover — white pill with dark type at rest, the dark
+   shiny treatment under the pointer — and an unregistered custom property
+   cannot be interpolated, so the swap would be a hard cut. */
+@property --gleam-base {
+  syntax: "<color>";
+  initial-value: #ffffff;
+  inherits: false;
+}
+
+@property --gleam-label {
+  syntax: "<color>";
+  initial-value: #000000;
+  inherits: false;
+}
+
+@property --gleam-inset {
+  syntax: "<color>";
+  initial-value: #e4e1db;
+  inherits: false;
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: min(36px, 2.4vw);
+}
+
+.shiny-btn {
+  /* Fallbacks for a browser with no @property: without these the gradient
+     below is invalid and the fill goes with it. */
+  --gradient-angle: 0deg;
+  --gradient-angle-offset: 0deg;
+  --gradient-percent: 5%;
+  --gradient-shine: #ffffff;
+
+  /* At rest this is a plain white pill with black type. The component's
+     black-and-orange treatment is the HOVER state: the fill inverts, the
+     speckle and sheen fade up, and the arc widens. Two reasons it is this way
+     round and not the component's — a permanently glowing black button under
+     a paragraph of grey body copy shouts over the copy it is meant to follow,
+     and the page it sits on is white, so the shine has somewhere to arrive
+     from. */
+  --gleam-base: #ffffff;
+  --gleam-label: var(--ink);
+  --gleam-inset: #e4e1db;
+  --gleam-accent: #ff5f00;
+  --gleam-accent-soft: #ff9253;
+  --duration: 3s;
+  --shadow-size: 2px;
+  --transition: 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  /* The fill and the label cross far quicker than the arc does. Both are
+     mid-grey halfway through the swap, so a slow inversion would leave grey
+     type on a grey pill for a noticeable beat; at 240ms that window is the
+     same as any ordinary button's hover and passes unnoticed. The arc, glow
+     and sheen keep the component's own 0.8s. */
+  --swap: 240ms cubic-bezier(0.25, 1, 0.5, 1);
+
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  /* Smaller than the component's 1.25rem/2.5rem, which is sized for a
+     standalone button on a black page. This one follows a paragraph, so it
+     sits at the scale of the rest of the site's buttons. */
+  padding: 11px 22px;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--gleam-label);
+  background:
+    linear-gradient(var(--gleam-base), var(--gleam-base)) padding-box,
+    conic-gradient(
+      from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+      transparent,
+      var(--gleam-accent) var(--gradient-percent),
+      var(--gradient-shine) calc(var(--gradient-percent) * 2),
+      var(--gleam-accent) calc(var(--gradient-percent) * 3),
+      transparent calc(var(--gradient-percent) * 4)
+    ) border-box;
+  box-shadow: inset 0 0 0 1px var(--gleam-inset);
+  transition:
+    --gradient-angle-offset var(--transition),
+    --gradient-percent var(--transition),
+    --gradient-shine var(--transition),
+    --gleam-base var(--swap),
+    --gleam-label var(--swap),
+    --gleam-inset var(--swap);
+}
+
+.shiny-btn::before,
+.shiny-btn::after,
+.shiny-btn .shiny-btn-label::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  z-index: -1;
+}
+
+.shiny-btn:active { translate: 0 1px; }
+
+/* The speckle field, masked to the travelling arc. */
+.shiny-btn::before {
+  --size: calc(100% - var(--shadow-size) * 3);
+  --position: 2px;
+  --space: calc(var(--position) * 2);
+  width: var(--size);
+  height: var(--size);
+  background: radial-gradient(
+    circle at var(--position) var(--position),
+    #ffffff calc(var(--position) / 4),
+    transparent 0
+  ) padding-box;
+  background-size: var(--space) var(--space);
+  background-repeat: space;
+  -webkit-mask-image: conic-gradient(from calc(var(--gradient-angle) + 45deg), #000, transparent 10% 90%, #000);
+  mask-image: conic-gradient(from calc(var(--gradient-angle) + 45deg), #000, transparent 10% 90%, #000);
+  border-radius: inherit;
+  /* Hidden at rest: a speckle field on a white pill reads as dust. */
+  opacity: 0;
+  transition: opacity var(--swap);
+}
+
+/* The rotating sheen. */
+.shiny-btn::after {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(-50deg, transparent, var(--gleam-accent), transparent);
+  -webkit-mask-image: radial-gradient(circle at bottom, transparent 40%, #000);
+  mask-image: radial-gradient(circle at bottom, transparent 40%, #000);
+  /* Same: the orange sheen belongs to the dark state. */
+  opacity: 0;
+  transition: opacity var(--swap);
+}
+
+.shiny-btn .shiny-btn-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The warm inner glow, breathing, revealed on hover.
+   The component's `inset 0 -1ex 2rem 4px` is sized for its own 1.25rem/2.5rem
+   button on a black page. On this one — 214x56 — that blur radius and
+   positive spread flood the whole pill with #ff5f00, and white on that
+   measures about 3.2:1: the label fails AA at the exact moment the pointer
+   is on it. Pulled back to a smaller blur and a negative spread so it reads
+   as warmth rising from the bottom edge and the label stays on near-black.
+   Measured from painted pixels afterwards, not adjusted by eye. */
+.shiny-btn .shiny-btn-label::before {
+  --size: calc(100% + 1rem);
+  width: var(--size);
+  height: var(--size);
+  box-shadow: inset 0 -0.7ex 1rem -6px var(--gleam-accent);
+  opacity: 0;
+  transition: opacity var(--transition);
+  animation: calc(var(--duration) * 1.5) shiny-btn-breathe linear infinite;
+}
+
+/* Two copies of the sweep composited together — the second runs in reverse
+   at a different rate and stays paused until hover, which is what makes the
+   arc visibly change character under the pointer rather than merely speed up. */
+.shiny-btn,
+.shiny-btn::before,
+.shiny-btn::after {
+  animation:
+    shiny-btn-angle var(--duration) linear infinite,
+    shiny-btn-angle calc(var(--duration) / 0.4) linear infinite reverse paused;
+  animation-composition: add;
+}
+
+/* The whole inversion, in one rule: the pill goes black, the type goes white,
+   the hairline darkens to the component's own inset, and the arc opens up. */
+.shiny-btn:is(:hover, :focus-visible) {
+  --gleam-base: var(--ink);
+  --gleam-label: var(--on-ink);
+  --gleam-inset: #1a1818;
+  --gradient-percent: 20%;
+  --gradient-angle-offset: 95deg;
+  --gradient-shine: var(--gleam-accent-soft);
+}
+
+.shiny-btn:is(:hover, :focus-visible)::before { opacity: 0.4; }
+.shiny-btn:is(:hover, :focus-visible)::after { opacity: 0.6; }
+
+.shiny-btn:is(:hover, :focus-visible),
+.shiny-btn:is(:hover, :focus-visible)::before,
+.shiny-btn:is(:hover, :focus-visible)::after {
+  animation-play-state: running;
+}
+
+.shiny-btn:is(:hover, :focus-visible) .shiny-btn-label::before { opacity: 1; }
+
+@keyframes shiny-btn-angle { to { --gradient-angle: 360deg; } }
+@keyframes shiny-btn-breathe { from, to { scale: 1; } 50% { scale: 1.2; } }
+
+/* ---- The cycling greeting ----------------------------------------------
+   The slot is the fixed-width window the words travel through. Its width is
+   written by script.js as `--say-hi-w`, measured from the widest greeting in
+   the rendered font, so the button is sized once and never resizes.
+
+   `min-inline-size` rather than a fixed width: if the measurement is ever
+   missing, the slot still fits its content instead of collapsing the word
+   to nothing. */
+.say-hi-slot {
+  position: relative;
+  display: inline-block;
+  min-inline-size: var(--say-hi-w, 0px);
+  /* Tall enough for the tallest script in the list — Devanagari matras and
+     CJK both sit outside a Latin line box — and it must not clip, because
+     the words travel vertically through it. */
+  block-size: 1.5em;
+  overflow: visible;
+}
+
+.say-hi-word {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  display: block;
+  inline-size: 100%;
+  text-align: center;
+  line-height: 1.5;
+  white-space: nowrap;
+  /* Resting state is the arrival state: a word appended with no class sits
+     below the slot, and `.is-in` brings it up. */
+  opacity: 0;
+  transform: translateY(0.55em);
+  transition: opacity 320ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.say-hi-word.is-in { opacity: 1; transform: translateY(0); }
+
+/* The outgoing word leaves faster than the incoming one arrives. At matching
+   durations the two overlap at half opacity through the middle of the swap
+   and the button reads as a smudge rather than as a word. */
+.say-hi-word.is-out {
+  opacity: 0;
+  transform: translateY(-0.55em);
+  transition: opacity 150ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The measuring pass: laid out for its width, never seen. `visibility`
+   rather than `display: none`, because a box with no display has no width
+   to measure. */
+.say-hi-word.is-probe {
+  position: absolute;
+  visibility: hidden;
+  inline-size: auto;
+  transition: none;
+}
+
+.say-hi-wave { font-size: 1.05em; }
+
+/* Reduced motion. script.js already stops the cycle at the first greeting;
+   this stops the arc, the sheen and the glow. */
+@media (prefers-reduced-motion: reduce) {
+  .shiny-btn,
+  .shiny-btn::before,
+  .shiny-btn::after,
+  .shiny-btn .shiny-btn-label::before {
+    animation: none !important;
+  }
+
+  .shiny-btn:is(:hover, :focus-visible),
+  .shiny-btn:is(:hover, :focus-visible)::before,
+  .shiny-btn:is(:hover, :focus-visible)::after {
+    animation-play-state: paused !important;
+  }
+
+  .shiny-btn:is(:hover, :focus-visible) .shiny-btn-label::before { opacity: 0; }
+
+  .shiny-btn { transition: none; }
+  .say-hi-word { transition: none; }
+}

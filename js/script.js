@@ -223,12 +223,151 @@
     headline.appendChild(el('span', 'gradient-text', data.hero.headlineHighlight));
     headline.appendChild(document.createTextNode(data.hero.headlinePost));
 
+    renderSayHi(data.hero.cta);
+
     var photo = document.getElementById('heroPhoto');
     photo.src = data.hero.photo;
     photo.alt = data.hero.photoAlt;
 
     var introPhoto = document.getElementById('introPortraitImg');
     introPhoto.src = data.hero.introPhoto || data.hero.photo;
+  }
+
+  /* -----------------------------------------------------------
+     Say hi — one CTA whose greeting cycles through languages
+     -----------------------------------------------------------
+     Only the word changes. "Say" and the wave hold still, so the button
+     reads as one phrase being re-spoken rather than three things animating.
+
+     An <a>, not a <button>: it navigates (mailto), and a <button> that
+     navigates is a link wearing a costume. The shiny-button treatment in the
+     stylesheet is written against the class, not the tag, so it applies
+     either way.
+
+     THE BUTTON NEVER CHANGES SIZE. Its word slot is sized to the widest
+     greeting in the list, measured from the rendered font rather than
+     guessed from character counts — which are meaningless across Devanagari,
+     Cyrillic and CJK — and re-measured once the webfont lands. */
+  function renderSayHi(cta) {
+    var host = document.getElementById('heroCta');
+    if (!host || !cta) return;
+
+    var link = el('a', 'shiny-btn say-hi');
+    link.href = cta.href;
+    link.setAttribute('aria-label', cta.label);
+
+    /* The component's outer <span> — the shiny-button CSS hangs its hover
+       glow off this element's ::before, so it has to exist even though the
+       three runs below could have been children of the link directly. */
+    var inner = el('span', 'shiny-btn-label');
+    inner.setAttribute('aria-hidden', 'true');
+
+    var verb = el('span', 'say-hi-verb', cta.verb);
+    var slot = el('span', 'say-hi-slot');
+    var wave = el('span', 'say-hi-wave', cta.wave);
+
+    inner.appendChild(verb);
+    inner.appendChild(slot);
+    inner.appendChild(wave);
+    link.appendChild(inner);
+    host.appendChild(link);
+
+    var greetings = cta.greetings || [];
+    if (!greetings.length) return;
+
+    function wordSpan(greeting) {
+      var span = el('span', 'say-hi-word', greeting.word);
+      span.lang = greeting.lang;
+      if (greeting.dir) span.dir = greeting.dir;
+      return span;
+    }
+
+    /* Reserve the width: every greeting is laid into the slot in turn, the
+       widest wins, and that becomes the slot's minimum. One pass, before
+       anything is painted, so there is no flash of a resizing button. */
+    function measure() {
+      var widest = 0;
+      greetings.forEach(function (greeting) {
+        var probe = wordSpan(greeting);
+        probe.classList.add('is-probe');
+        slot.appendChild(probe);
+        widest = Math.max(widest, probe.getBoundingClientRect().width);
+        slot.removeChild(probe);
+      });
+      slot.style.setProperty('--say-hi-w', Math.ceil(widest) + 'px');
+    }
+
+    measure();
+
+    /* And again once the webfont has actually arrived. The first pass runs
+       during render, usually before Bricolage has loaded, so every width is
+       measured in the fallback face — and a slot sized for the fallback is
+       too narrow for the real one, which pushes the longest greetings out
+       past the padding and into the wave. */
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure).catch(function () {});
+    }
+
+    var index = 0;
+    var current = wordSpan(greetings[0]);
+    current.classList.add('is-in');
+    slot.appendChild(current);
+
+    /* Cycling text is motion. Asked to reduce it, the button keeps the first
+       greeting and never changes — it still works, it just holds still. */
+    if (motion.reduced) return;
+
+    var timer = 0;
+
+    function advance() {
+      index = (index + 1) % greetings.length;
+
+      var next = wordSpan(greetings[index]);
+      slot.appendChild(next);
+
+      /* The incoming word rises from below as the outgoing one leaves
+         upward, so the two read as one word being replaced rather than two
+         crossing. Forcing a reflow between append and class-add is what makes
+         the transition run at all: without it the browser coalesces the
+         initial and final styles into one frame and the word just pops. */
+      void next.offsetWidth;
+      next.classList.add('is-in');
+      current.classList.add('is-out');
+
+      var leaving = current;
+      current = next;
+      window.setTimeout(function () {
+        if (leaving.parentNode === slot) slot.removeChild(leaving);
+      }, 600);
+    }
+
+    function start() {
+      if (timer) return;
+      timer = window.setInterval(advance, 2200);
+    }
+
+    function stop() {
+      window.clearInterval(timer);
+      timer = 0;
+    }
+
+    /* Nothing cycles while it cannot be seen: a timer still firing in a
+       background tab, or under several thousand pixels of scrolled-past page,
+       is work nobody asked for. */
+    var onScreen = true;
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else if (onScreen) start();
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        onScreen = entries[0].isIntersecting;
+        if (onScreen && !document.hidden) start(); else stop();
+      }, { threshold: 0 }).observe(link);
+    } else {
+      start();
+    }
   }
 
   /* -----------------------------------------------------------
