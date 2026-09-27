@@ -3210,10 +3210,29 @@ a.work-image .work-image-arrow:hover svg {
 /* Over the shiny CTA the disc shrinks to a dot. At full size it laid a
    60px circle across a pill of a different shape and hid the button's own
    hover shine; the dot still says where the pointer is and leaves the
-   shine to fill the button. `scale` rather than `transform`, which
-   js/cursor.js owns for position. */
-.cursor { transition: opacity 300ms ease, scale 250ms cubic-bezier(0.25, 1, 0.5, 1); }
-.cursor.is-small { scale: 0.2; }
+   shine to fill the button.
+
+   The shrink lives on an inner layer, never on .cursor itself. .cursor's
+   `transform` carries the on-screen position (js/cursor.js), and a `scale`
+   on the same element is applied on top of that transform, so it scaled
+   the position too and threw the dot toward the top-left of the page.
+   The blend mode stays on .cursor, which blends its whole subtree. */
+.cursor { background-color: transparent; }
+
+.cursor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: #fff;
+  transition: scale 250ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.cursor.is-small::before { scale: 0.2; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor::before { transition: none; }
+}
 
 /* Reduced motion keeps the disc and loses the lag: js/cursor.js drops the
    easing to 1 so it tracks exactly, and the fade goes too. A visitor who
