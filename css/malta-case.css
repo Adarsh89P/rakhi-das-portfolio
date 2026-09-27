@@ -210,7 +210,12 @@ body.m-doc { background-color: var(--m-base); }
 .m-chips-scroll {
   display: flex;
   gap: 8px;
-  padding: 10px clamp(20px, 5vw, 56px);
+  /* Inline padding is the shell's own gutter, so the first chip lines up with
+     the logo above and the content below at every width. A fixed 56px only
+     matched them at narrow widths; past ~1350px the shell caps at 1240px and
+     the row drifted left of everything else. */
+  padding-block: 10px;
+  padding-inline: calc((100% - var(--m-shell)) / 2);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -228,6 +233,8 @@ body.m-doc { background-color: var(--m-base); }
   white-space: nowrap;
   transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
 }
+
+.m-chip:hover { color: var(--m-ink); border-color: var(--m-line-2); }
 
 .m-chip.is-active {
   color: #ffffff;
@@ -480,10 +487,24 @@ body.m-doc { background-color: var(--m-base); }
   box-shadow: 0 10px 34px -12px rgba(250, 5, 1, 0.9);
 }
 
+.m-btn:focus-visible {
+  outline: 2px solid var(--m-red-soft);
+  outline-offset: 3px;
+}
+
+/* The fill deepens rather than brightens: white on anything lighter than
+   --m-red-deep drops under 4.5:1. #b80400 is 6.9:1 with white. The inset
+   hairline gives the pill a lit top edge so the change reads as depth. */
 .m-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 44px -12px rgba(250, 5, 1, 1);
+  background: #b80400;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 18px 48px -12px rgba(250, 5, 1, 1);
 }
+
+.m-btn-primary:active,
+.m-btn-ghost:active { transform: translateY(0); }
 
 .m-btn-ghost {
   background: var(--m-glass);
@@ -493,7 +514,21 @@ body.m-doc { background-color: var(--m-base); }
   -webkit-backdrop-filter: blur(10px);
 }
 
-.m-btn-ghost:hover { transform: translateY(-2px); border-color: var(--m-ink-3); }
+.m-btn-ghost:hover {
+  transform: translateY(-2px);
+  background: var(--m-glass-2);
+  border-color: var(--m-ink-3);
+}
+
+/* On a phone the two pills wrap onto separate lines at whatever width their
+   labels happen to be, which reads as a mistake. Below 520px they become an
+   equal, full-width stack. */
+@media (max-width: 520px) {
+  .m-cta-row .m-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
 
 /* ---- The stage ----------------------------------------------------------
    The static composition IS the finished hero. The canvas is absolutely

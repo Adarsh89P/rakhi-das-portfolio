@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Suraksha case study — editorial product-design layout
+   Healthcare case study — editorial product-design layout
    ==========================================================================
    Loaded *after* styles.css, which supplies the font, the ink tokens, the
    button component and the whole footer. Only what this page adds lives here.
@@ -302,7 +302,12 @@
   font-size: 1rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.72);
-  flex-shrink: 0;
+  /* The project name is long enough to meet the section links just above
+     the 1080px breakpoint; let it give way with an ellipsis, not overlap. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cs-nav-links {

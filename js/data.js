@@ -42,10 +42,10 @@ var PORTFOLIO_DATA = {
   hero: {
     /* Top line: an icon glyph + two differently-coloured words. */
     badgeIcon: '✦',
-    badgeWord: 'Product',
+    badgeWord: 'UI/UX',
     badgeWordMuted: 'Designer',
     /* Bottom line: a sentence with one gradient-highlighted word. */
-    headlinePre: 'I design products that feels ',
+    headlinePre: 'I design products that feel ',
     headlineHighlight: 'simple',
     headlinePost: ', even when they are not.',
 
@@ -133,7 +133,7 @@ var PORTFOLIO_DATA = {
            the case study behind this card is a healthcare diagnostic
            ecosystem — and hid the one fact that makes it worth opening: it is
            five products, not a dashboard. */
-        heading: 'Suraksha — Diagnostic Ecosystem',
+        heading: 'Healthcare Diagnostic Platform',
         dateRange: 'Mar 2025 – Jul 2025',
         description: 'Five connected products, four user types, one system. Simplified patient, doctor and admin workflows across app, website and dashboard.',
         /* The plate colour behind the layers — the original export's own
@@ -156,15 +156,15 @@ var PORTFOLIO_DATA = {
 
            Shared by the case study banner, which renders the same list. */
         layers: [
-          { name: 'dash',   src: 'public/Surksha/banner/dash.png',      w: 1700, h: 816, depth: 0.35 },
-          { name: 'table',  src: 'public/Surksha/banner/table.png',     w: 448,  h: 436, depth: 0.55, webp: 'public/Surksha/banner/table.webp' },
-          { name: 'card',   src: 'public/Surksha/banner/card.png',      w: 824,  h: 883, depth: 0.7 },
-          { name: 'phones', src: 'public/Surksha/banner/phone.png',     w: 845,  h: 658, depth: 1, float: true, webp: 'public/Surksha/banner/phone.webp' },
+          { name: 'dash',   src: 'public/Healthcare/banner/dash.png',      w: 1700, h: 816, depth: 0.35 },
+          { name: 'table',  src: 'public/Healthcare/banner/table.png',     w: 448,  h: 436, depth: 0.55, webp: 'public/Healthcare/banner/table.webp' },
+          { name: 'card',   src: 'public/Healthcare/banner/card.png',      w: 824,  h: 883, depth: 0.7 },
+          { name: 'phones', src: 'public/Healthcare/banner/phone.png',     w: 845,  h: 658, depth: 1, float: true, webp: 'public/Healthcare/banner/phone.webp' },
           /* Small screens only: the middle device cut out of the strip above,
              the one phone in it with an unoccluded silhouette. */
-          { name: 'app',    src: 'public/Surksha/banner/phone-app.png', w: 319,  h: 658, depth: 1, float: true, webp: 'public/Surksha/banner/phone-app.webp' }
+          { name: 'app',    src: 'public/Healthcare/banner/phone-app.png', w: 319,  h: 658, depth: 1, float: true, webp: 'public/Healthcare/banner/phone-app.webp' }
         ],
-        href: 'case-studies/suraksha_case_study.html'
+        href: 'case-studies/healthcare_case_study.html'
       },
       {
         fullWidth: true,
@@ -184,7 +184,7 @@ var PORTFOLIO_DATA = {
       {
         fullWidth: true,
         heading: 'Influencer Marketing Platform',
-        dateRange: 'Jan 2023 - Sept 2023',
+        dateRange: 'Jan 2023 – Sep 2023',
         description: 'One platform for influencer–brand collaboration covering the full four-stage journey: discovery, communication, payments and campaign tracking.',
         /* The one artwork not authored at the frame's 1314x580: it is
            1032x580, so `cover` had to scale it up 1.27x to fill the width
@@ -198,8 +198,8 @@ var PORTFOLIO_DATA = {
         href: 'https://www.figma.com/deck/7Z5C9KMnP7e2YqW3y3xLEM/Cheeky?node-id=2-1411&t=EG6GvTgBjcCRHNGp-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1'
       },
       {
-        heading: 'Malta Taxi App 🚖 ',
-        dateRange: 'Jan 2024 - July 2024',
+        heading: 'Malta Taxi App 🚖',
+        dateRange: 'Jan 2024 – Jul 2024',
         /* Was "reduced UI inconsistencies, aligned four product teams,
            accelerated delivery through a scalable design system" — a design
            system blurb on a taxi booking app. Nothing in the deck supports
@@ -216,7 +216,7 @@ var PORTFOLIO_DATA = {
       },
       {
         heading: 'Mobile Banking Onboarding',
-        dateRange: 'Nov 2025 - Nov 2025',
+        dateRange: 'Nov 2025',
         /* The counts here are read off the app's own screens: three
            onboarding steps, and four tab-bar destinations (Home, Partners,
            Locate, Converter). Still missing, and still not to be guessed:

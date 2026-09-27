@@ -1,7 +1,7 @@
 /* ==========================================================================
    Layered product hero — shared by the home page tile and the case study
    ==========================================================================
-   Replaces the flattened export (public/Surksha/Frame21.png) with the
+   Replaces the flattened export (public/Healthcare/Frame21.png) with the
    individual product surfaces as separate elements, so each can be positioned
    and animated on its own and the composition can be *rebuilt* for small
    screens rather than shrunk.

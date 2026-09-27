@@ -3207,6 +3207,14 @@ a.work-image .work-image-arrow:hover svg {
 
 .cursor.is-live { opacity: 1; }
 
+/* Over the shiny CTA the disc shrinks to a dot. At full size it laid a
+   60px circle across a pill of a different shape and hid the button's own
+   hover shine; the dot still says where the pointer is and leaves the
+   shine to fill the button. `scale` rather than `transform`, which
+   js/cursor.js owns for position. */
+.cursor { transition: opacity 300ms ease, scale 250ms cubic-bezier(0.25, 1, 0.5, 1); }
+.cursor.is-small { scale: 0.2; }
+
 /* Reduced motion keeps the disc and loses the lag: js/cursor.js drops the
    easing to 1 so it tracks exactly, and the fade goes too. A visitor who
    asked for less movement still needs to see where they are pointing. */
@@ -3413,9 +3421,11 @@ a.work-image .work-image-arrow:hover svg {
   transition: opacity var(--swap);
 }
 
+/* Deliberately not positioned: that makes the button, not the label, the
+   containing block for the glow below, so the glow can fill the whole pill.
+   The type still paints above the z-index:-1 layers, because in-flow content
+   comes after negative-z children inside the button's isolated context. */
 .shiny-btn .shiny-btn-label {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -3428,11 +3438,17 @@ a.work-image .work-image-arrow:hover svg {
    measures about 3.2:1: the label fails AA at the exact moment the pointer
    is on it. Pulled back to a smaller blur and a negative spread so it reads
    as warmth rising from the bottom edge and the label stays on near-black.
-   Measured from painted pixels afterwards, not adjusted by eye. */
+   Measured from painted pixels afterwards, not adjusted by eye.
+
+   It spans the whole button and takes the pill's radius. It used to be sized
+   off the label, which left a hard-cornered rectangle of glow floating inside
+   a rounded button. For the same reason it breathes by swelling its shadow
+   rather than by `scale`: scaling a full-size layer would push the glow out
+   past the clipped edge. */
 .shiny-btn .shiny-btn-label::before {
-  --size: calc(100% + 1rem);
-  width: var(--size);
-  height: var(--size);
+  inset: 0;
+  translate: none;
+  border-radius: var(--radius-pill);
   box-shadow: inset 0 -0.7ex 1rem -6px var(--gleam-accent);
   opacity: 0;
   transition: opacity var(--transition);
@@ -3474,7 +3490,10 @@ a.work-image .work-image-arrow:hover svg {
 .shiny-btn:is(:hover, :focus-visible) .shiny-btn-label::before { opacity: 1; }
 
 @keyframes shiny-btn-angle { to { --gradient-angle: 360deg; } }
-@keyframes shiny-btn-breathe { from, to { scale: 1; } 50% { scale: 1.2; } }
+@keyframes shiny-btn-breathe {
+  from, to { box-shadow: inset 0 -0.7ex 1rem -6px var(--gleam-accent); }
+  50% { box-shadow: inset 0 -1ex 1.3rem -4px var(--gleam-accent); }
+}
 
 /* ---- The cycling greeting ----------------------------------------------
    The slot is the fixed-width window the words travel through. Its width is

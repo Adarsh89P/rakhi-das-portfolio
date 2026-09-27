@@ -7,7 +7,7 @@ Open `index.html` in a browser and it runs.
 index.html    Home. Structure only — all copy comes from js/data.js.
 
 case-studies/
-  suraksha_case_study.html   Suraksha case study. Self-contained content.
+  healthcare_case_study.html   Healthcare case study. Self-contained content.
   yoga_case_study.html       Yoga case study. Self-contained content.
   (both reach css/, js/ and public/ with ../ — old root URLs redirect
    to these, see vercel.json)
@@ -19,13 +19,13 @@ js/
   reveal.js     Scroll-reveal. Shared by every page.
   to-top.js     Back-to-top button. Shared by every page.
   hero.js       Layered product hero: parallax, tilt, entrance.
-  cs-nav.js     Suraksha scrollspy, progress bar, drawer.
+  cs-nav.js     Healthcare case study scrollspy, progress bar, drawer.
   yoga-nav.js   The same, for the yoga case study.
 
 css/
   styles.css      Design tokens + every shared component. Loaded by every page.
   hero.css        The layered product hero.
-  case-study.css  Only what the Suraksha case study adds on top.
+  case-study.css  Only what the Healthcare case study adds on top.
   yoga-case.css   Only what the yoga case study adds on top.
 
 public/       Images, video, resume PDF.
@@ -109,7 +109,7 @@ immediately, so the visible layers pay nothing.
 
 ### The case study
 
-`suraksha_case_study.html` + `case-study.css` + `cs-nav.js` are a self-contained
+`healthcare_case_study.html` + `case-study.css` + `cs-nav.js` are a self-contained
 editorial layout that borrows only the font, ink tokens, `.btn` and the footer
 from `styles.css`.
 
@@ -161,10 +161,10 @@ re-read them at use rather than caching.
 
 ### The case study banner
 
-The Suraksha banner is **four separate layers**, not one image, so each part
+The Healthcare banner is **four separate layers**, not one image, so each part
 can carry its own entrance and parallax rate:
 
-| `public/Surksha/banner/` | part | depth |
+| `public/Healthcare/banner/` | part | depth |
 |---|---|---|
 | `dash.png` | admin dashboard | 0.35 |
 | `table.png` | right-hand table | 0.55 |

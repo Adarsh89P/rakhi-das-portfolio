@@ -129,6 +129,13 @@
     request();
   }, { passive: true });
 
+  /* Over the shiny CTA the disc steps back to a dot (see .cursor.is-small in
+     styles.css), so the button's own hover shine fills the pill. */
+  document.addEventListener('pointerover', function (e) {
+    var over = !!(e.target.closest && e.target.closest('.shiny-btn'));
+    cursor.classList.toggle('is-small', over);
+  }, { passive: true });
+
   /* Out of the window, or away from the tab, and it goes. A disc frozen at
      the edge of the page after the pointer has left is a bug you can see. */
   function hide() { cursor.classList.remove('is-live'); }

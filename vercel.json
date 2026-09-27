@@ -4,8 +4,8 @@
   "outputDirectory": ".",
   "redirects": [
     {
-      "source": "/suraksha_case_study.html",
-      "destination": "/case-studies/suraksha_case_study.html",
+      "source": "/healthcare_case_study.html",
+      "destination": "/case-studies/healthcare_case_study.html",
       "permanent": true
     },
     {
